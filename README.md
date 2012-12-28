@@ -131,7 +131,7 @@ This is a rewriting-based difinition of the `map` function:
 (total (klist 1 2 3)) ==> 6
 ```
 
-  f) A *Haskell*-like syntax for dealing with **monads**:
+  **f)** A *Haskell*-like syntax for dealing with **monads**:
 
 ```Scheme
 (do [x <- '(1 2 3)]
@@ -178,7 +178,7 @@ Define new monads:
     (odd? x)))              ==> #t
 ```
 
-  **f)** A handfull of functional tools:
+  **g)** A handfull of functional tools:
 
 A **generalized function composition**:
 
