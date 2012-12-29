@@ -211,6 +211,8 @@ What do I need to build/compile/interpret Formica programs?
 
 The Formica is a dialect of the [Racket](http://planet.racket-lang.org/) language and could be interpreted by the `racket` program or in the DrRacket IDE. It could be loaded as a package using `(require formica)` or as a language using `#lang formica` header.
 
+To build Formica in the DrRacket environment clone this repository to any working directory using `git` and then link this directory using `raco link` program. Finally run `raco setup` to build documentation and include formica modules in Racket module resolving system.
+
 
 Why package is not complete?
 ----------------------------
