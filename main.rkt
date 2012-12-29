@@ -8,10 +8,14 @@
 (require racket/list
          racket/math
          racket/promise
-         racket/string)
+         racket/string
+         "arity.rkt")
 (provide
  (all-from-out racket/base
                racket/list
                racket/math
                racket/promise
-               racket/string))
+               racket/string)
+ (except-out (all-from-out
+              "arity.rkt")
+             reduce-arity fixed-arity))

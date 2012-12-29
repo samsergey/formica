@@ -23,7 +23,6 @@
          
          Formica is available as both a language level and a module that can be used in other languages.}
 
-
-@include-section["tags.scrbl"]
+@include-section["utils.scrbl"]
 
 @local-table-of-contents[]
