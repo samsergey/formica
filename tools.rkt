@@ -12,10 +12,15 @@
          racket/match
          "tags.rkt"
          "arity.rkt"
-         "functionals.rkt")
+         "functionals.rkt"
+         "curry.rkt")
 
 (provide
- (all-from-out "functionals.rkt")
+ (all-from-out "functionals.rkt"
+               "curry.rkt")
+ (except-out (all-from-out
+              "arity.rkt")
+             reduce-arity fixed-arity)
  ; functional forms
  ==>
  (rename-out [or* or]

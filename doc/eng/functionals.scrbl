@@ -22,7 +22,7 @@ Returns @racket[#t] only if @racket[_x] is a function and @racket[#f] otherwise.
 
 
 @defthing[id Fun]
-Th eidentity function.
+The identity function.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -39,6 +39,7 @@ Creates a trivial function which returns the @racket[_n]-th argument.
 
 Examples:
 @interaction[#:eval formica-eval
+  (arg 1)
   ((arg 1) 'x 'y 'z)
   ((arg 2) 'x 'y 'z)
   ((arg 3) 'x 'y 'z)]
@@ -49,6 +50,7 @@ Creates a trivial function which returns @racket[_x] for any arguments.
 
 Examples:
 @interaction[#:eval formica-eval
+  (const 'A)
   ((const 'A) 1)
   ((const 'A) 1 2)
   ((const +))]
@@ -59,6 +61,7 @@ Returns the negation of a predicate @racket[_p].
 
 Examples:
 @interaction[#:eval formica-eval
+  (negated odd?)
   ((negated odd?) 2)
   ((negated <) 1 2)]
 
@@ -124,6 +127,39 @@ Examples:
   ((any-args real?) '(1 2) 'a "abc" 1-2i)
   ((any-args real?) 'x 2 "abc" 0+8i)]
 
+
+@defproc*[([(curry [f Fun] [arg Any] ...) (or/c curried? Any)]
+            [(curryr [f Fun] [arg Any] ...) (or/c curried? Any)])]
+Return partially applied (curried) function @racket[_f], with fixed arguments @racket[_arg ...].
+
+Examples of partial application:
+@interaction[#:eval formica-eval
+  (curry list 1 2)
+  ((curry list 1 2) 3 4)
+  (map (curry cons 1) '(1 2 3))
+  (curryr list 1 2)
+  ((curryr list 1 2) 3 4)
+  (map (curryr cons 1) '(1 2 3))
+  (curry cons 1 2)
+  (curryr cons 1 2)]
+
+The @racket[curry] function correctly reduces the arity of curried function:
+@interaction[#:eval formica-eval
+  (procedure-arity cons)
+  (procedure-arity (curry cons))
+  (procedure-arity (curry cons 1))
+  (procedure-arity (curryr cons 1))
+  (procedure-arity (curry + 1 2 3))]
+
+@defproc[(curried? [x Any]) boolean?]
+Returns @racket[#t] if @racket[x] is partially applied or curried function, and @racket[#f] otherwise.
+
+Examples:
+@interaction[#:eval formica-eval
+  (curried? (curry cons 1))
+  (curried (curry +))
+  (curried (curryr +))
+  (curried? +)]
 
 @defproc[(fixed-point [f Fun] [#:same-test same? (any/c any/c -> boolean?) equal?]) Fun]
 Returns a function which finds a least fixed point of @racket[_f] by iterative application. 

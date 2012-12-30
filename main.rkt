@@ -9,7 +9,6 @@
          racket/math
          racket/promise
          racket/string
-         "arity.rkt"
          "tools.rkt")
 (provide
  (all-from-out racket/base
@@ -18,6 +17,4 @@
                racket/promise
                racket/string)
  (except-out (all-from-out
-              "arity.rkt"
-              "tools.rkt")
-             reduce-arity fixed-arity))
+              "tools.rkt")))
