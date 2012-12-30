@@ -4,7 +4,8 @@
          racket/math
          racket/promise
          racket/string
-         "../tools.rkt")
+         "../tools.rkt"
+         "formal.rkt")
 (provide 
  (except-out 
   (all-from-out racket/base
@@ -13,7 +14,8 @@
                 racket/math
                 racket/promise
                 racket/string
-                "../tools.rkt")
+                "../tools.rkt"
+                "formal.rkt")
   procedure? lazy delay)
  (rename-out [procedure? function?]
              [lazy delay]))

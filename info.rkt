@@ -4,8 +4,7 @@
 
 (require string-constants)
 (define name "Formica") 
-(define compile-omit-paths '("tests"
-                             "variants"
+(define compile-omit-paths '("variants"
                              "monad/examples" 
                              "rewrite/examples"))
 (define drscheme-language-modules '(("main.rkt" "formica")))

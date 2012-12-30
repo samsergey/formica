@@ -6,3 +6,6 @@
 (require "tools-tests.rkt")
 (require "curry-tests.rkt")
 (require "partial-app-tests.rkt")
+(require "hold-tests.rkt")
+(require "formal-tests.rkt")
+(require "regular-app-formal-tests.rkt")
