@@ -15,7 +15,8 @@
 
 @defmodule[formica/arity]
 
-The @racketmodname[formica/arity] module provides tools to work with function arity.
+The bindings documented in this section are provided by the @racketmodname[formica/arity], 
+@racketmodname[formica/tools] and @racketmodname[formica] modules.
 
 
 @defproc[(polyadic? [f Any]) boolean?]

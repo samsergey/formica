@@ -5,3 +5,4 @@
 (require "functionals-tests.rkt")
 (require "tools-tests.rkt")
 (require "curry-tests.rkt")
+(require "partial-app-tests.rkt")

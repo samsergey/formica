@@ -9,7 +9,8 @@
          racket/math
          racket/promise
          racket/string
-         "tools.rkt")
+         "tools.rkt"
+         "partial-app.rkt")
 (provide
  (all-from-out racket/base
                racket/list
@@ -17,4 +18,5 @@
                racket/promise
                racket/string)
  (except-out (all-from-out
-              "tools.rkt")))
+              "tools.rkt"
+              "partial-app.rkt")))

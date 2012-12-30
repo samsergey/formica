@@ -15,7 +15,7 @@
 
 @defmodule[formica/tools]
 
-The @racketmodname[formica/tools] module provides a variety of functional tools.
+The bindings documented in this section are provided by the @racketmodname[formica/tools] and @racketmodname[formica] modules.
 
 @defproc[(function? [x Any]) Bool]
 Returns @racket[#t] only if @racket[_x] is a function and @racket[#f] otherwise.
