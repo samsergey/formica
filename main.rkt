@@ -12,11 +12,14 @@
          "tools.rkt"
          "partial-app.rkt")
 (provide
- (all-from-out racket/base
-               racket/list
-               racket/math
-               racket/promise
-               racket/string)
  (except-out (all-from-out
+              racket/base
+              racket/list
+              racket/math
+              racket/promise
+              racket/string
               "tools.rkt"
-              "partial-app.rkt")))
+              "partial-app.rkt")
+             procedure? lazy delay)
+ (rename-out [procedure? function?]
+             [lazy delay]))

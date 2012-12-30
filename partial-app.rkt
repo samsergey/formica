@@ -12,21 +12,19 @@
          "arity.rkt")
 
 (provide
- using-partial-application
  (rename-out [#%app #%app*] ; regular application
              [%p-app #%app] ; partial application
-             [apply apply*]
-             [p-apply apply]
-             ; fixing arity for some functions
+             [apply apply*] ; regular application
+             [p-apply apply] ; partial application
              [p-map map]
              [p-ormap ormap]
              [p-andmap andmap]
              [p-+ +]
              [p-* *]))
 
-(define using-partial-application
-  (make-parameter #t))
-
+;; partial application form
+;; Catches the exn:fail:contract:arity? exception and 
+;; returns partially applyed function if arity allows. 
 (define-syntax (%p-app stx)
   (syntax-case stx (apply curry curryr)
     [(%p-app f) #'(with-handlers ([exn:fail:contract:arity? 
@@ -47,6 +45,7 @@
          (#%app f args ...))]))
 
 
+;; partial application operator
 (define-syntax p-apply
   (syntax-id-rules ()
     [(p-apply f) (#%app curry apply f)]
@@ -61,6 +60,7 @@
          (#%app apply f args ...))]
     [p-apply apply]))
 
+;; reducing arity for some functions
 (define p-map  (procedure-reduce-arity map (arity-at-least 2)))
 (define p-andmap  (procedure-reduce-arity andmap (arity-at-least 2)))
 (define p-ormap  (procedure-reduce-arity ormap (arity-at-least 2)))

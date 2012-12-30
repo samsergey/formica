@@ -17,7 +17,6 @@
  I1 I2 I3
  const
  (contract-out
-  (function? predicate/c)
   (negated (-> procedure? procedure?))
   (flipped (-> procedure? procedure?))
   (arg (-> natural-number/c procedure?))
@@ -28,11 +27,6 @@
   (-< (-> procedure? unary? procedure?))
   (fixed-point (->* (procedure?) (#:same-test (-> any/c any/c boolean?)) procedure?))
   (>> (->* () #:rest (listof procedure?) procedure?))))
-
-;;;-------------------------------------------------------------
-;;; function?
-;;;-------------------------------------------------------------
-(define function? procedure?)
 
 ;;;-------------------------------------------------------------
 ;;; id
