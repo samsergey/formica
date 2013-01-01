@@ -4,7 +4,7 @@
          "../curry.rkt"
          ;"../nest.rkt"
          "../arity.rkt"
-         ;"../formal.rkt"
+         "../formal.rkt"
          racket/list)
 
 (test-case 
@@ -48,7 +48,7 @@
  (check-equal? ((apply +) '(1 2 3)) 6)
  (check-equal? ((apply) cons '(1 2)) '(1 . 2)))
 
-#;(test-case
+(test-case
  "formal functions"
  (check-true (curried? ((hold 'f 2) 1)))
  (check-true (curried? ((hold cons) 1)))
