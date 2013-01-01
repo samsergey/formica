@@ -12,11 +12,13 @@
                         racket/match))
      sandbox))
 
-@title[#:tag "formal"]{Formal functions}
+@title[#:style '(toc) #:tag "formal"]{Formal functions}
 
 @defmodule[formica/formal]
 
 The bindings documented in this section are provided by the @racketmodname[formica/formal] and @racketmodname[formica] modules.
+
+@local-table-of-contents[]
 
 The concept of formal functions was taken from symbolic computation languages, such as
 @emph{Wolfram Mathematica} or @emph{Maxima}. Together with pattern-matching and rewriting techniques formal
@@ -43,7 +45,98 @@ Here are some points which show the difference between formal functions and stru
                Formal applications could be combined and transformed, mapped and folded as any list. 
                However they could be identified by pattern-matching, as structures.}}
 
-@section{Creation of formal functions}
+@section[#:tag "formal motivation"]{Motivation}
+
+Pattern matching usually goes together with algebraic types. 
+Racket's structures and lists could be used as constructors for algebraic data types, but they use have some drawbacks.
+
+Suppose we wish to define a rewriting system for Peano axioms. We start with definition of types for numerals, successor, sum and product:
+@defs+int[#:eval formica-eval
+                 [(struct N (x) #:transparent)
+                  (struct 1+ (x) #:transparent)
+                  (struct Sum (x y) #:transparent)
+                  (struct Prod (x y) #:transparent)]]
+Next we define rewriting rules:
+@def+int[#:eval formica-eval
+                (define calculate
+                  (rewrite-all-repeated 
+                   (N 0) --> 0
+                   (N n) --> (1+ (N (- n 1)))
+                   
+                   (Sum x 0) --> x
+                   (Sum x (1+ y)) --> (1+ (Sum x y))
+                   
+                   (Prod _ 0) --> 0
+                   (Prod x (1+ y)) --> (Sum x (Prod x y))))
+                (calculate (Sum (N 2) (N 3)))]
+
+However, this clear definition doesn't work, because the rewriting process can't get into the structures and change their parts. One solution is to add rules for penetrating into the structures:
+@def+int[#:eval formica-eval
+                (define calculate2
+                  (rewrite-repeated 
+                   (N 0) --> 0
+                   (N n) --> (1+ (N (- n 1)))
+                   
+                   (Sum x 0) --> x
+                   (Sum x (1+ y)) --> (1+ (Sum x y))
+                   
+                   (Prod _ 0) --> 0
+                   (Prod x (1+ y)) --> (Sum x (Prod x y))
+                   
+                   (1+ x) --> (1+ (calculate2 x))
+                   (Sum x y) --> (Sum (calculate2 x) (calculate2 y))
+                   (Prod x y) --> (Prod (calculate2 x) (calculate2 y))))
+                (calculate2 (Sum (N 2) (N 3)))
+                (calculate2 (Prod (N 2) (N 3)))]
+Now it works! But heavy and tautological lines which end up the rewriting system look cumbersome. They describe programming, not Peano axioms.
+
+Moreover, we need explicit recursion, therefore we have lost the ability to make anonymous rewriting system. Finally, use of structures fixes the number of their fields, so it is impossible to write a pattern like @racket[(Sum x ___)] and to have any number of arguments, which is reasonable when dealing with sums.
+
+Another approach is to use lists and interpret their @racket[car]-s as tags.
+@def+int[#:eval formica-eval
+                (define calculate3
+                  (rewrite-all-repeated 
+                   `(N 0) --> 0
+                   `(N ,n) --> `(1+ (N ,(- n 1)))
+                   
+                   `(Sum ,x 0) --> x
+                   `(Sum ,x (1+ ,y)) --> `(1+ (Sum ,x ,y))
+                   
+                   `(Prod ,_ 0) --> 0
+                   `(Prod ,x (1+ ,y)) --> `(Sum ,x (Prod ,x ,y))))
+                
+                (calculate3 '(Sum (N 2) (N 3)))
+                (calculate3 '(Prod (N 2) (N 3)))]
+
+Looks much better, but a bit prickly because of quotes and commas. It may become even worse-looking if we use blanks _ and ___ a lot. Using explicit @racket[list] constructor does not help either, it makes patterns more difficult to read and write: @racket[(list 'Sum x (list '1+ y))].
+
+The package provides an abstraction named @emph{formal function} which work as a tagged list constructor in expression position and as a structure constructor in patterns. With use of formal functions we may write clear definition of rewriting system for Peano's numerals without a single redundant word or symbol:
+@defs+int[#:eval formica-eval
+                 [(define-formal N 1+ Sum Prod)
+                  (define calculate4
+                    (rewrite-all-repeated 
+                     (N 0) --> 0
+                     (N n) --> (1+ (N (- n 1)))
+                     
+                     (Sum x 0) --> x
+                     (Sum x (1+ y)) --> (1+ (Sum x y))
+                     
+                     (Prod _ 0) --> 0
+                     (Prod x (1+ y)) --> (Sum x (Prod x y))))]
+                 
+                 (calculate4 (Sum (N 2) (N 3)))
+                 (calculate4 (Prod (N 2) (N 3)))]
+
+Besides, formal functions could be useful in general. For example in exploring functional programming:
+
+@interaction[#:eval formica-eval
+                    (define-formal f g h)
+                    (map f '(a b c))
+                    (foldl g 'x0 '(a b c))
+                    (foldr g 'x0 '(a b c))
+                    ((compose f g h) 'x 'y)]
+
+@section[#:tag "formal creation"]{Creation of formal functions}
 
 @defform/subs[(define-formal f-spec ...) 
 ([f-spec
@@ -122,7 +215,6 @@ Examples:
   (($ 'f 2) 1 2)
   (($ 'f 2) 1 2 3)]
 
-
 @defproc[(formal-function? [x Any]) Bool]
 Returns @racket[#t], if @racket[_x] is a @elemref["formal"]{formal function}, and @racket[#f] otherwise.
 
@@ -132,6 +224,8 @@ Examples:
   (formal-function? f)
   (formal-function? +)
   (formal-function? (hold +))]
+
+@section[#:tag "formal applications"]{Identification of formal applications}
 
 @defproc[(formal? [x Any]) Bool]
 Returns @racket[#t], if @racket[_x] is a @elemref["formal"]{formal application}, and @racket[#f] otherwise.

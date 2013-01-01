@@ -131,7 +131,7 @@
 ;: (any/c ... -> (values any/c ...)) -> (any/c ... -> (values any/c ...))
 (define (fixed-point f #:same-test [eq-test equal?]) 
   ((set-tag* 'fixed-point (or (object-name f) 'λ))
-   (if (unary? f)
+   (if (and (fixed-arity? f) (unary? f))
        (λ (x)
          (let F ([x x] [fx (f x)])
            (if (eq-test x fx)

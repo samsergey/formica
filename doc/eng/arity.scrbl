@@ -18,7 +18,16 @@
 The bindings documented in this section are provided by the @racketmodname[formica/arity], 
 @racketmodname[formica/tools] and @racketmodname[formica] modules.
 
+@defproc[(fixed-arity? [f Any]) boolean?]
+Returns @racket[#t] if function @racket[_f] has single fixed arity, and @racket[#f] otherwise.
 
+Examples:
+@interaction[#:eval formica-eval
+  (fixed-arity? (lambda (x) (+ 2 x)))
+  (define (f . x) (cons 'f x))
+  (fixed-arity? f)
+  (fixed-arity? cons)
+  (fixed-arity? +)]
 
 @defproc[(polyadic? [f Any]) boolean?]
 @elemtag["t:polyadic"]{}Returns @racket[#t] if function @racket[_f] may accept different 
@@ -36,7 +45,7 @@ Examples:
 
 
 @defproc[(variadic? [f Any]) boolean?]
-@elemtag["t:variadic"]{}Returns @racket[#t] function @racket[_f] may accept different 
+@elemtag["t:variadic"]{}Returns @racket[#t] if function @racket[_f] may accept different 
 (probably unlimited) number of arguments, and @racket[#f] otherwise.
 
 Examples:

@@ -91,5 +91,7 @@
  (let* ([Newt-step (λ (f df) (λ (x) (- x (/ (f x) (df x)))))]
         [Sqrt (λ (y) (fixed-point (Newt-step (λ (x) (- (* x x) y)) (λ (x) (* 2. x)))
                                   #:same-test almost-equal?))])
-   (check almost-equal? (sqrt 2) ((Sqrt 2.) 1.))))
+   (check almost-equal? (sqrt 2) ((Sqrt 2.) 1.)))
+ (for ([f test-functions])
+   (check-equal? (procedure-arity (fixed-point f)) (procedure-arity f))))
 

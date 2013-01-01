@@ -8,13 +8,13 @@ Introduction
 
 The Formica dialect was created for educational purposes while teaching 
 the "Functional and logical programming" undergraduate course in the 
-Kamchatkan State Technical University (Russia).
+Kamchatka State Technical University (Russia).
 
 It is based on the [Racket programming language](http://planet.racket-lang.org/), famous by it's educational and practical use.
 
 The main goal of designing the Formica language is to have a functional programming language as flexible as *Racket* and *Wolfram Mathematica*, and almost as syntactically clean as *Qi* or *Haskell*.
 
-Even though it is mainly educational language, some of it's feaures (such as **formal functions**, **abstract rewriting systems**, **generalized composition** etc.) could be used in various practical applications.
+Even though it is mainly educational language, some of it's features (such as **formal functions**, **abstract rewriting systems**, **generalized composition** etc.) could be used in various practical applications.
 
 Why Racket?
 -----------
@@ -71,7 +71,7 @@ This rewrites 1 to 2, 3 to 4, and 4 to 1 repeatedly. The first rule is terminal 
 (map r '(1 2 3 4)) ==> '(2 2 2 2)
 ```
 
-This is a rewriting-based difinition of the `map` function:
+This is a rewriting-based definition of the `map` function:
 ```Scheme
   (define map
     (/. f (cons h t) --> (cons (f h) (map f t))
@@ -178,7 +178,7 @@ Define new monads:
     (odd? x)))              ==> #t
 ```
 
-  **g)** A handfull of functional tools:
+  **g)** A handful of functional tools:
 
 A **generalized function composition**:
 
@@ -192,7 +192,7 @@ Here is a composition of them:
 ((∘ b u) 1 2) ==> `(b (u 1) 2)
 ((∘ u b) 1 2) ==> `(u (b 1 2))
 ```
-The generalized composition is associative and has identity functiona as a neutral element:
+The generalized composition is associative and has identity function as a neutral element:
 ```Scheme
 ((∘ (∘ b u) b) 1 2 3) ==> `(b (u (b 1 2)) 3)
 ((∘ b (∘ u b)) 1 2 3) ==> `(b (u (b 1 2)) 3)

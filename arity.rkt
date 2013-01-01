@@ -15,6 +15,7 @@
  (contract-out
   (polyadic? predicate/c)
   (variadic? predicate/c)
+  (fixed-arity? predicate/c)
   (nullary? predicate/c)
   (unary? predicate/c)
   (binary? predicate/c)
@@ -36,6 +37,11 @@
          (if (list? ar) 
              (ormap arity-at-least? ar)
              (arity-at-least? ar)))))
+
+;; Predicate. Specifies variadic functions.
+(define (fixed-arity? f) 
+  (and (procedure? f) 
+       (integer? (procedure-arity f))))
 
 ;; Predicate. Specifies variadic nullary functions.
 (define (nullary? f) 

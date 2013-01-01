@@ -11,7 +11,8 @@
          racket/string
          "tools.rkt"
          "partial-app.rkt"
-         "formal.rkt")
+         "formal.rkt"
+         "rewrite.rkt")
 (provide
  (except-out (all-from-out
               racket/base
@@ -21,7 +22,8 @@
               racket/string
               "tools.rkt"
               "partial-app.rkt"
-              "formal.rkt")
+              "formal.rkt"
+              "rewrite.rkt")
              procedure? lazy delay)
  (rename-out [procedure? function?]
              [lazy delay]))

@@ -168,8 +168,22 @@ Returns a function @centered[@tt{x ⟼ (f (f (f ... (f x))))}]
 which finds a least fixed point of @racket[_f] by iterative application,
 while result keeps changing in the sense of the @racket[_same?] function.
 
+If function @racket[_f] is not unary, it must return as many values, as it could accept.
+
 Example:
 @interaction[#:eval formica-eval
   (define fcos (fixed-point cos))
   (fcos 1)
   (cos (fcos 1))]
+
+Finding a root of the equation @math{F(x) = 0} by secant method:
+@interaction[#:eval formica-eval
+  (define (root f)
+    (compose I1
+             (fixed-point (λ (x y) 
+                            (let ([fx (f x)] 
+                                  [fy (f y)])
+                              (values y (/ (- (* x fy) (* y fx)) 
+                                           (- fy fx)))))
+                          #:same-test almost-equal?)))
+  ((root (λ (x) (- (* x x) 2))) 1. 2.)]

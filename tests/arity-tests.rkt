@@ -6,11 +6,12 @@
 
 (test-case
  "exact arity tests"
- (check-predicate variadic? (n* u* b* v*) (n u b t v o))
- (check-predicate polyadic? (v v* o) (n u b t n* u* b*))
- (check-predicate nullary?  (n n*) (u b t u* b* v v* o))
- (check-predicate unary?    (u n* u* v v* o) (n b t b*))
- (check-predicate binary?   (n* u* b b* v v* o) (n u t)))
+ (check-predicate variadic?     (n* u* b* v*) (n u b t v o))
+ (check-predicate polyadic?     (v v* o) (n u b t n* u* b*))
+ (check-predicate fixed-arity?  (n u b t) (n* u* b* v o v*))
+ (check-predicate nullary?      (n n*) (u b t u* b* v v* o))
+ (check-predicate unary?        (u n* u* v v* o) (n b t b*))
+ (check-predicate binary?       (n* u* b b* v v* o) (n u t)))
 
 (test-case
  "min arity tests"
