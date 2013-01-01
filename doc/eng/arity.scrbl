@@ -19,8 +19,10 @@ The bindings documented in this section are provided by the @racketmodname[formi
 @racketmodname[formica/tools] and @racketmodname[formica] modules.
 
 
+
 @defproc[(polyadic? [f Any]) boolean?]
-Returns @racket[#t] if @racket[_f] is polyadic function, and @racket[#f] otherwise.
+@elemtag["t:polyadic"]{}Returns @racket[#t] if function @racket[_f] may accept different 
+but limited number of arguments, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -34,7 +36,8 @@ Examples:
 
 
 @defproc[(variadic? [f Any]) boolean?]
-Returns @racket[#t] if @racket[_f] is variadic function, and @racket[#f] otherwise.
+@elemtag["t:variadic"]{}Returns @racket[#t] function @racket[_f] may accept different 
+(probably unlimited) number of arguments, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval

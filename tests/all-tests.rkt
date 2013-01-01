@@ -8,4 +8,6 @@
 (require "partial-app-tests.rkt")
 (require "hold-tests.rkt")
 (require "formal-tests.rkt")
+(require "formal-out-test.rkt")
+(require "formal-in-tests.rkt")
 (require "regular-app-formal-tests.rkt")

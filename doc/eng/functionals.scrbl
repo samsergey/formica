@@ -21,7 +21,7 @@ The bindings documented in this section are provided by the @racketmodname[formi
 Returns @racket[#t] only if @racket[_x] is a function and @racket[#f] otherwise.
 
 
-@defthing[id Fun]
+@defproc[(id (x Any)) Any]
 The identity function.
 
 Examples:
@@ -79,7 +79,7 @@ Examples:
 
 
 @defproc[(fif [p Fun] [f Fun] [g Fun]) Fun]
-Returns function @tt{x y ... --> (if (p x y ...) (f x y ...) (g x y ...))}.
+Returns function @centered[@tt{x y ... ⟼ (if (p x y ...) (f x y ...) (g x y ...)).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -87,7 +87,7 @@ Examples:
 
 
 @defproc[(andf [f Fun] [g Fun] ...) Fun]
-Returns function @tt{x y ... --> (and (f x y ...) (g x y ...) ...)}.
+Returns function @centered[@tt{x y ... ⟼ (and (f x y ...) (g x y ...) ...).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -95,7 +95,7 @@ Examples:
 
 
 @defproc[(orf [f Fun] [g Fun] ...) Fun]
-Returns function @tt{x y ... --> (or (f x y ...) (g x y ...) ...)}.
+Returns function @centered[@tt{x y ... ⟼ (or (f x y ...) (g x y ...) ...).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -103,15 +103,17 @@ Examples:
 
 
 @defproc[(fork [f Fun] [g unary?]) Fun]
-Returns function @tt{x y ... --> (f (g x) (g y) ...)}.
+Returns function @centered[@tt{x y ... ⟼ (f (g x) (g y) ...).}]
+This function has an alias @racket[-<].
 
 Examples:
 @interaction[#:eval formica-eval
-  ((fork cons sqr) 2 3)]
+  ((fork cons sqr) 2 3)
+  ((-< + sqr) 1 2 3)]
 
 
 @defproc[(all-args [p Fun]) Fun]
-Returns @tt{(fork and p)}.
+Returns @centered[@tt{(fork and p).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -120,7 +122,7 @@ Examples:
 
 
 @defproc[(any-args [f Fun]) Fun]
-Returns function @tt{(fork or p)}.
+Returns function @centered[@tt{(fork or p).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -162,8 +164,8 @@ Examples:
   (curried? +)]
 
 @defproc[(fixed-point [f Fun] [#:same-test same? (any/c any/c -> boolean?) equal?]) Fun]
-Returns a function which finds a least fixed point of @racket[_f] by iterative application. 
-For any argument @racket[x], this function calculates @racket[(_f (_f (_f ... (_f x))))] 
+Returns a function @centered[@tt{x ⟼ (f (f (f ... (f x))))}]
+which finds a least fixed point of @racket[_f] by iterative application,
 while result keeps changing in the sence of the @racket[_same?] function.
 
 Example:
