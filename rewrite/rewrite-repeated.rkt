@@ -28,9 +28,8 @@
   (raise-syntax-error (error-source) message (map syntax->datum stx)))
 
 ;;================================================================================
-;;    rewrite-once form
+;;   different expressions
 ;;================================================================================
-
 (define-for-syntax (conditional? l)
   (and (pair? (syntax-e (cadr l)))
        (eq? '? (syntax-e (car (syntax-e (cadr l)))))))
@@ -160,7 +159,7 @@
                                              (loop (cddr l)))]) ]
                       [else (read-patterns (cdr l) (cons (car l) res))])))]))))
 
-
+;; returns the arity of rewriting system
 (define-for-syntax (rules-arity lst)
   (let ([rule-arity (λ (rule)
                       (cond
@@ -249,22 +248,19 @@
                                   ((fixed-point 
                                     (match-lambda 
                                       p ... 
-                                      #;[(list (? formal? any)) (#,stop-id (map f any))]
                                       [(? list? any) (#,stop-id (map f any))]
                                       [any any])) x)))])
                     (procedure-rename f 'rewrite-all-repeated))]
                
                [(only-terminal-rules? #'(rules ...))
                 #'(letrec ([f (match-lambda 
-                                p ... 
-                                #;[(list (? formal? any)) (map f any)]
+                                p ...
                                 [(? list? any) (map f any)]
                                 [any any])])
                     (procedure-rename f 'rewrite-all))]
                [else
                 #`(letrec ([f (match-lambda 
-                                p ... 
-                                #;[(list (? formal? any)) (map f any)]
+                                p ...
                                 [(? list? any) (map f any)]
                                 [any any])])
                     (procedure-rename (fixed-point f) 'rewrite-all-repeated))]))
@@ -277,8 +273,7 @@
                                   (let/cc #,stop-id
                                     (apply (fixed-point
                                             (match-lambda* 
-                                              p ... 
-                                              #;[(list (? formal? any)) (#,stop-id (map f any))]
+                                              p ...
                                               [(list (? list? any)) (#,stop-id (map f any))]
                                               [(list any) any] 
                                               [any any])) x)))])
@@ -290,8 +285,7 @@
                  
                  [(only-terminal-rules? #'(rules ...))
                   #'(letrec ([f (match-lambda* 
-                                  p ... 
-                                  #;[(list (? formal? any)) (map f any)]
+                                  p ...
                                   [(list (? list? any)) (map f any)]
                                   [(list any) any] 
                                   [any any])])
@@ -304,7 +298,6 @@
                  [else
                   #`(letrec ([f (match-lambda* 
                                   p ... 
-                                  #;[(list (? formal? any)) (map f any)]
                                   [(list (? list? any)) (map f any)]
                                   [(list any) any] 
                                   [any any])])

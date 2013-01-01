@@ -179,11 +179,12 @@ Example:
 Finding a root of the equation @math{F(x) = 0} by secant method:
 @interaction[#:eval formica-eval
   (define (root f)
-    (compose I1
-             (fixed-point (λ (x y) 
-                            (let ([fx (f x)] 
-                                  [fy (f y)])
-                              (values y (/ (- (* x fy) (* y fx)) 
-                                           (- fy fx)))))
-                          #:same-test almost-equal?)))
+    (compose 
+     I1
+     (fixed-point (λ (x y) 
+                    (let ([fx (f x)] 
+                          [fy (f y)])
+                      (values y (/ (- (* x fy) (* y fx)) 
+                                   (- fy fx)))))
+                  #:same-test almost-equal?)))
   ((root (λ (x) (- (* x x) 2))) 1. 2.)]

@@ -25,6 +25,8 @@
 
 @include-section["partial.scrbl"]
 
+@include-section["tacit.scrbl"]
+
 @include-section["rewrite.scrbl"]
 
 @include-section["formal.scrbl"]

@@ -10,7 +10,7 @@
      sandbox))
 
 
-@title[#:style '(toc) #:tag "rewriting"]{The Term Rewriting Tools}
+@title[#:style '(toc) #:tag "rewriting"]{The Term Rewriting}
 
 @defmodule["main.rkt"]{The package provides tools for programming via term rewriting technique. 
                        Provided forms could be considered as a syntactic sugar for Racket's @racket[match] form,

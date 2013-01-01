@@ -12,3 +12,4 @@
 (require "formal-in-tests.rkt")
 (require "regular-app-formal-tests.rkt")
 (require "rewrite-tests.rkt")
+(require "tacit-tests.rkt")
