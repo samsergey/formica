@@ -166,7 +166,7 @@ Examples:
 @defproc[(fixed-point [f Fun] [#:same-test same? (any/c any/c -> boolean?) equal?]) Fun]
 Returns a function @centered[@tt{x ⟼ (f (f (f ... (f x))))}]
 which finds a least fixed point of @racket[_f] by iterative application,
-while result keeps changing in the sence of the @racket[_same?] function.
+while result keeps changing in the sense of the @racket[_same?] function.
 
 Example:
 @interaction[#:eval formica-eval

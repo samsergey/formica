@@ -20,10 +20,10 @@ The bindings documented in this section are provided by the @racketmodname[formi
 
 The concept of formal functions was taken from symbolic computation languages, such as
 @emph{Wolfram Mathematica} or @emph{Maxima}. Together with pattern-matching and rewriting techniques formal
-functions give powerfull and flexible framework for development of abstract data types,
+functions give powerful and flexible framework for development of abstract data types,
 symbolic computations, debugging of functional programs and teaching different programming concepts.
 
-@elemtag["t:formal"]{A @emph{formal function}} if applyed to any
+@elemtag["t:formal"]{A @emph{formal function}} if applied to any
 arguments does not provide any computations and returns a literal expression denoting
 it's application (the @emph{formal application}).
 
@@ -34,14 +34,14 @@ the sequence of arguments as the rest of it.
 
 Formal functions are in many ways similar to Racket's structures: they provide tagged containers, 
 which could be identified and analyzed by pattern-matching and contract systems.
-Here are some points whuch show the difference between formal functions and structures.
+Here are some points which show the difference between formal functions and structures.
 @itemize{@item{Formal functions do not give names to their arguments as Racket structures do.}
          @item{Unlike structure formal function may accept different number of arguments,
                as a @elemref["variadic"]{variadic} or @elemref["polyadic"]{polyadic} function. Structures allowed to have only optional fields
                with default values.}
          @item{Because formal applications are lists, they are much more flexible then structures.
                Formal applications could be combined and transformed, mapped and folded as any list. 
-               However they could be identifyed by pattern-matching, as structures.}}
+               However they could be identified by pattern-matching, as structures.}}
 
 @section{Creation of formal functions}
 
@@ -104,7 +104,7 @@ The last two cases have wrong syntax because @racket[g] was declared
 to be a binary function.
 
 @defproc[(hold [f (or/c Fun Sym)] [arity procedure-arity? (arity-at-least 0)]) formal-function?]
-Returns a @elemref["formal"]{formal function}, named like function @racket[_f] with arity specifyed by @racket[_arity].
+Returns a @elemref["formal"]{formal function}, named like function @racket[_f] with arity specified by @racket[_arity].
 
 Function @racket[hold] has a short alias: @racket[$].  
 

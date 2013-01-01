@@ -16,7 +16,7 @@
 
 @author{Sergey B. Samoylenko}
 
-@smaller{Refference guide.}
+@smaller{Reference guide.}
 
 @defmodulelang[formica]{This guide describes functions and syntax forms defined 
          in the @racket[formica] module.

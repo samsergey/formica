@@ -22,7 +22,7 @@ or @racket[(require formica/regular-app)]. It will load all bindings from  @rack
 @racketmodname[formica/partial-app].
 
 One of features making Formica different from Racket, is simplifyed syntax for partial application
-and currying, which is close to Haskell or Qi programming laguages.
+and currying, which is close to Haskell or Qi programming languages.
 
 For example, function @racket[cons], expects two arguments:
 @interaction[#:eval formica-eval
@@ -47,7 +47,7 @@ That's how it is possible to define the increment function:
   (inc 3)
   (map (+ 1) '(1 2 3))] 
 
-The simplifyed syntax makes possible only "left" partial application by fixing arguments from left to right. 
+The simplified syntax makes possible only "left" partial application by fixing arguments from left to right. 
 For fixing the sequence of arguments "from the right" one has to use explicit partial application using 
 @racket[curryr] function.
                        
