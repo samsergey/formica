@@ -13,3 +13,4 @@
 (require "regular-app-formal-tests.rkt")
 (require "rewrite-tests.rkt")
 (require "tacit-tests.rkt")
+(require "nest-tests.rkt")

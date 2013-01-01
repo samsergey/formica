@@ -1,0 +1,17 @@
+#! /bin/bash
+
+code=`egrep -v -e '^ *$' -e ' *^;'  rewrite/*.rkt | wc -l`
+code=$(( $code + `egrep -v -e '^ *$' -e '^;'  *.rkt | wc -l` ))
+echo $code" code lines"
+
+tests=`egrep -v -e '^ *$' -e ' *^;'  tests/*.rkt | wc -l`
+tests=$(( $tests + `egrep -v -e '^ *$' -e '^;'  examples/*.rkt | wc -l` ))
+echo $tests" test lines"
+
+comm=`egrep '^ *;'  *.rkt | wc -l`
+comm=$(( $comm + `egrep '^;'  rewrite/*.rkt | wc -l` ))
+echo $comm" comment lines"
+
+
+docs=`egrep -v -e '^ *$'  doc/eng/*.scrbl | wc -l`
+echo $docs" documentation lines"

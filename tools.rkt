@@ -13,14 +13,16 @@
          "tags.rkt"
          "arity.rkt"
          "functionals.rkt"
-         "curry.rkt")
+         "curry.rkt"
+         "nest.rkt")
 
 (provide
  (all-from-out "functionals.rkt"
                "curry.rkt")
  (except-out (all-from-out
-              "arity.rkt")
-             reduce-arity fixed-arity)
+              "arity.rkt"
+              "nest.rkt")
+             reduce-arity fixed-arity add-arity feed nest-arity)
  ; functional forms
  ==>
  (rename-out [or* or]

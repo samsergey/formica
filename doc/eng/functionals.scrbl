@@ -56,6 +56,65 @@ Examples:
   ((const +))]
 
 
+@defproc[(composition [f Fun] ...) Fun]
+Returns a generalized composition of functions @racket[_f ...]. 
+Function may have any arity: composition is done as if they all were curried.
+
+In the generalized composition variadic or polyadic functions have minimal possible arity,
+unless they are @elemref["greedy"]{greedy}.
+
+For function @racket[composition] there is an alias: @racket[∘]
+(could be entered as @litchar{\circ} + Alt @litchar{\}).
+
+Examples:
+@interaction[#:eval formica-eval
+  (define-formal (u 1) (b 2) (t 3))
+  ((∘ u b) 1 2)
+  ((∘ b u) 1 2)
+  ((∘ t b u) 1 2 3 4)
+  ((∘ t u b) 1 2 3 4)
+  ((∘ u t b) 1 2 3 4)
+  ((∘ u b t) 1 2 3 4)
+  ((∘ b u t) 1 2 3 4)
+  ((∘ b t u) 1 2 3 4)
+  ((∘ length (filter odd?)) '(1 2 3 4))]
+
+Composition with nullary function:
+@interaction[#:eval formica-eval
+  (define-formal (n 0) (u 1) (b 2))
+  ((∘ u n))
+  ((∘ b n) 1)
+  ((∘ n u) 1)]
+
+Composition is associative:
+@interaction[#:eval formica-eval
+  ((∘ (∘ b t) u) 1 2 3 4)
+  ((∘ b (∘ t u)) 1 2 3 4)]
+
+Composition has left and right neutral element:
+@interaction[#:eval formica-eval
+  ((∘ b id) 1 2)
+  ((∘ id b) 1 2)]
+
+
+In the generalized composition variadic or polyadic functions have minimal possible arity:
+@interaction[#:eval formica-eval
+  (define (f . x) (cons 'f x))
+  (define (g x . y) (list* 'g x y))
+  ((∘ f g) 1 2 3 4)]
+
+@defproc[(greedy [f Fun]) Fun]
+@elemtag["greedy"]{}For variadic or polyadic function @racket[_f] returns equivalent function having 
+maximal possible arity.
+
+Examples:
+@interaction[#:eval formica-eval
+  (define-formal f g h)
+  ((∘ f g h) 1 2 3 4)
+  ((∘ f (greedy g) h) 1 2 3 4)
+  ((∘ remove-duplicates (greedy append)) '(1 2 3) '(2 3 2 4))]
+
+
 @defproc[(negated (p Fun)) Fun]
 Returns the negation of a predicate @racket[_p].
 
