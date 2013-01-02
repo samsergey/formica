@@ -14,3 +14,4 @@
 (require "rewrite-tests.rkt")
 (require "tacit-tests.rkt")
 (require "nest-tests.rkt")
+(require "types-tests.rkt")

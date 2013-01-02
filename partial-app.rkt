@@ -7,7 +7,8 @@
 ;;..............................................................
 ; Provides syntax for partial function application
 ;;;=============================================================
-(require (for-syntax racket/base)
+(require (for-syntax racket/base racket/contract)
+         racket/contract
          "curry.rkt"
          "arity.rkt")
 
@@ -37,11 +38,20 @@
     [(%p-app f args ...) 
      #'(with-handlers ([exn:fail:contract:arity? 
                         (lambda (exn)
-                          (let* ([e (max-arity f)]
-                                 [g (length (list args ...))])
+                          (let ([e (max-arity f)]
+                                [g (length (list args ...))])
                             (cond 
                               [(< g e) (#%app curry f args ...)]
-                              [else (raise exn)])))])
+                              [else (raise exn)])))]
+                       [exn:fail:contract:blame? 
+                        (lambda (exn)
+                          (if (regexp-match #rx"Signature violation:  received [0-9]+ argument" (exn-message exn))
+                              (let* ([e (max-arity f)]
+                                     [g (length (list args ...))])
+                                (cond 
+                                  [(< g e) (#%app curry f args ...)]
+                                  [else (raise exn)]))
+                              (raise exn)))])
          (#%app f args ...))]))
 
 

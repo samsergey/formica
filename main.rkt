@@ -14,7 +14,8 @@
          "formal.rkt"
          "rewrite.rkt"
          "tacit.rkt"
-         "memoize.rkt")
+         "memoize.rkt"
+         "types.rkt")
 (provide
  (except-out (all-from-out
               racket/base
@@ -27,7 +28,8 @@
               "formal.rkt"
               "rewrite.rkt"
               "tacit.rkt"
-              "memoize.rkt")
+              "memoize.rkt"
+              "types.rkt")
              procedure? lazy delay)
  (rename-out [procedure? function?]
              [lazy delay]))
