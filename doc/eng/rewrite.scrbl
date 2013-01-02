@@ -106,7 +106,7 @@ More examples could be found in the @racket{examples/} folder within the package
 Examples include:
 @itemize{
          
-         @item{@scheme{examples.rkt} -- more basic examples.}
+         @item{@scheme{rewrite.rkt} -- more basic examples.}
           
           @item{@scheme{automata.rkt} -- finite automata defined with rewriting.}
           
@@ -117,8 +117,6 @@ Examples include:
           @item{@scheme{logics.rkt} -- simple tautology prover.}
           
           @item{@scheme{turing.rkt} -- a Turing machine interpreter.}
-          
-          @item{@scheme{amb-rewriting.rkt} -- non-deterministic rewriting systems.}
           
           }
 

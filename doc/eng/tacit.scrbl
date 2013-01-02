@@ -11,10 +11,11 @@
      (sandbox '(require formica))
      sandbox))
 
-@title[#:tag "bindings"]{Point-free function definitions}
+@title[#:tag "tacit"]{Point-free function definitions}
 
 The bindings documented in this section are provided by the @racketmodname[formica/tacit] and @racketmodname[formica] modules.
 
+@elemtag["point-free"]
 @defform/subs[#:literals (lambda match-lambda case-lambda rewrite rewrite-all rewrite-repeated rewrite-all-repeated /. //.) 
                          (define/c (f var ...) rhs) 
 ([rhs

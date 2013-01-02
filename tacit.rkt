@@ -127,13 +127,18 @@
     [(_ (f x ...) (quote y ...)) (define (f x ...) (quote y ...))]
     [(_ (f x ...) (quasiquote y ...)) (define (f x ...) (quasiquote y ...))]
     
-    [(_ (f x ...) (g y ...)) (define f 
-                               ((inherit-name 'f)
-                                (procedure-reduce-arity
-                                 (λ (x ... . r)
-                                   (apply g (append (list y ...) r)))
-                                 (arity-add (reduce-arity (procedure-arity g) (length '(y ...)))
-                                            (length '(x ...))))))]
+    [(_ (f x ...) (g y ...)) (begin
+                               (unless (procedure? g) (raise-syntax-error 
+                                                       'define/c 
+                                                       "the right-hand side of definiton is not a function application"
+                                                       #'(g y ...)))
+                               (define f 
+                                 ((inherit-name 'f)
+                                  (procedure-reduce-arity
+                                   (λ (x ... . r)
+                                     (apply g (append (list y ...) r)))
+                                   (arity-add (reduce-arity (procedure-arity g) (length '(y ...)))
+                                              (length '(x ...)))))))]
     
     [(_ f b) (raise-syntax-error #f 
                                  "the right-hand side of point-free definition is not a function constructor, nor the function call"

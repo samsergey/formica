@@ -18,8 +18,20 @@
 The bindings documented in this section are provided by the @racketmodname[formica/arity], 
 @racketmodname[formica/tools] and @racketmodname[formica] modules.
 
+In the refference guide to the Formica language following terminology concerned to function arity is used:
+@itemize{@item{Function has @deftech{@emph{fixed arity}} if it may accept exact finite number of arguments. 
+               The arity of function having fixed arity is expressed as positive integer number.}
+          @item{Function is called @deftech{@emph{variadic}} if it may accept different 
+               (probably unlimited) number of arguments. The arity of variadic function is expressed
+               with the @racket[arity-at-least] structure.}
+         @item{Function is called @deftech{@emph{polyadic}} if it may accept different 
+               but limited number of arguments. The arity of polyadic function is expressed as a list of
+               positive integers or @racket[arity-at-least] structure.}}
+          
+          
+          
 @defproc[(fixed-arity? [f Any]) boolean?]
-Returns @racket[#t] if function @racket[_f] has single fixed arity, and @racket[#f] otherwise.
+Returns @racket[#t] if function @racket[_f] has @tech{fixed arity}, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -29,24 +41,9 @@ Examples:
   (fixed-arity? cons)
   (fixed-arity? +)]
 
-@defproc[(polyadic? [f Any]) boolean?]
-@elemtag["t:polyadic"]{}Returns @racket[#t] if function @racket[_f] may accept different 
-but limited number of arguments, and @racket[#f] otherwise.
-
-Examples:
-@interaction[#:eval formica-eval
-  (polyadic? (case-lambda
-               [(x) x]
-               [(x y) (+ x y)]))
-  (define (f x (y 2)) '(f x y))
-  (polyadic? f)
-  (polyadic? cons)
-  (polyadic? +)]
-
 
 @defproc[(variadic? [f Any]) boolean?]
-@elemtag["t:variadic"]{}Returns @racket[#t] if function @racket[_f] may accept different 
-(probably unlimited) number of arguments, and @racket[#f] otherwise.
+Returns @racket[#t] if function @racket[_f] is @tech{variadic}, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -57,6 +54,19 @@ Examples:
   (variadic? f)
   (variadic? cons)
   (variadic? +)]
+
+@defproc[(polyadic? [f Any]) boolean?]
+Returns @racket[#t] if function @racket[_f] is @tech{polyadic}, and @racket[#f] otherwise.
+
+Examples:
+@interaction[#:eval formica-eval
+  (polyadic? (case-lambda
+               [(x) x]
+               [(x y) (+ x y)]))
+  (define (f x (y 2)) '(f x y))
+  (polyadic? f)
+  (polyadic? cons)
+  (polyadic? +)]
 
 @defproc[(nullary? [f Any]) boolean?]
 Returns @racket[#t] if arity of @racket[_f] includes 0, and @racket[#f] otherwise.

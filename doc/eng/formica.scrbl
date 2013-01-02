@@ -31,6 +31,8 @@
 
 @include-section["formal.scrbl"]
 
+@include-section["memoize.scrbl"]
+
 @include-section["functionals.scrbl"]
 
 @include-section["utils.scrbl"]

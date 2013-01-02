@@ -25,9 +25,9 @@ The concept of formal functions was taken from symbolic computation languages, s
 functions give powerful and flexible framework for development of abstract data types,
 symbolic computations, debugging of functional programs and teaching different programming concepts.
 
-@elemtag["t:formal"]{A @emph{formal function}} if applied to any
+A @deftech{@emph{formal function}} if applied to any
 arguments does not provide any computations and returns a literal expression denoting
-it's application (the @emph{formal application}).
+it's application (the @deftech{@emph{formal application}}).
 
 @centered[@tt{(f 'x 'y)  ==>  '(f x y)}]
 
@@ -39,7 +39,7 @@ which could be identified and analyzed by pattern-matching and contract systems.
 Here are some points which show the difference between formal functions and structures.
 @itemize{@item{Formal functions do not give names to their arguments as Racket structures do.}
          @item{Unlike structure formal function may accept different number of arguments,
-               as a @elemref["variadic"]{variadic} or @elemref["polyadic"]{polyadic} function. Structures allowed to have only optional fields
+               as a @tech{variadic} or @tech{polyadic} function. Structures allowed to have only optional fields
                with default values.}
          @item{Because formal applications are lists, they are much more flexible then structures.
                Formal applications could be combined and transformed, mapped and folded as any list. 
@@ -145,7 +145,7 @@ Besides, formal functions could be useful in general. For example in exploring f
  #:contracts ([id symbol?]
               [arity-spec procedure-arity?])]
 
-Defines @elemref["formal"]{formal functions}, according to specifications @racket[_f-spec ...], where
+Defines @tech{formal functions}, according to specifications @racket[_f-spec ...], where
 @racket[_id] is the name of a formal function and @racket[_arity-spec] is it's arity.
 
 For each formal function @racket[_id] the @racket[define-formal] form also defines
@@ -197,7 +197,7 @@ The last two cases have wrong syntax because @racket[g] was declared
 to be a binary function.
 
 @defproc[(hold [f (or/c Fun Sym)] [arity procedure-arity? (arity-at-least 0)]) formal-function?]
-Returns a @elemref["formal"]{formal function}, named like function @racket[_f] with arity specified by @racket[_arity].
+Returns a @tech{formal function}, named like function @racket[_f] with arity specified by @racket[_arity].
 
 Function @racket[hold] has a short alias: @racket[$].  
 
@@ -216,7 +216,7 @@ Examples:
   (($ 'f 2) 1 2 3)]
 
 @defproc[(formal-function? [x Any]) Bool]
-Returns @racket[#t], if @racket[_x] is a @elemref["formal"]{formal function}, and @racket[#f] otherwise.
+Returns @racket[#t], if @racket[_x] is a @tech{formal function}, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -228,7 +228,7 @@ Examples:
 @section[#:tag "formal applications"]{Identification of formal applications}
 
 @defproc[(formal? [x Any]) Bool]
-Returns @racket[#t], if @racket[_x] is a @elemref["formal"]{formal application}, and @racket[#f] otherwise.
+Returns @racket[#t], if @racket[_x] is a @tech{formal application}, and @racket[#f] otherwise.
 This predicate distinguishes only applications of formal functions, defined using @racket[define-formal].
 
 Examples:
@@ -239,7 +239,7 @@ Examples:
   (formal? (($ +) 1 2))]
 
 @defform[(formal patt)]
-A pattern which matches any @elemref["formal"]{formal application}. 
+A pattern which matches any @tech{formal application}. 
 It allows to name the head of a formal application, not only arguments.
 
 Examples:
@@ -252,7 +252,7 @@ Examples:
 
 @defproc*[[[(n/f-pair? [x Any]) Bool]
            [(n/f-list? [x Any]) Bool]]]
-Return @racket[#t], if @racket[_x] is a pair (list) but not a @elemref["formal"]{formal application}, and @racket[#f] otherwise.
+Return @racket[#t], if @racket[_x] is a pair (list) but not a @tech{formal application}, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
