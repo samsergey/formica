@@ -1,5 +1,74 @@
-3452
-#hash(((def ((lib "formica/tools.rkt") fork)) . ((2572 . 4))) ((def ((lib "formica/tools.rkt") id)) . ((2048 . 3))) ((def ((lib "formica/tools.rkt") fif)) . ((2367 . 5))) ((form ((lib "formica/main.rkt") define/c)) . ((67 . 16))) ((def ((lib "formica/tools.rkt") curry)) . ((2729 . 7))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> //.)) . ((1201 . 2))) ((def ((lib "formica/tools.rkt") function?)) . ((1999 . 3))) ((def ((lib "formica/arity.rkt") binary?)) . ((3708 . 3))) ((def ((lib "formica/tags.rkt") set-tag)) . ((3241 . 4))) ((def ((lib "formica/arity.rkt") inherit-arity)) . ((3897 . 3))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> /.)) . ((858 . 2))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite-all)) . ((821 . 2))) ((def ((lib "formica/formal.rkt") n/f-list?)) . ((1667 . 5))) ((def ((lib "formica/memoize.rkt") memoized?)) . ((1837 . 3))) ((def ((lib "formica/arity.rkt") min-arity)) . ((3759 . 3))) ((def ((lib "formica/arity.rkt") polyadic?)) . ((3553 . 3))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite)) . ((653 . 6))) ((def ((lib "formica/tools.rkt") flipped)) . ((2321 . 3))) ((def ((lib "formica/tools.rkt") curryr)) . ((2729 . 7))) ((form ((lib "formica/memoize.rkt") define/memo)) . ((1886 . 3))) ((def ((lib "formica/tools.rkt") fixed-point)) . ((2948 . 4))) ((def ((lib "formica/arity.rkt") fixed-arity?)) . ((3444 . 3))) ((def ((lib "formica/formal.rkt") n/f-pair?)) . ((1667 . 5))) ((def ((lib "formica/formal.rkt") formal-function?)) . ((1542 . 3))) ((def ((lib "formica/tools.rkt") any-args)) . ((2682 . 3))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> define//.)) . ((1230 . 2))) ((def ((lib "formica/tags.rkt") tagged?)) . ((3074 . 3))) ((def ((lib "formica/formal.rkt") formal?)) . ((1598 . 3))) ((def ((lib "formica/tags.rkt") set-tag*)) . ((3344 . 4))) ((def ((lib "formica/tools.rkt") greedy)) . ((2230 . 3))) ((form ((lib "formica/formal.rkt") formal)) . ((1645 . 2))) ((def ((lib "formica/arity.rkt") unary?)) . ((3658 . 3))) ((def ((lib "formica/tools.rkt") curried?)) . ((2896 . 3))) ((def ((lib "formica/tags.rkt") tag?)) . ((3124 . 3))) ((def ((lib "formica/partial-app.rkt") apply*)) . ((0 . 4))) ((def ((lib "formica/tools.rkt") composition)) . ((2175 . 3))) ((def ((lib "formica/tools.rkt") orf)) . ((2508 . 4))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite-all-repeated)) . ((1155 . 2))) ((def ((lib "formica/tools.rkt") arg)) . ((2089 . 3))) ((def ((lib "formica/memoize.rkt") memoized)) . ((1784 . 3))) ((def ((lib "formica/tools.rkt") negated)) . ((2275 . 3))) ((def ((lib "formica/tags.rkt") check-tag)) . ((3171 . 4))) ((form ((lib "formica/formal.rkt") formal-out)) . ((1755 . 2))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> define/.)) . ((886 . 2))) ((def ((lib "formica/formal.rkt") hold)) . ((1409 . 4))) ((def ((lib "formica/tools.rkt") all-args)) . ((2635 . 3))) ((def ((lib "formica/arity.rkt") max-arity)) . ((3824 . 3))) ((def ((lib "formica/arity.rkt") nullary?)) . ((3606 . 3))) ((form ((lib "formica/formal.rkt") define-formal)) . ((1269 . 8))) ((form ((lib "formica/memoize.rkt") define/memo/c)) . ((1955 . 2))) ((def ((lib "formica/tools.rkt") andf)) . ((2443 . 4))) ((def ((lib "formica/arity.rkt") variadic?)) . ((3500 . 3))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite-repeated)) . ((924 . 9))) ((def ((lib "formica/tools.rkt") const)) . ((2131 . 3))))
+4550
+#hash(((def ((lib "formica/tools.rkt") all-args)) . ((3771 . 3))) ((def ((lib "formica/formal.rkt") n/f-list?)) . ((2803 . 5))) ((def ((lib "formica/main.rkt") Num)) . ((145 . 2))) ((def ((lib "formica/tools.rkt") function?)) . ((3135 . 3))) ((def ((lib "formica/arity.rkt") unary?)) . ((4794 . 3))) ((def ((lib "formica/arity.rkt") binary?)) . ((4844 . 3))) ((def ((lib "formica/tags.rkt") tag?)) . ((4260 . 3))) ((def ((lib "formica/tools.rkt") arg)) . ((3225 . 3))) ((form ((lib "formica/main.rkt") ::)) . ((1107 . 2))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite-all)) . ((1957 . 2))) ((def ((lib "formica/main.rkt") Fun)) . ((316 . 2))) ((def ((lib "formica/tools.rkt") fif)) . ((3503 . 5))) ((def ((lib "formica/tools.rkt") andf)) . ((3579 . 4))) ((def ((lib "formica/arity.rkt") variadic?)) . ((4636 . 3))) ((def ((lib "formica/tags.rkt") set-tag)) . ((4377 . 4))) ((def ((lib "formica/tools.rkt") curried?)) . ((4032 . 3))) ((def ((lib "formica/arity.rkt") inherit-arity)) . ((5033 . 3))) ((def ((lib "formica/tools.rkt") curry)) . ((3865 . 7))) ((def ((lib "formica/arity.rkt") min-arity)) . ((4895 . 3))) ((def ((lib "formica/memoize.rkt") memoized)) . ((2920 . 3))) ((form ((lib "formica/main.rkt") define-type)) . ((340 . 6))) ((def ((lib "formica/tools.rkt") fork)) . ((3708 . 4))) ((def ((lib "formica/tools.rkt") fixed-point)) . ((4084 . 4))) ((def ((lib "formica/main.rkt") Nat)) . ((218 . 2))) ((def ((lib "formica/formal.rkt") formal-function?)) . ((2678 . 3))) ((def ((lib "formica/memoize.rkt") memoized?)) . ((2973 . 3))) ((form ((lib "formica/main.rkt") is)) . ((49 . 5))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite-repeated)) . ((2060 . 9))) ((def ((lib "formica/formal.rkt") n/f-pair?)) . ((2803 . 5))) ((def ((lib "formica/formal.rkt") formal?)) . ((2734 . 3))) ((def ((lib "formica/main.rkt") contract?)) . ((0 . 3))) ((form ((lib "formica/memoize.rkt") define/memo)) . ((3022 . 3))) ((def ((lib "formica/tags.rkt") check-tag)) . ((4307 . 4))) ((def ((lib "formica/main.rkt") Real)) . ((169 . 2))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> /.)) . ((1994 . 2))) ((form ((lib "formica/main.rkt") ->)) . ((868 . 10))) ((def ((lib "formica/tools.rkt") const)) . ((3267 . 3))) ((def ((lib "formica/main.rkt") not/c)) . ((625 . 3))) ((def ((lib "formica/tools.rkt") orf)) . ((3644 . 4))) ((def ((lib "formica/main.rkt") cons:)) . ((681 . 4))) ((def ((lib "formica/formal.rkt") hold)) . ((2545 . 4))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite)) . ((1789 . 6))) ((def ((lib "formica/main.rkt") Any)) . ((456 . 3))) ((form ((lib "formica/formal.rkt") formal-out)) . ((2891 . 2))) ((def ((lib "formica/main.rkt") Str)) . ((268 . 2))) ((def ((lib "formica/main.rkt") Sym)) . ((292 . 2))) ((def ((lib "formica/main.rkt") Index)) . ((242 . 2))) ((def ((lib "formica/tools.rkt") any-args)) . ((3818 . 3))) ((def ((lib "formica/main.rkt") and/c)) . ((564 . 3))) ((def ((lib "formica/main.rkt") Bool)) . ((120 . 2))) ((def ((lib "formica/tools.rkt") negated)) . ((3411 . 3))) ((form ((lib "formica/main.rkt") define/c)) . ((1203 . 16))) ((def ((lib "formica/tags.rkt") tagged?)) . ((4210 . 3))) ((form ((lib "formica/formal.rkt") formal)) . ((2781 . 2))) ((form ((lib "formica/formal.rkt") define-formal)) . ((2405 . 8))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> rewrite-all-repeated)) . ((2291 . 2))) ((def ((lib "formica/main.rkt") or/c)) . ((504 . 3))) ((def ((lib "formica/tools.rkt") flipped)) . ((3457 . 3))) ((def ((lib "formica/tools.rkt") greedy)) . ((3366 . 3))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> //.)) . ((2337 . 2))) ((form ((lib "formica/main.rkt") list:)) . ((764 . 5))) ((def ((lib "formica/tools.rkt") curryr)) . ((3865 . 7))) ((def ((lib "formica/main.rkt") Int)) . ((194 . 2))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> define/.)) . ((2022 . 2))) ((def ((lib "formica/arity.rkt") polyadic?)) . ((4689 . 3))) ((def ((lib "formica/tools.rkt") composition)) . ((3311 . 3))) ((def ((lib "formica/partial-app.rkt") apply*)) . ((1136 . 4))) ((form (#<path:/home/serpol/dev/racket/formica/main.rkt> define//.)) . ((2366 . 2))) ((def ((lib "formica/arity.rkt") max-arity)) . ((4960 . 3))) ((def ((lib "formica/tools.rkt") id)) . ((3184 . 3))) ((def ((lib "formica/tags.rkt") set-tag*)) . ((4480 . 4))) ((def ((lib "formica/arity.rkt") fixed-arity?)) . ((4580 . 3))) ((form ((lib "formica/memoize.rkt") define/memo/c)) . ((3091 . 2))) ((def ((lib "formica/arity.rkt") nullary?)) . ((4742 . 3))))
+procedure
+(contract? v) -> Bool
+  v : Any
+syntax
+(is v type-pred)
+ 
+  v : Any
+  type-pred : contract?
+value
+Bool : contract?
+value
+Num : contract?
+value
+Real : contract?
+value
+Int : contract?
+value
+Nat : contract?
+value
+Index : contract?
+value
+Str : contract?
+value
+Sym : contract?
+value
+Fun : contract?
+syntax
+(define-type name c ...)
+(define-type (name x ...) c ...)
+ 
+  c : contract?
+  x : contract?
+procedure
+(Any v) -> contract?
+  v : Any
+procedure
+(or/c c ...) -> contract?
+  c : contract?
+procedure
+(and/c c ...) -> contract?
+  c : contract?
+procedure
+(not/c c) -> contract?
+  c : contract?
+procedure
+(cons: c1 c2) -> contract?
+  c1 : contract?
+  c2 : contract?
+syntax
+(list: c ...)
+(list: c ..)
+ 
+  c : contract?
+syntax
+(f: c ...)
+ 
+  c : contract?
+syntax
+(-> dom ... range)
+(-> dom ... rest .. range)
+(-> dom ... (? opt ...) range)
+(-> dom ... (? opt ...) rest .. range)
+ 
+  dom : contract?
+  range : contract?
+  opt : contract?
+  rest : contract?
+syntax
+(:: f sig fun-def)
 procedure
 (apply* f v ...) -> Any
   f : Fun

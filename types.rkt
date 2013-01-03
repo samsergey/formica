@@ -11,7 +11,8 @@
          racket/contract/parametric
          racket/path
          racket/match
-         (for-syntax racket/base))
+         (for-syntax racket/base)
+         "tags.rkt")
 
 (provide 
  ::
@@ -58,14 +59,19 @@
 (define-for-syntax (free-symbols stx)
   (let* ([lst (syntax->list stx)])
     (if lst
-        (foldl (λ(s res) (let ([l (syntax->list s)])
-                           (cond
-                             [l (foldl include res (free-symbols s))]
-                             [(and (identifier? s)
-                                   (not (eq? (syntax-e s) '?))
-                                   (not (eq? (syntax-e s) '..))
-                                   (eq? #f (identifier-binding s))) (include s res)]
-                             [else res])))
+        (foldl (λ(s res) 
+                 (let ([l (syntax->list s)])
+                   (cond
+                     ; go deep into lists
+                     [l (foldl include res (free-symbols s))]
+                     ; special symbols
+                     [(or (eq? (syntax-e s) '?)
+                          (eq? (syntax-e s) '..)) res]
+                     ; unknown identifiers
+                     [(and (identifier? s)
+                           (not (identifier-binding s))) (include s res)]
+                     ; unknown identifiers
+                     [else res])))
                '()
                lst)
         stx)))
@@ -75,15 +81,17 @@
     [(:: name contract body) 
      (let ([f (free-symbols #'contract)])
        (if (null? f)
+           ; no free symbols
            #`(with-contract name 
                             ((name #,(parse-infix-contract #'contract)))
                             body)
+           ; polymorphic types
            (with-syntax ([(free ...) f])
              #`(with-contract name 
                               ((name (parametric->/c 
                                       (free ...)
                                       #,(parse-infix-contract #'contract)))) 
-                             body))))]))
+                              body))))]))
 
 
 ;;;=================================================================
@@ -91,27 +99,42 @@
 ;;;=================================================================
 (define-syntax define-type
   (syntax-rules (_)
-    [(_ (name A ...) expr ...) (define (name A ...)
-                                 (flat-named-contract 
-                                  (cons 'name (map object-name (list A ...)))
-                                  (λ (x) (or ((flat-contract expr) x) ...))))]
-    [(_ name expr) (define name (procedure-rename (flat-named-contract 'name expr) 'name))]
-    [(_ name expr ...) (define name 
-                         (flat-named-contract 
-                          'name
-                          (flat-rec-contract name (or/c expr ...))))]))
+    ; parameterized type
+    [(_ (name A ...) expr ...) 
+     (define (name A ...)
+       (procedure-rename
+        (flat-named-contract 
+         (cons 'name (map object-name (list A ...)))
+         (λ (x) (or ((flat-contract expr) x) ...)))
+        'name))]
+    ; primitive type or type product
+    [(_ name expr) 
+     (define name 
+       (procedure-rename 
+        (flat-named-contract 'name expr) 
+        'name))]
+    ; type sum
+    [(_ name expr ...) 
+     (define name 
+       (procedure-rename
+        (flat-named-contract 
+         'name
+         (flat-rec-contract name (or/c expr ...))) 
+        'name))]))
 
 
 ;;;=================================================================
-;;; Type checking
+;;; Safe type checking
 ;;;=================================================================
 (define-syntax (is stx)
   (syntax-case stx ()
-    [(_ x type) (with-syntax ([c (parse-infix-contract #'type)])
-                  #'(cond
-                      [(contract? c) (with-handlers ([exn:fail:contract? (lambda (exn) #f)])
-                                       (contract-first-order-passes? c x))]
-                      [else (raise-type-error 'is "predicate" 1 x type)]))]))
+    [(_ x type) 
+     (with-syntax ([c (parse-infix-contract #'type)])
+       #'(cond
+           [(contract? c) 
+            (with-handlers ([exn:fail? (lambda (exn) #f)])
+              (contract-first-order-passes? c x))]
+           [else (raise-type-error 'is "predicate" 1 x type)]))]))
 
 ;;;=================================================================
 ;;; Blaming text
@@ -181,8 +204,8 @@
 
 (define-syntax list:
   (syntax-id-rules (..)
-    [(_ c ..) (listof c)]
-    [(_ c ...) (list/c c ...)]
-    [list: list/c]))
+    [(_ c ..) ((procedure-rename listof 'list:) c)]
+    [(_ c ...) ((procedure-rename list/c 'list:) c ...)]
+    [list: (procedure-rename list/c 'list:)]))
 
-(define cons: cons/c)
+(define cons: (procedure-rename cons/c 'cons:))

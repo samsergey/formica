@@ -4,6 +4,10 @@ code=`egrep -v -e '^ *$' -e ' *^;'  rewrite/*.rkt | wc -l`
 code=$(( $code + `egrep -v -e '^ *$' -e '^;'  *.rkt | wc -l` ))
 echo $code" code lines"
 
+defs=`egrep -e '^ *\(define' rewrite/*.rkt | wc -l`
+defs=$(( $defs + `egrep -e '^ *\(define'   *.rkt | wc -l` ))
+echo $defs" definitions"
+
 tests=`egrep -v -e '^ *$' -e ' *^;'  tests/*.rkt | wc -l`
 tests=$(( $tests + `egrep -v -e '^ *$' -e '^;'  examples/*.rkt | wc -l` ))
 echo $tests" test lines"
@@ -12,6 +16,13 @@ comm=`egrep '^ *;'  *.rkt | wc -l`
 comm=$(( $comm + `egrep '^;'  rewrite/*.rkt | wc -l` ))
 echo $comm" comment lines"
 
-
 docs=`egrep -v -e '^ *$'  doc/eng/*.scrbl | wc -l`
 echo $docs" documentation lines"
+
+the_code=`egrep -v -e '^ *$' -e ' *^;'  *.rkt`
+echo -n 'words in code: '
+echo $the_code | wc -w
+echo -n 'cons/car/cdr: '
+echo $the_code | egrep -o 'car|cdr|cons|cadr|null' | wc -l
+echo -n 'arithmetics: '
+echo $the_code | egrep -o '\([-+*/]' | wc -l
