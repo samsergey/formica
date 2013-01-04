@@ -18,6 +18,7 @@
  const
  (contract-out
   (negated (-> procedure? procedure?))
+  (¬ (-> procedure? procedure?))
   (flipped (-> procedure? procedure?))
   (arg (-> natural-number/c procedure?))
   (fif (-> procedure? procedure? procedure? procedure?))
@@ -61,6 +62,8 @@
   ((set-tag* 'negated (or (object-name f) 'λ))
    ((inherit-arity f) 
     result)))
+
+(define ¬ negated)
 
 ;;;-------------------------------------------------------------
 ;;; flip

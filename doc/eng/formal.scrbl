@@ -14,7 +14,7 @@
 
 @title[#:style '(toc) #:tag "formal"]{Formal functions}
 
-@defmodule[formica/formal]
+@declare-exporting[formica]
 
 The bindings documented in this section are provided by the @racketmodname[formica/formal] and @racketmodname[formica] modules.
 
@@ -198,8 +198,7 @@ to be a binary function.
 
 @defproc[(hold [f (or/c Fun Sym)] [arity procedure-arity? (arity-at-least 0)]) formal-function?]
 Returns a @tech{formal function}, named like function @racket[_f] with arity specified by @racket[_arity].
-
-Function @racket[hold] has a short alias: @racket[$].  
+Function @racket[hold] has an alias: @racket[$].  
 
 Examples:
 @interaction[#:eval formica-eval

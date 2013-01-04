@@ -8,12 +8,12 @@
 
 @(define formica-eval
    (let ([sandbox (make-base-eval)])
-     (sandbox '(require formica/tags))
+     (sandbox '(require formica/tags formica))
      sandbox))
 
 @title[#:tag "tags"]{Tagged functions}
 
-@defmodule[formica/tags]
+@declare-exporting[formica/tags]
 
 The bindings documented in this section are provided by the @racketmodname[formica/tags] module,
 but not @racketmodname[formica].

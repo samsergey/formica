@@ -19,23 +19,17 @@
 @smaller{Reference guide.}
 
 @defmodulelang[formica]{This guide describes functions and syntax forms defined 
-         in the @racket[formica] module.
+         in the @racket[formica] language.
          
          Formica is available as both a language level and a module that can be used in other languages.}
 
-@include-section["types.scrbl"]
-
-@include-section["partial.scrbl"]
-
-@include-section["tacit.scrbl"]
+@include-section["syntax.scrbl"]
 
 @include-section["rewrite.scrbl"]
 
 @include-section["formal.scrbl"]
 
-@include-section["memoize.scrbl"]
-
-@include-section["functionals.scrbl"]
+@include-section["types.scrbl"]
 
 @include-section["utils.scrbl"]
 

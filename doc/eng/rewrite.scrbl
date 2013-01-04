@@ -12,11 +12,9 @@
 
 @title[#:style '(toc) #:tag "rewriting"]{The Term Rewriting}
 
-@defmodule["main.rkt"]{The package provides tools for programming via term rewriting technique. 
-                       Provided forms could be considered as a syntactic sugar for Racket's @racket[match] form,
-                       however they offer different semantics. The package introduces repetitive rewriting 
-                       in order to obtain the normal form of given expression, ability to transform any subpart
-                       in nested list structure and definition of formal functions which abstract general algebraic types.}
+@declare-exporting[formica/rewrite]
+
+The package provides tools for programming via term rewriting technique. Provided forms could be considered as a syntactic sugar for Racket's @racket[match] form, however they offer different semantics. The package introduces repetitive rewriting in order to obtain the normal form of given expression, ability to transform any subpart in nested list structure and definition of formal functions which abstract general algebraic types.
 
 @local-table-of-contents[]
 
@@ -180,8 +178,8 @@ Repetitive rewriting rules could be either @emph{regular} or @emph{terminal}.
 Application of repetitive rewriting rules follows the algorithm:
 @itemize{
          @item{Consequently try to apply given rules to the expression.}
-          @item{If a pattern, corresponding to a @emph{regular} rule matches, make rewriting and apply rules to the result, starting from the beginning of the rule sequence.}
-          @item{If a pattern, corresponding to a @emph{terminal} rule matches, make rewriting, stop the rewriting process and return the result.}
+          @item{If a pattern, corresponding to a @emph{regular} rule matches (rule with @(defidform/inline -->) arrow), make rewriting and apply rules to the result, starting from the beginning of the rule sequence.}
+          @item{If a pattern, corresponding to a @emph{terminal} rule matches (rule with @(defidform/inline -->.) arrow), make rewriting, stop the rewriting process and return the result.}
           @item{The rewriting process stops either if expression does not change after rewriting, or if the last applied rule was terminal.}}
 
 @defform/subs[#:id rewrite-repeated #:literals (--> -->. => ?) (rewrite-repeated rule-spec ...) 

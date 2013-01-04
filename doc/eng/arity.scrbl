@@ -13,7 +13,7 @@
 
 @title[#:tag "arity"]{Managing the function arity}
 
-@defmodule[formica/arity]
+@declare-exporting[formica/arity]
 
 The bindings documented in this section are provided by the @racketmodname[formica/arity], 
 @racketmodname[formica/tools] and @racketmodname[formica] modules.

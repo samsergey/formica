@@ -8,11 +8,16 @@
 
 @(define formica-eval
    (let ([sandbox (make-base-eval)])
-     (sandbox '(require formica 
-                        formica/tags))
+     (sandbox '(require formica))
      sandbox))
 
-@title[#:tag "utils"]{Different utilities}
+@title[#:tag "utils"]{Miscellaneous issues}
+
+@include-section["differences.scrbl"]
+
+@include-section["functionals.scrbl"]
+
+@include-section["memoize.scrbl"]
 
 @include-section["tags.scrbl"]
 

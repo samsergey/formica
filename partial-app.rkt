@@ -15,11 +15,11 @@
 (provide
  (rename-out [#%app #%app*] ; regular application
              [%p-app #%app] ; partial application
-             [apply apply*] ; regular application
+             ;[apply apply*] ; regular application
              [p-apply apply] ; partial application
              [p-map map]
-             [p-ormap ormap]
-             [p-andmap andmap]
+             [p-ormap any?]
+             [p-andmap all?]
              [p-+ +]
              [p-* *]))
 
@@ -71,7 +71,7 @@
     [p-apply apply]))
 
 ;; reducing arity for some functions
-(define p-map  (procedure-reduce-arity map (arity-at-least 2)))
+(define p-map (procedure-reduce-arity map (arity-at-least 2)))
 (define p-andmap  (procedure-reduce-arity andmap (arity-at-least 2)))
 (define p-ormap  (procedure-reduce-arity ormap (arity-at-least 2)))
 (define p-+  (procedure-reduce-arity + (arity-at-least 2)))

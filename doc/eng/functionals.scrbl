@@ -13,7 +13,7 @@
 
 @title[#:tag "functional"]{Operators and functionals}
 
-@defmodule[formica/tools]
+@declare-exporting[formica/tools]
 
 The bindings documented in this section are provided by the @racketmodname[formica/tools] and @racketmodname[formica] modules.
 
@@ -44,6 +44,11 @@ Examples:
   ((arg 2) 'x 'y 'z)
   ((arg 3) 'x 'y 'z)]
 
+@defthing*[([I1 (arg 1)]
+            [I2 (arg 2)]
+            [I3 (arg 3)])]
+
+Aliases for grequently used @racket[arg] calls.
 
 @defproc[(const (x Any)) Fun]
 Creates a trivial function which returns @racket[_x] for any arguments.
@@ -57,6 +62,7 @@ Examples:
 
 
 @defproc[(composition [f Fun] ...) Fun]
+@defthing[∘ composition]
 Returns a generalized composition of functions @racket[_f ...]. 
 Function may have any arity: composition is done as if they all were curried.
 
@@ -114,15 +120,27 @@ Examples:
   ((∘ f (greedy g) h) 1 2 3 4)
   ((∘ remove-duplicates (greedy append)) '(1 2 3) '(2 3 2 4))]
 
+@defproc[(>> (f Fun) ...) Fun]
+Like @racket[∘] but composes functions @racket[_f ...] in reverse order. Equivalent to @centered{@tt{(flipped ∘)}.}
 
-@defproc[(negated (p Fun)) Fun]
+Examples:
+@interaction[#:eval formica-eval
+  (define-formal f g h)
+  ((∘ f g h) 1 2 3 4)
+  ((>> f g h) 1 2 3 4)]
+
+@defproc*[([(negated (p Fun)) Fun]
+           [(¬ (p Fun)) Fun])]
 Returns the negation of a predicate @racket[_p].
+
+For function @racket[negated] there is an alias: @racket[¬]
+(could be entered as @litchar{\neg} + Alt @litchar{\}).
 
 Examples:
 @interaction[#:eval formica-eval
   (negated odd?)
   ((negated odd?) 2)
-  ((negated <) 1 2)]
+  ((¬ <) 1 2)]
 
 
 @defproc[(flipped [f Fun]) Fun]
@@ -142,7 +160,7 @@ Returns function @centered[@tt{x y ... ⟼ (if (p x y ...) (f x y ...) (g x y ..
 
 Examples:
 @interaction[#:eval formica-eval
-  (map (fif odd? sub1 id) '(1 2 3 4))]
+  (map (fif odd? (+ 1) id) '(0 1 2 3 4))]
 
 
 @defproc[(andf [f Fun] [g Fun] ...) Fun]
@@ -161,7 +179,8 @@ Examples:
   (map (orf integer? positive?) '(-3/5 -1 2 4.2))]
 
 
-@defproc[(fork [f Fun] [g unary?]) Fun]
+@defproc*[([(fork [f Fun] [g unary?]) Fun]
+           [(-< [f Fun] [g unary?]) Fun])]
 Returns function @centered[@tt{x y ... ⟼ (f (g x) (g y) ...).}]
 This function has an alias @racket[-<].
 
@@ -190,24 +209,28 @@ Examples:
 
 
 @defproc*[([(curry [f Fun] [arg Any] ...) (or/c curried? Any)]
-            [(curryr [f Fun] [arg Any] ...) (or/c curried? Any)])]
-Return partially applied (curried) function @racket[_f], with fixed arguments @racket[_arg ...].
+            [(curried [f Fun] [arg Any] ...) (or/c curried? Any)])]
+Return partially applied (curried) function @racket[_f], with fixed arguments @racket[_arg ...]. Symbols @racket[curry] and @racket[curried] are synonyms.
+
+@defproc*[([(curryr [f Fun] [arg Any] ...) (or/c curried? Any)]
+            [(r-curried [f Fun] [arg Any] ...) (or/c curried? Any)])]
+Like @racket[curry] but argumets @racket[_arg ...] are fixed from the right side of argument sequence. Symbols @racket[curryr] and @racket[r-curried] are synonyms.
 
 Examples of partial application:
 @interaction[#:eval formica-eval
   (curry list 1 2)
   ((curry list 1 2) 3 4)
-  (map (curry cons 1) '(1 2 3))
+  (map (curried cons 1) '(1 2 3))
   (curryr list 1 2)
   ((curryr list 1 2) 3 4)
-  (map (curryr cons 1) '(1 2 3))
+  (map (r-curried cons 1) '(1 2 3))
   (curry cons 1 2)
   (curryr cons 1 2)]
 
-The @racket[curry] function correctly reduces the arity of curried function:
+The @racket[curry] (@racket[curried]) and @racket[curryr] (@racket[r-curried]) functions correctly reduce the arity of curried function:
 @interaction[#:eval formica-eval
   (procedure-arity cons)
-  (procedure-arity (curry cons))
+  (procedure-arity (curried cons))
   (procedure-arity (curry cons 1))
   (procedure-arity (curryr cons 1))
   (procedure-arity (curry + 1 2 3))]

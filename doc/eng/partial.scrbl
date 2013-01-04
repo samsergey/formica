@@ -13,7 +13,7 @@
 
 @title[#:tag "partial"]{Partial function application}
 
-@defmodule[formica/partial-app]
+@declare-exporting[formica/partial-app]
 
 The bindings documented in this section are provided by the @racketmodname[formica/partial-app] and @racketmodname[formica] modules.
 
@@ -21,8 +21,7 @@ In order to get Formica language without syntax for partial application, use @ra
 or @racket[(require formica/regular-app)]. It will load all bindings from  @racketmodname[formica] module except for those provided in
 @racketmodname[formica/partial-app].
 
-One of features making Formica different from Racket, is simplifyed syntax for partial application
-and currying, which is close to Haskell or Qi programming languages.
+One of features making Formica different from Racket, is simplifyed syntax for @deftech{partial application}, which is close to Haskell or Qi programming languages.
 
 For example, function @racket[cons], expects two arguments:
 @interaction[#:eval formica-eval
@@ -61,5 +60,10 @@ Examples of explicit partial application:
   ((curryr - 1) 3)
   (map (curryr - 1) '(1 2 3))]
 
-@defproc[(apply* [f Fun] [v Any] ...) Any]
-Applies @racket[_f] to a list of arguments @racket[_v ...] in a regular way without partial application.
+@defproc[(apply [f Fun] [v Any] ...) Any]
+Applies function @racket[_f] to a list of arguments @racket[_v ...]. If the number of arguments is less then arity of function @racket[_f] returns partially applied function.
+
+@interaction[#:eval formica-eval
+  (apply cons '(1 2))
+  (apply cons '(1))
+  (apply cons '(1 2 3))]
