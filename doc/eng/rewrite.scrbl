@@ -28,7 +28,9 @@ language @cite["Wolfram"] give excellent examples of scalability, power and expr
 The aim of developing this library is to mimic Mathematica's rewriting tools in Scheme. 
 The library provides four forms: @racket[rewrite], @racket[rewrite-all], @racket[rewrite-repeated] and @racket[rewrite-all-repeated] named almost in the same way as rewriting functions in Mathematica. 
 In spite of this naming convention, we use word ``rewriting'' for ``replacement'', ``substitution'' 
-or ``transformation'' in this manual, since ``rewriting'' has precise mathematical meaning. 
+or ``transformation'' in this manual, since ``rewriting'' has precise mathematical meaning.
+
+@deftech{Rewriting} is a formal method of replacing subterms of an expression with other terms. In Formica the role of the expression play lists, structures and @tech{formal applications}.
 
 @subsection{Short examples}
 

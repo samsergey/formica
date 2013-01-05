@@ -18,7 +18,7 @@ runtime.
 
 Types are used for identification and guarding only. There is no optimisation based on types as in Typed Racket. It is not necessary to declare types of functions and arguments, they are used in the same way as Racket contracts.
 
-Contract-based type system is implemented in Formica for educational purpose: in order to give students a gentle but quite deep introduction to type systems used in functional programming languages. In Formica it is possible to declare and use abstract algebraic, inductive, parameterized and functional types, still being able to utilize @tech{rewriting}, simplified syntax for @tech{partial application} and @tech{point-free definitions}. Moreower the Formica types have close relation to a concept of @tech{formal functions} widely used in the language.
+Contract-based type system is implemented in Formica for educational purpose: in order to give students a gentle but quite deep introduction to type systems used in functional programming languages. In Formica it is possible to declare and use abstract algebraic, inductive, parameterized and functional types, still being able to utilize @tech{rewriting}, simplified syntax for @tech{partial application} and definitions in @tech{point-free notation}. Moreower the Formica types have close relation to a concept of @tech{formal functions} widely used in the language.
 
 The type in Formica is bound to a value, not to a variable, it represents a set to which value belongs. Such a set could be specified by enumeration, a predicate function or by the inductive definition.
 

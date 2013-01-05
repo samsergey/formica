@@ -15,11 +15,11 @@
 
 @declare-exporting[formica/partial-app]
 
-The bindings documented in this section are provided by the @racketmodname[formica/partial-app] and @racketmodname[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/partial-app] and @racket[formica] modules.
 
 In order to get Formica language without syntax for partial application, use @racket{#lang formica/regular-app} at the header of the file
-or @racket[(require formica/regular-app)]. It will load all bindings from  @racketmodname[formica] module except for those provided in
-@racketmodname[formica/partial-app].
+or @racket[(require formica/regular-app)]. It will load all bindings from  @racket[formica] module except for those provided in
+@racket[formica/partial-app].
 
 One of features making Formica different from Racket, is simplifyed syntax for @deftech{partial application}, which is close to Haskell or Qi programming languages.
 

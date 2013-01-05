@@ -19,7 +19,9 @@ Defines named contract which returns @racket[#t], if the argument satisfies any 
 
 Types defined by @racket[define-type] represent @deftech{algebraic types}, where the sequence @nonbreaking{@racket[_c ...]} represents the @emph{type sum}, @tech{container types}  correspond to @emph{type products} and @tech{primitive types} correspond to @emph{unit types}.
 
-@section[#:tag "types:type combinators"]{Type combinators}
+@section[#:tag "types:type combinators"]{Contract combinators}
+@deftech{Contract combinators} allow to construct new types out of existing @tech{primitive types} or @tech{container types}.
+
 @defproc[(Any [v Any]) contract?]
 The contract for any value.
 

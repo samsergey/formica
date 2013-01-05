@@ -15,7 +15,7 @@
 
 @declare-exporting[formica/tools]
 
-The bindings documented in this section are provided by the @racketmodname[formica/tools] and @racketmodname[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/tools] and @racket[formica] modules.
 
 @defproc[(function? [x Any]) Bool]
 Returns @racket[#t] only if @racket[_x] is a function and @racket[#f] otherwise.

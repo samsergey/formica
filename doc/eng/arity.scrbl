@@ -15,8 +15,8 @@
 
 @declare-exporting[formica/arity]
 
-The bindings documented in this section are provided by the @racketmodname[formica/arity], 
-@racketmodname[formica/tools] and @racketmodname[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/arity], 
+@racket[formica/tools] and @racket[formica] modules.
 
 In the refference guide to the Formica language following terminology concerned to function arity is used:
 @itemize{@item{Function has @deftech{@emph{fixed arity}} if it may accept exact finite number of arguments. 

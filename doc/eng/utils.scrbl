@@ -15,6 +15,8 @@
 
 @include-section["differences.scrbl"]
 
+@include-section["comparison.scrbl"]
+
 @include-section["functionals.scrbl"]
 
 @include-section["memoize.scrbl"]

@@ -17,7 +17,7 @@ All types are defined by @emph{contracts}.
 A role of a contract could play
 @itemize{@item{a constant which belongs to a @tech{primitive type};}
          @item{an unary predicate, describing the type;}
-         @item{a compound contract, constructed by @tech{type combinators}.}}
+         @item{a compound contract, constructed by @tech{contract combinators}.}}
 
 @defproc[(contract? [v Any]) Bool]
 Returns @racket[#t] if @racket[_v] could be used as a contract and @racket[#f] otherwise.

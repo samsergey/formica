@@ -15,10 +15,10 @@
 
 @declare-exporting[formica/tags]
 
-The bindings documented in this section are provided by the @racketmodname[formica/tags] module,
-but not @racketmodname[formica].
+The bindings documented in this section are provided by the @racket[formica/tags] module,
+but not @racket[formica].
 
-The @racketmodname[formica/tags] module provides tools for creating tagged functions.
+The @racket[formica/tags] module provides tools for creating tagged functions.
 
 Tagging allows to distinguish functions and classes of functions.
 

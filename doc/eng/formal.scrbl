@@ -16,7 +16,7 @@
 
 @declare-exporting[formica]
 
-The bindings documented in this section are provided by the @racketmodname[formica/formal] and @racketmodname[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/formal] and @racket[formica] modules.
 
 @local-table-of-contents[]
 
