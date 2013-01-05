@@ -15,14 +15,10 @@
 
 @declare-exporting[formica]
 
-The bindings documented in this section are provided by the @racket[formica/tools] and @racket[formica] modules.
-        
-@defproc*[([(eq? [x Any] [y Any] ...+) boolean?]
-           [(equal? [x Any] [y Any] ...+) boolean?])]
-Same as @racket[eq?] and @racket[equal?] proveded @racket[racket/base], but if more then two arguments are given, arguments are compared pairwise from left to right.
+The bindings documented in this section are provided by the @racket[formica/tools] library and @racket[formica] language.
 
-@defproc[(different? [x Any] [y Any] ...+) boolean?]
-Returns @racket[#t] if @racket[_x] and @racket[_y] are not @racket[equal?], and @racket[#f] otherwise. If more then two arguments are given, they are compared pairwise, so the result is @racket[#t] if none of earguments are @racket[equal?].
+@defproc[(different? [v1 Any] [v2 Any] ...+) boolean?]
+Returns @racket[#t] if @racket[_v1] and @racket[_v2] are not @racket[equal?], and @racket[#f] otherwise. If more then two arguments are given, they are compared pairwise, so the result is @racket[#t] if none of arguments are @racket[equal?].
 
 Examples:
 @interaction[#:eval formica-eval
@@ -32,16 +28,16 @@ Examples:
   (different? 1 2 6 3 9 7)
   (different? 1 2 6 3 2 7)]
 
-@defproc[(almost-equal? [x Any] [y Any] ...+) boolean?]
+@defproc[(almost-equal? [v1 Any] [v2 Any] ...+) boolean?]
 @defthing[≈ almost-equal?]
-Returns @racket[#t] if @racket[_x] and @racket[_y] are @racket[equal?], or for numeric values if the magnitude of difference between @racket[_x] and @racket[_y] is less then @racket[(tolerance)]. Returns @racket[#f] otherwise.
+Returns @racket[#t] if @racket[_v1] and @racket[_v2] are @racket[equal?], or for numeric values if the magnitude of difference between @racket[_x] and @racket[_y] is less then @racket[(tolerance)]. Returns @racket[#f] otherwise.
 
 If lists and pairs are compared, they are @racket[almost-equal?] if they have the same structure and all entries at corresponding positions are @racket[almost-equal?].
 
 If more then two arguments are given, they are compared pairwise from left to right.
 
 Function @racket[almost-equal?] has an alias: @racket[≈]
-(could be entered as @litchar{\approx} + Alt @litchar{\}).
+(could be entered as @litchar{\approx} + @onscreen{Alt} @litchar{\}).
 
 Examples:
 @interaction[#:eval formica-eval
@@ -70,7 +66,15 @@ In the last case it is impossible to use the relative tolerance, so @racket[(tol
 
 @section{Generic ordering}
 
-Symbolic transformations often require ordering of objects of different kinds: numbers, booleans, strings or lists. Formica provides a generic ordering procedure which allows to define the ordering on different sets which are represented by contract-based types.
+Symbolic transformations often require ordering of objects of different kinds: numbers, booleans, strings or lists. For example, these two algebraic expressions, should be equivalent: @centered{@tt{'(+ a b) = '(+ b a).}} As another example consider following simplification chain:
+@centered{@tt{'(+ x 2 (* y x) 5)}   ==> 
+          
+          @tt{'(+ 2 5 x (* x y))}   ==> 
+          
+          @tt{'(+ 7 x (* x y)).}}
+So it is reasonable to sort the arguments of commutative  operations. One more example, is given in the @filepath{logics.rkt} file in the @filepath{formica/examples} folder.
+
+Formica provides a generic ordering procedure which allows to define the ordering on different sets which are represented by contract-based types.
 
 By default following ordering of different types is used:
 @tabular[#:sep @hspace[2]
@@ -83,10 +87,10 @@ By default following ordering of different types is used:
                (list "6"   @racket[null?]    @racket[(const #f)])
                (list "7"   @racket[pair?]    @racket[pair<?]))]
 It means that any string follows any real number, and for comparing values within the type the corresponding ordering function is used.
-This table is stored in the @racket[(type-ordering)] parameter, and could be extended or modifyed.
+This table is stored in the @racket[(type-ordering)] parameter, and could be extended or modified.
 
-@defproc[(ordered? [x Any] ...) boolean?]
-Returns @racket[#t] if arguments @racket[_x ...] are ordered according to ordering given by the @racket[(type-ordering)] parameter. Returns @racket[#f] otherwise.
+@defproc[(ordered? [v Any] ...) boolean?]
+Returns @racket[#t] if arguments @racket[_v ...] are ordered according to ordering given by the @racket[(type-ordering)] parameter. Returns @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -99,7 +103,7 @@ Examples:
 @defparam[type-ordering p (list: (cons: contract? (Any Any -> Bool)))]
 A parameter which defines the ordering of different types and ordering functions within types.
 
-In following example even numbers follow odd numbers, moreover, within odd numbers reverse ordering is set up. Symbols are not oredered, hence they are left unsorted, but shifted to the right.
+In following example even numbers follow odd numbers, moreover, within odd numbers reverse ordering is set up. Symbols are not ordered, hence they are left unsorted, but shifted to the right.
 @interaction[#:eval formica-eval
  (parameterize ([type-ordering (list (cons odd? >)
                                      (cons even? <))])
@@ -108,14 +112,14 @@ In following example even numbers follow odd numbers, moreover, within odd numbe
 @defproc[(add-to-type-ordering (type contract?) (prec-type contract? 'last) (ord-fun (Any Any -> Bool) (cons #f))) void?]
 Adds @racket[_type] to the current @racket[(type-ordering)] table. If the @racket[_prec-type] is given, the new type will have the order next to it. If the comparing function @racket[_ord-fun] is given, it will be used to compare values within the type. 
 
-In this example complex numbers follow reals and preceed strings. Moreover, within complex numbers ordering according to magnitude is set up. Symbols are oredered in default way.
+In this example complex numbers follow reals and precede strings. Moreover, within complex numbers ordering according to magnitude is set up. Symbols are ordered in default way.
 @interaction[#:eval formica-eval
  (parameterize ([type-ordering (type-ordering)])
    (add-to-type-ordering complex? real? (fork < magnitude))
    (sort '(0-i 2 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9) ordered?))]
 
-@defproc[(symbol<? [x Sym] [y Sym]) boolean?]
-Returns @racket[#t] if @racket[_x] preceeds @racket[_y] in lexicographic order, and @racket[#f] otherwise.
+@defproc[(symbol<? [s1 Sym] [s2 Sym]) boolean?]
+Returns @racket[#t] if @racket[_s1] precedes @racket[_s2] in lexicographic order, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -124,7 +128,7 @@ Examples:
   (symbol<? 'x 'x)
   (sort '(a X abc x abcd A) symbol<?)]
 
-@defproc[(pair<? [x pair?] [y pair?]) boolean?]
+@defproc[(pair<? [p1 pair?] [p2 pair?]) boolean?]
 Defines lexicographic order on a set of pairs, according to ordering of pair elements.
 
 Examples:

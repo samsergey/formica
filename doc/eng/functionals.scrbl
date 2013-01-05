@@ -15,7 +15,7 @@
 
 @declare-exporting[formica/tools]
 
-The bindings documented in this section are provided by the @racket[formica/tools] and @racket[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/tools] library and @racket[formica] language.
 
 @defproc[(function? [x Any]) Bool]
 Returns @racket[#t] only if @racket[_x] is a function and @racket[#f] otherwise.
@@ -48,7 +48,7 @@ Examples:
             [I2 (arg 2)]
             [I3 (arg 3)])]
 
-Aliases for grequently used @racket[arg] calls.
+Aliases for frequently used @racket[arg] calls.
 
 @defproc[(const (x Any)) Fun]
 Creates a trivial function which returns @racket[_x] for any arguments.
@@ -214,7 +214,7 @@ Return partially applied (curried) function @racket[_f], with fixed arguments @r
 
 @defproc*[([(curryr [f Fun] [arg Any] ...) (or/c curried? Any)]
             [(r-curried [f Fun] [arg Any] ...) (or/c curried? Any)])]
-Like @racket[curry] but argumets @racket[_arg ...] are fixed from the right side of argument sequence. Symbols @racket[curryr] and @racket[r-curried] are synonyms.
+Like @racket[curry] but arguments @racket[_arg ...] are fixed from the right side of argument sequence. Symbols @racket[curryr] and @racket[r-curried] are synonyms.
 
 Examples of partial application:
 @interaction[#:eval formica-eval

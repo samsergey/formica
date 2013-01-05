@@ -15,23 +15,17 @@
 
 @declare-exporting[formica/arity]
 
-The bindings documented in this section are provided by the @racket[formica/arity], 
-@racket[formica/tools] and @racket[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/tools] library and @racket[formica] language.
 
-In the refference guide to the Formica language following terminology concerned to function arity is used:
-@itemize{@item{Function has @deftech{@emph{fixed arity}} if it may accept exact finite number of arguments. 
-               The arity of function having fixed arity is expressed as positive integer number.}
-          @item{Function is called @deftech{@emph{variadic}} if it may accept different 
-               (probably unlimited) number of arguments. The arity of variadic function is expressed
-               with the @racket[arity-at-least] structure.}
-         @item{Function is called @deftech{@emph{polyadic}} if it may accept different 
-               but limited number of arguments. The arity of polyadic function is expressed as a list of
-               positive integers or @racket[arity-at-least] structure.}}
+In the reference guide to the Formica language following terminology concerned to function arity is used:
+@itemize{@item{Function has @deftech{@emph{fixed arity}} if it may accept exact finite number of arguments. The arity of function having fixed arity is expressed as positive integer number.}
+          @item{Function is called @deftech{@emph{variadic}} if it may accept different (probably unlimited) number of arguments. The arity of variadic function is expressed with the @racket[arity-at-least] structure.}
+         @item{Function is called @deftech{@emph{polyadic}} if it may accept different but limited number of arguments. The arity of polyadic function is expressed as a list of positive integers or @racket[arity-at-least] structure.}}
           
           
           
-@defproc[(fixed-arity? [f Any]) boolean?]
-Returns @racket[#t] if function @racket[_f] has @tech{fixed arity}, and @racket[#f] otherwise.
+@defproc[(fixed-arity? [v Any]) boolean?]
+Returns @racket[#t] if @racket[_v] is a function having @tech{fixed arity}, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -42,8 +36,8 @@ Examples:
   (fixed-arity? +)]
 
 
-@defproc[(variadic? [f Any]) boolean?]
-Returns @racket[#t] if function @racket[_f] is @tech{variadic}, and @racket[#f] otherwise.
+@defproc[(variadic? [v Any]) boolean?]
+Returns @racket[#t] if @racket[_v] is @tech{variadic} function, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -55,8 +49,8 @@ Examples:
   (variadic? cons)
   (variadic? +)]
 
-@defproc[(polyadic? [f Any]) boolean?]
-Returns @racket[#t] if function @racket[_f] is @tech{polyadic}, and @racket[#f] otherwise.
+@defproc[(polyadic? [v Any]) boolean?]
+Returns @racket[#t] if @racket[_v] is @tech{polyadic} function, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -68,8 +62,8 @@ Examples:
   (polyadic? cons)
   (polyadic? +)]
 
-@defproc[(nullary? [f Any]) boolean?]
-Returns @racket[#t] if arity of @racket[_f] includes 0, and @racket[#f] otherwise.
+@defproc[(nullary? [v Any]) boolean?]
+Returns @racket[#t] if @racket[_v] is a function and arity of @racket[_v] includes 0, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -82,8 +76,8 @@ Examples:
   (nullary? cons)
   (nullary? +)]
 
-@defproc[(unary? [f Any]) boolean?]
-Returns @racket[#t] if arity of @racket[_f] includes 1, and @racket[#f] otherwise.
+@defproc[(unary? [v Any]) boolean?]
+Returns @racket[#t] if @racket[_v] is a function and arity of @racket[_v] includes 1, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -98,7 +92,7 @@ Examples:
   (unary? +)]
 
 @defproc[(binary? [f Any]) boolean?]
-Returns @racket[#t] if arity of @racket[_f] includes 2, and @racket[#f] otherwise.
+Returns @racket[#t] if @racket[_v] is a function and arity of @racket[_v] includes 2, and @racket[#f] otherwise.
 
 Examples:
 @interaction[#:eval formica-eval

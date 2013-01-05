@@ -66,14 +66,6 @@
    ; сортировка элементов в выражении
    (cons op x) -->  (cons op (sort (map simplify x) ordered?))))
 
-(define ordered?
-  (rewrite
-   (? symbol? x) (? symbol? y) --> (string<=? (symbol->string x) (symbol->string y)) 
-   (? symbol?) (? pair?)  --> #t
-   (cons a x) (cons a y) --> (ordered? x y) 
-   (cons x _) (cons y _) --> (ordered? x y) 
-   _ _ --> #f ))
-
 ;; =====================================================================
 ;; перевод в дизъюнктивную нормальную форму
 ;; =====================================================================

@@ -15,7 +15,7 @@
 
 @defform*[[(define-type name c ...)
   (define-type (name x ...) c ...)] #:contracts ([c contract?] [x contract?])]
-Defines named contract which returns @racket[#t], if the argument satisfies any contract within @racket[_c ...]. If parameters @racket[_x ...] are given, defines the contract for parameterized type.
+Defines named contract which returns @racket[#t], if the argument satisfies any contract within @racket[_c ...]. If parameters @racket[_x ...] are given, defines the contract for parametrized type.
 
 Types defined by @racket[define-type] represent @deftech{algebraic types}, where the sequence @nonbreaking{@racket[_c ...]} represents the @emph{type sum}, @tech{container types}  correspond to @emph{type products} and @tech{primitive types} correspond to @emph{unit types}.
 
@@ -114,7 +114,7 @@ Inductive type "List":
 
 @bold{Example 4.}
 
-Inductive parameterized type: "List of A":
+Inductive parametrized type: "List of A":
 @def+int[#:eval formica-eval
   (define-type (Listof A)
     null?
@@ -170,7 +170,7 @@ Finally let's define folding of @racket[klist]s and it's ancestors:
 
 @bold{Example 6.}
 
-Let's define a parameterized abstract algebraic type to represent a binary tree having leaves of given type:
+Let's define a parametrized abstract algebraic type to represent a binary tree having leaves of given type:
 @racketgrammar[#:literals (Empty) (Tree A) Empty (Leaf A) (Node (Tree A) (Tree A))]
 As a type constructors @racket[Leaf] and @racket[Node] we will use formal functions, the unit type @racket[Empty] will be represented by a symbol @racket['Empty].
 

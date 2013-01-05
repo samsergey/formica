@@ -18,8 +18,7 @@
 
 @smaller{Reference guide.}
 
-@defmodulelang[formica]{This guide describes functions and syntax forms defined 
-         in the @racket[formica] language.
+@defmodulelang[formica]{This guide describes functions and syntax forms defined in the @racket[formica] language.
          
          Formica is available as both a language level and a module that can be used in other languages.}
 

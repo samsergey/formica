@@ -14,7 +14,7 @@
 @title[#:tag "memo"]{Memoization}
 
 @declare-exporting[formica/memoize]
-The bindings documented in this section are provided by the @racket[formica/memoize] and @racket[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/memoize] library and @racket[formica] language.
 
 @defproc[(memoized [f Fun]) memoized?]
 Returns memoized equivalent of the function @racket[_f].

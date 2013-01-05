@@ -42,7 +42,7 @@ Contracts could be constructed using @tech{contract combinators}:
 Provides safe type check. Returns @racket[#t] if @racket[_v] belongs to a type, defined by the contract @racket[_type-pred], and @racket[#f] otherwise.
 
 This form differs from direct contract application in following:
-@itemize{@item{it allows to concider @tech{primitive types};} 
+@itemize{@item{it allows to consider @tech{primitive types};} 
          @item{if application of @racket[_type-pred] leads to exception, the @racket[is] form does not stop running the program and returns @racket[#f].}}
 
 @interaction[#:eval formica-eval

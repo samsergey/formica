@@ -16,7 +16,7 @@
 
 @declare-exporting[formica]
 
-The bindings documented in this section are provided by the @racket[formica/formal] and @racket[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/formal] library and @racket[formica] language.
 
 @local-table-of-contents[]
 
@@ -149,13 +149,10 @@ Defines @tech{formal functions}, according to specifications @racket[_f-spec ...
 @racket[_id] is the name of a formal function and @racket[_arity-spec] is it's arity.
 
 For each formal function @racket[_id] the @racket[define-formal] form also defines
-@itemize{@item{the predicate @racket[_id?], which returns
-               @racket[#t] for formal application of @racket[_id] and @racket[#f] otherwise;}
-         @item{the syntax form @racket[(_id: _args ...)], which could be used as a contract 
-               for the formal application with arguments of given types.}}
+@itemize{@item{the predicate @racket[_id]@racketidfont{?}, which returns @racket[#t] for formal application of @racket[_id] and @racket[#f] otherwise;}
+         @item{the syntax form @racket[_id]@racketidfont{:}, which could be used as a contract for the formal application with arguments of given types.}}
 
-Examples:
-@interaction[#:eval formica-eval
+@examples[#:eval formica-eval
   (define-formal f)
   f
   (f 2)
@@ -193,13 +190,13 @@ Using formal applications as patterns:
   (match (g 1 2) 
     [(g a b c) (list a b c)])]
 
-The last two cases have wrong syntax because @racket[g] was declared
-to be a binary function.
+The last two cases have wrong syntax because @racket[g] was declared to be a binary function.
 
-@defproc[(hold [f (or/c Fun Sym)] [arity procedure-arity? (arity-at-least 0)]) formal-function?]
-@defthing[$ hold]
+@deftogether[(
+              @defproc[(hold [f (or/c Fun Sym)] [arity procedure-arity? (arity-at-least 0)]) formal-function?]
+              @defthing[#:kind "alias" $ hold])]
 Returns a @tech{formal function}, named like function @racket[_f] with arity specified by @racket[_arity].
-Function @racket[hold] has an alias: @racket[$].  
+Function @racket[hold] has an alias: @(racket $).  
 
 Examples:
 @interaction[#:eval formica-eval

@@ -39,7 +39,7 @@ Some frequently used primitive types have short names, which denote sets, define
 @defthing[Real contract?]  defines a set of real numbers. Equivalent to @racket[real?].
 @defthing[Int contract?]  defines a set of integer numbers. Equivalent to @racket[integer?].
 @defthing[Nat contract?]  defines a set of natural numbers.
-@defthing[Index contract?]  defines a set of positive integer exceedin zero.
+@defthing[Index contract?]  defines a set of positive integer exceeding zero.
 @defthing[Str contract?]  defines a set of strings. Equivalent to @racket[string?].
 @defthing[Sym contract?] defines a set of symbols. Equivalent to @racket[symbol?].
 @defthing[Fun contract?]  defines a set of functions. Equivalent to @racket[function?].

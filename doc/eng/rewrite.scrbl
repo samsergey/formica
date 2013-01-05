@@ -14,21 +14,17 @@
 
 @declare-exporting[formica/rewrite]
 
-The package provides tools for programming via term rewriting technique. Provided forms could be considered as a syntactic sugar for Racket's @racket[match] form, however they offer different semantics. The package introduces repetitive rewriting in order to obtain the normal form of given expression, ability to transform any subpart in nested list structure and definition of formal functions which abstract general algebraic types.
+The bindings documented in this section are provided by the @racket[formica/rewrite] library and @racket[formica] language.
+
+The Formica provides tools for programming via term rewriting technique. Provided forms could be considered as a syntactic sugar for Racket's @racket[match] form, however they offer different semantics. The language introduces repetitive rewriting in order to obtain the normal form of given expression, ability to transform any sub-part in nested list structure and definition of formal functions which abstract general algebraic types.
 
 @local-table-of-contents[]
 
 @section{Motivation}
 
-The thoroughly developed rewriting theory has many applications in different fields of
-computer science @cite["Baader99"  "Bezem03"]. It could be a handy tool in everyday programming practice, making 
-program units shorter and more expressive. The REFAL @cite["Turchin89" "Surhone10"] and Wolfram's Mathematica core 
-language @cite["Wolfram"] give excellent examples of scalability, power and expressiveness provided by rewriting.
+The thoroughly developed rewriting theory has many applications in different fields of computer science @cite["Baader99"  "Bezem03"]. It could be a handy tool in everyday programming practice, making program units shorter and more expressive. The REFAL @cite["Turchin89" "Surhone10"] and Wolfram's Mathematica core language @cite["Wolfram"] give excellent examples of scalability, power and expressiveness provided by rewriting.
 
-The aim of developing this library is to mimic Mathematica's rewriting tools in Scheme. 
-The library provides four forms: @racket[rewrite], @racket[rewrite-all], @racket[rewrite-repeated] and @racket[rewrite-all-repeated] named almost in the same way as rewriting functions in Mathematica. 
-In spite of this naming convention, we use word ``rewriting'' for ``replacement'', ``substitution'' 
-or ``transformation'' in this manual, since ``rewriting'' has precise mathematical meaning.
+The aim of developing this library is to mimic Mathematica's rewriting tools in Scheme. The library provides four forms: @racket[rewrite], @racket[rewrite-all], @racket[rewrite-repeated] and @racket[rewrite-all-repeated] named almost in the same way as rewriting functions in Mathematica. In spite of this naming convention, we use word ``rewriting'' for ``replacement'', ``substitution'' or ``transformation'' in this manual, since ``rewriting'' has precise mathematical meaning.
 
 @deftech{Rewriting} is a formal method of replacing subterms of an expression with other terms. In Formica the role of the expression play lists, structures and @tech{formal applications}.
 
@@ -102,21 +98,21 @@ These rules read: ``The λ-term @math{λ.x (f x)} could be rewritten as @math{f}
 @margin-note{To be precise, it is not really lazy. If the whole expression were not a β-redex, rewriting would proceed with it's parts and finally fall into @math{(ω ω)} infinite loop.}
 The last example shows that we have implemented a sort of lazy evaluation. This is a reflection of the rewriting strategy: first try to rewrite the whole expression and then it's parts.
 
-More examples could be found in the @racket{examples/} folder within the package distribution.
+More examples could be found in the @filepath{formica/examples} folder within the package distribution.
 Examples include:
 @itemize{
          
-         @item{@scheme{rewrite.rkt} -- more basic examples.}
+         @item{@filepath{rewrite.rkt} -- more basic examples.}
           
-          @item{@scheme{automata.rkt} -- finite automata defined with rewriting.}
+          @item{@filepath{automata.rkt} -- finite automata defined with rewriting.}
           
-          @item{@scheme{infix.rkt} -- transformation of algebraic expressions given in infix notation,
+          @item{@filepath{infix.rkt} -- transformation of algebraic expressions given in infix notation,
                  to prefix notation with parenthesis and reverse polish notation.}
-          @item{@scheme{peano.rkt} -- definition of Peano axioms.}
+          @item{@filepath{peano.rkt} -- definition of Peano axioms.}
           
-          @item{@scheme{logics.rkt} -- simple tautology prover.}
+          @item{@filepath{logics.rkt} -- simple tautology prover.}
           
-          @item{@scheme{turing.rkt} -- a Turing machine interpreter.}
+          @item{@filepath{turing.rkt} -- a Turing machine interpreter.}
           
           }
 

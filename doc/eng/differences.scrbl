@@ -15,7 +15,7 @@
 
 @declare-exporting[formica]
 
-In order to use symplifyed syntax for @tech{partial application} and curring, the arity of some variadic functions, defined in the Racket is changed in Formica.
+In order to use simplified syntax for @tech{partial application} and curring, the arity of some variadic functions, defined in the Racket is changed in Formica.
 
 @defproc*[([(+ [x Num] [y Num] ...+) Num]
            [(* [x Num] [y Num] ...+) Num])]
@@ -72,3 +72,7 @@ Returns binary boolean function if used not in a head position of application fo
   ==>
   (==> 'A 'B)
   (==> #f (/ 1 0))]
+
+@defproc*[([(eq? [x Any] [y Any] ...+) boolean?]
+           [(equal? [x Any] [y Any] ...+) boolean?])]
+Same as @racket[eq?] and @racket[equal?] provided @racket[racket/base], but if more then two arguments are given, arguments are compared pairwise from left to right.

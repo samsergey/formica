@@ -14,7 +14,7 @@
 @title[#:tag "tacit"]{Point-free function definitions}
 
 @declare-exporting[formica/tacit]
-The bindings documented in this section are provided by the @racket[formica/tacit] and @racket[formica] modules.
+The bindings documented in this section are provided by the @racket[formica/tacit] library and @racket[formica] language.
 
 @defform/subs[#:literals (lambda match-lambda case-lambda rewrite rewrite-all rewrite-repeated rewrite-all-repeated /. //.) 
                          (define/c (f var ...) rhs) 

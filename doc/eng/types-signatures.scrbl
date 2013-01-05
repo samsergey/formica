@@ -13,7 +13,7 @@
 
 @title[#:tag "contracts"]{Function signatures}
 
-The @deftech{function signature} defines the domain and range of a function. On the other hand the signature plays role of the contract: it defines preconditions and postconditions for a function in terms of predicates which should be satisfyed by arguments and a result. In case of pure functions this two interpretations of signature coincide. 
+The @deftech{function signature} defines the domain and range of a function. On the other hand the signature plays role of the contract: it defines preconditions and postconditions for a function in terms of predicates which should be satisfied by arguments and a result. In case of pure functions this two interpretations of signature coincide. 
 
 @defform*[#:literals (? ..)
    [(-> dom ... range)
@@ -23,7 +23,7 @@ The @deftech{function signature} defines the domain and range of a function. On 
                                                          (range contract?)
                                                          (opt contract?)
                                                          (rest contract?)]]
-Defines a function siginature, having domain @racket[_dom ...] and range  @racket[_range]. Function may have optional argumets @racket[_opt ...]. For @tech{variadic} functions the type of arguments is given by the contract @racket[_rest] followed by symbol @litchar{..} .
+Defines a function signature, having domain @racket[_dom ...] and range  @racket[_range]. Function may have optional arguments @racket[_opt ...]. For @tech{variadic} functions the type of arguments is given by the contract @racket[_rest] followed by symbol @litchar{..} .
 
 Could be used in the infix notation:
 @racketblock[(dom ... -> range)
@@ -40,7 +40,7 @@ The definition @racket[_fun-def] could be given using any binding form:
 
 @bold{Examples}
 
-Definion of numeric function:
+Definition of numeric function:
 @def+int[#:eval formica-eval
   (:: sqr (Num -> Num)
    (define (sqr x)
@@ -48,7 +48,7 @@ Definion of numeric function:
    (sqr 3)
    (sqr 'a)]
 
-This defines a function, which must have a positive number and a symbol as first and second argumets, resulting an even number.
+This defines a function, which must have a positive number and a symbol as first and second arguments, resulting an even number.
 @def+int[#:eval formica-eval
   (:: f (positive? Sym -> even?)
    (define (f x s)
