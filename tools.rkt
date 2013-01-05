@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 ;;______________________________________________________________
 ;;                   ______ 
 ;;                  (  //   _____ ____   .  __  __
@@ -26,17 +26,21 @@
  ; functional forms
  ==>
  (rename-out [or* or]
-             [and* and])
- xor
+             [and* and]
+             [eq?* eq?]
+             [equal?* equal?]
+             [almost-equal?* almost-equal?])
  ; functions
+ different?
+ xor ≈
+ ordered/c
  (contract-out
   (any-args (-> procedure? procedure?))
   (all-args (-> procedure? procedure?))
-  (almost-equal? (-> any/c any/c boolean?))
   (tolerance (parameter/c real?))
+  (ordered? (->* () #:rest (listof ordered/c) boolean?))  
   (symbol<? (->* (symbol? symbol?) #:rest (listof symbol?) boolean?))
-  (pair<? (->* (pair? pair?) #:rest (listof pair?) boolean?))
-  (ordered? (->* () #:rest list? boolean?))))
+  (pair<? (->* (pair? pair?) #:rest (listof pair?) boolean?))))
 
 ;;;=============================================================
 ;;; Logics
@@ -96,20 +100,45 @@
 
 (define (almost-equal? x y)
   (cond
-    [((all-args real?) x y) (if ((any-args inexact-number?) x y)
-                                (let ([ε (tolerance)])
-                                  (or (and (< x ε) (< y ε))
-                                      (< (abs (/ (- x y) (+ x y))) ε)))
-                                (= x y))]
+    [((all-args real?) x y) 
+      (cond 
+       [((any-args inexact-number?) x y) (or (= x y)
+                                              (< (+ x y) (tolerance))
+                                              (< (abs (/ (- x y) (+ x y))) (tolerance)))]
+       [else (= x y)])]
     
-    [((any-args complex?) x y) ((andf (-< almost-equal? angle)
-                                      (-< almost-equal? magnitude)) x y)]
+    [((andf (all-args number?)
+            (any-args complex?)) x y) (almost-equal? 0 (magnitude (- x y)))]
+    
     
     [((all-args pair?) x y) ((andf (-< almost-equal? car)
                                    (-< almost-equal? cdr)) x y)]
     
     [else (equal? x y)]))
 
+(define eq?* 
+  (case-lambda 
+    [(x y) (eq? x y)]
+    [(x y . z) (and (eq? x y) (apply eq?* y z))]))
+
+(define equal?* 
+  (case-lambda 
+    [(x y) (equal? x y)]
+    [(x y . z) (and (equal? x y) (apply equal?* y z))]))
+
+(define almost-equal?* 
+  (case-lambda 
+    [(x y) (almost-equal? x y)]
+    [(x y . z) (and (almost-equal? x y) (apply almost-equal?* y z))]))
+
+(define ≈ almost-equal?*)
+
+(define different?
+  (case-lambda 
+    [(x y) (not (equal? x y))]
+    [(x y . z) (or (not (equal? x y)) 
+                   (ormap (λ (t) (different? x t)) z)
+                   (apply different? y z))]))
 ;;;-------------------------------------------------------------
 ;; generic ordering function
 ;;;-------------------------------------------------------------
@@ -152,3 +181,12 @@
                         (cons symbol? symbol<?)
                         (cons null? (const #f))
                         (cons pair? pair<?))))
+
+(define ordered/c
+  (flat-rec-contract ordered/c 
+                     (or/c boolean?
+                           real?
+                           string?
+                           symbol?
+                           null?
+                           (cons/c ordered/c ordered/c))))

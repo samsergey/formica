@@ -36,18 +36,32 @@
 (test-case
  "almost-equal? tests"
  (check-true (almost-equal? 1 1))
+ (check-true (almost-equal? 1. 1.))
+ (check-true (almost-equal? 0 0))
+ (check-true (almost-equal? 0. 0.))
+ (check-true (almost-equal? 1. 1.+0i 1+0i 1.+0i 1+1e-16i (+ 1 1e-16)))
+ (check-true (almost-equal? 0. 0.+0i 0+0i 0.+0i 0+1e-16i 1e-16))
  (check-true (almost-equal? 1 1.0))
+ (check-false (almost-equal? 1 'x))
  (check-false (almost-equal? 1 2))
  (check-false (almost-equal? 1 (+ 1 1e-14)))
  (check-true (almost-equal? 1 (+ 1 1e-17)))
  (check-true (almost-equal? 1+2i 1+2i))
  (check-true (almost-equal? 1+2i 1.0+2.0i))
- (check-true (almost-equal? 1+2i 1.0+2.000000000000001i))
+ (check-true (almost-equal? 1+2i 1.0+2.0000000000000005i))
  (check-false (almost-equal? 1+2i 1.0+2.00000000000001i))
  (check-true (almost-equal? 'a 'a))
  (check-true (almost-equal? '(a (b c)) '(a (b c))))
  (check-true (almost-equal? '(1 (2 3)) '(1 (2 3.000000000000001))))
  (check-false (almost-equal? '(1 (2 3)) '(1 (2 3.00000000000001)))))
+
+(test-case
+ "tolerance tests"
+(parameterize ([tolerance 0.01])
+    (check-true (almost-equal? 1 1.001))
+    (check-true (almost-equal? 10 10.01))
+    (check-true (almost-equal? 1e23 1.001e23))
+    (check-true (almost-equal? 1e-23 1.001e-23))))
 
 (test-case
  "symbol<? tests"
