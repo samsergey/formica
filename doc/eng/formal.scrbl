@@ -164,9 +164,9 @@ Examples:
   (foldr f 'x0 '(a b c))
   (f? (f 1 2))
   (f? '(1 2))
-  #;(is (f 1) (f: Num))
-  #;(is (f 1 'x) (f: Num Sym))
-  #;(is (f 1 2 3) (f: Num ..))]
+  (is (f 1) (f: Num))
+  (is (f 1 'x) (f: Num Sym))
+  (is (f 1 2 3) (f: Num ..))]
 
 Formal function with fixed arity:
 
@@ -197,6 +197,7 @@ The last two cases have wrong syntax because @racket[g] was declared
 to be a binary function.
 
 @defproc[(hold [f (or/c Fun Sym)] [arity procedure-arity? (arity-at-least 0)]) formal-function?]
+@defthing[$ hold]
 Returns a @tech{formal function}, named like function @racket[_f] with arity specified by @racket[_arity].
 Function @racket[hold] has an alias: @racket[$].  
 

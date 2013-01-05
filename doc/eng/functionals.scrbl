@@ -69,7 +69,7 @@ Function may have any arity: composition is done as if they all were curried.
 In the generalized composition variadic or polyadic functions have minimal possible arity,
 unless they are @elemref["greedy"]{greedy}.
 
-For function @racket[composition] there is an alias: @racket[∘]
+Function @racket[composition] has an alias: @racket[∘]
 (could be entered as @litchar{\circ} + Alt @litchar{\}).
 
 Examples:
@@ -258,15 +258,3 @@ Example:
   (fcos 1)
   (cos (fcos 1))]
 
-Finding a root of the equation @math{F(x) = 0} by secant method:
-@interaction[#:eval formica-eval
-  (define (root f)
-    (compose 
-     I1
-     (fixed-point (λ (x y) 
-                    (let ([fx (f x)] 
-                          [fy (f y)])
-                      (values y (/ (- (* x fy) (* y fx)) 
-                                   (- fy fx)))))
-                  #:same-test almost-equal?)))
-  ((root (λ (x) (- (* x x) 2))) 1. 2.)]

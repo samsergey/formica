@@ -26,7 +26,7 @@
   (orf (->* () #:rest (listof procedure?) procedure?))
   (fork (-> procedure? unary? procedure?))
   (-< (-> procedure? unary? procedure?))
-  (fixed-point (->* (procedure?) (#:same-test (-> any/c any/c boolean?)) procedure?))
+  (fixed-point (->* (procedure?) ((-> any/c any/c boolean?)) procedure?))
   (>> (->* () #:rest (listof procedure?) procedure?))))
 
 ;;;-------------------------------------------------------------
@@ -132,7 +132,7 @@
 ;;;-------------------------------------------------------------
 ;: The iterative procedure which finds the fixed point of the function f
 ;: (any/c ... -> (values any/c ...)) -> (any/c ... -> (values any/c ...))
-(define (fixed-point f #:same-test [eq-test equal?]) 
+(define (fixed-point f [eq-test equal?]) 
   ((set-tag* 'fixed-point (or (object-name f) 'λ))
    (if (and (fixed-arity? f) (unary? f))
        (λ (x)

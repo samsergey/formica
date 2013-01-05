@@ -13,7 +13,7 @@
 
 @title[#:tag "memo"]{Memoization}
 
-@defmodule[formica/memoize]
+@declare-exporting[formica/memoize]
 The bindings documented in this section are provided by the @racketmodname[formica/memoize] and @racketmodname[formica] modules.
 
 @defproc[(memoized [f Fun]) memoized?]
@@ -52,4 +52,4 @@ Examples:
   (f 3)]
 
 @defform[(define/memo/c (f var ...) body)]
-Defines memoized function @racket[_f] using @elemref["point-free"]{point-free notation}.
+Defines memoized function @racket[_f] using @tech{point-free notation}.

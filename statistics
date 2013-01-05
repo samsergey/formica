@@ -1,28 +1,24 @@
 #! /bin/bash
 
-code=`egrep -v -e '^ *$' -e ' *^;'  rewrite/*.rkt | wc -l`
-code=$(( $code + `egrep -v -e '^ *$' -e '^;'  *.rkt | wc -l` ))
+rkt_files () {
+	find *.rkt rewrite/*.rkt
+}
+
+tst_files () {
+	find {examples,tests}/*.rkt
+}
+
+code=`rkt_files | xargs egrep -v -e '^ *$' -e ' *^;' | wc -l`
 echo $code" code lines"
 
-defs=`egrep -e '^ *\(define' rewrite/*.rkt | wc -l`
-defs=$(( $defs + `egrep -e '^ *\(define'   *.rkt | wc -l` ))
+defs=`rkt_files | xargs egrep -e '^ *\(define' | wc -l`
 echo $defs" definitions"
 
-tests=`egrep -v -e '^ *$' -e ' *^;'  tests/*.rkt | wc -l`
-tests=$(( $tests + `egrep -v -e '^ *$' -e '^;'  examples/*.rkt | wc -l` ))
+tests=`tst_files | xargs egrep -v -e '^ *$' -e ' *^;' | wc -l`
 echo $tests" test lines"
 
-comm=`egrep '^ *;'  *.rkt | wc -l`
-comm=$(( $comm + `egrep '^;'  rewrite/*.rkt | wc -l` ))
+comm=`rkt_files | xargs egrep '^ *;'  | wc -l`
 echo $comm" comment lines"
 
 docs=`egrep -v -e '^ *$'  doc/eng/*.scrbl | wc -l`
 echo $docs" documentation lines"
-
-the_code=`egrep -v -e '^ *$' -e ' *^;'  *.rkt`
-echo -n 'words in code: '
-echo $the_code | wc -w
-echo -n 'cons/car/cdr: '
-echo $the_code | egrep -o 'car|cdr|cons|cadr|null' | wc -l
-echo -n 'arithmetics: '
-echo $the_code | egrep -o '\([-+*/]' | wc -l
