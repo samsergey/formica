@@ -63,27 +63,4 @@
     (check-true (almost-equal? 1e23 1.001e23))
     (check-true (almost-equal? 1e-23 1.001e-23))))
 
-(test-case
- "symbol<? tests"
- (check-true (symbol<? 'x 'y))
- (check-false (symbol<? 'y 'x))
- (check-false (symbol<? 'x 'x))
- (check-true (symbol<? 'x 'y 'z)))
-
-(test-case
- "pair<? tests"
- (check-true (pair<? '(x) '(y)))
- (check-true (pair<? '(x a) '(y b)))
- (check-true (pair<? '(x b) '(y a)))
- (check-true (pair<? '(x (a 1)) '(x (a 2)))))
-
-(test-case
- "ordered<? tests"
- (check-true (ordered?))
- (check-true (ordered? 1))
- (check-true (ordered? 'x 'y))
- (check-true (ordered? 1 "a" 'x))
- (let ([l '(#t #f 1 2.0 3  "ab" "abc" "bca" (1) (1 2) (1 (2 3)) (3 2) 'a 'b 'x 'y)])
-   (for ([i 10])
-     (check-equal? l (sort (shuffle l) ordered?)))))
      

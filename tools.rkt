@@ -33,14 +33,10 @@
  ; functions
  different?
  xor ≈
- ordered/c
  (contract-out
   (any-args (-> procedure? procedure?))
   (all-args (-> procedure? procedure?))
-  (tolerance (parameter/c real?))
-  (ordered? (->* () #:rest (listof ordered/c) boolean?))  
-  (symbol<? (->* (symbol? symbol?) #:rest (listof symbol?) boolean?))
-  (pair<? (->* (pair? pair?) #:rest (listof pair?) boolean?))))
+  (tolerance (parameter/c real?))))
 
 ;;;=============================================================
 ;;; Logics
@@ -136,57 +132,7 @@
 (define different?
   (case-lambda 
     [(x y) (not (equal? x y))]
-    [(x y . z) (or (not (equal? x y)) 
-                   (ormap (λ (t) (different? x t)) z)
-                   (apply different? y z))]))
-;;;-------------------------------------------------------------
-;; generic ordering function
-;;;-------------------------------------------------------------
-(define (ordered? . x)
-  (apply 
-   (case-lambda
-     [() #t]
-     [(x) #t]
-     [(x y) (for/or ([px (in-list (dict-keys (type-ordering)))]
-                     [i (in-naturals)]
-                     #:when (px x))
-              (for/and ([(py f) (in-dict (type-ordering))]
-                        [j (in-range (+ i 1))]
-                        #:when (py y))
-                (and (= i j) (f x y))))]
-     [(x y . z) (and (ordered? x y)
-                     (apply ordered? y z))]) x))
+    [(x y . z) (and (not (equal? x y)) 
+                    (andmap (λ (t) (different? x t)) z)
+                    (apply different? y z))]))
 
-;; ordering for booleans #t < #f
-(define (boolean<? x y) (and x (not y)))
-
-;; ordering for symbols
-(define symbol<? 
-  (-< string<? symbol->string))
-
-;; ordering for pairs
-(define pair<?
-  (orf (-< ordered? car)
-       (andf (-< equal? car)
-             (-< ordered? cdr))))
-
-;; type-ordering = [(<type> . <ordering-function>) ... ]
-;; the oreder in the list defines the order of types
-;; if compared objects have the same type 
-;; the <ordering-function> is used to compare them.
-(define type-ordering 
-  (make-parameter (list (cons boolean? boolean<?)
-                        (cons real? <)
-                        (cons string? string<?)
-                        (cons symbol? symbol<?)
-                        (cons null? (const #f))
-                        (cons pair? pair<?))))
-
-(define ordered/c
-  (flat-rec-contract ordered/c 
-                     (or/c boolean?
-                           real?
-                           string?
-                           symbol?
-                           null?
-                           (cons/c ordered/c ordered/c))))
