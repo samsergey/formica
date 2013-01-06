@@ -90,7 +90,7 @@
    (check-equal? (fcos 1) (cos (fcos 1))))
  (let* ([Newt-step (λ (f df) (λ (x) (- x (/ (f x) (df x)))))]
         [Sqrt (λ (y) (fixed-point (Newt-step (λ (x) (- (* x x) y)) (λ (x) (* 2. x)))
-                                  almost-equal?))])
+                                  #:same-test almost-equal?))])
    (check almost-equal? (sqrt 2) ((Sqrt 2.) 1.)))
  (for ([f test-functions])
    (check-equal? (procedure-arity (fixed-point f)) (procedure-arity f))))

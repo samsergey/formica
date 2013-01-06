@@ -258,3 +258,58 @@ Example:
   (fcos 1)
   (cos (fcos 1))]
 
+Let's define naive implementations of secant, bisection and Newton's methods for numerical solution of equation @math{F(x) = 0}.
+@defs+int[#:eval formica-eval
+  ((define (bisection f)
+     (λ (a b)
+       (let ([c (* 0.5 (+ a b))])
+         (if (<= (* (f a) (f c)) 0)
+             (values a c)
+             (values c b)))))
+   
+   (define (secant f) 
+     (λ (x y)
+       (let ([fx (f x)] 
+             [fy (f y)])
+         (values y (/ (- (* x fy) (* y fx)) 
+                      (- fy fx))))))
+     
+  (define (newton f) 
+    (λ (x)
+      (let* ([ε (tolerance)]
+             [fx (f x)]
+             [dfx (/ (- (f (+ x ε)) fx) ε)])
+        (- x (/ fx dfx))))))]
+
+Note that functions @racketidfont{bisection} and @racketidfont{secant} require and produce two approximation points on each step, while @racketidfont{newton} function accepts only one point.
+
+Now we can define the universal function @racketidfont{find-root} which solves given equation using these methods:
+@def+int[#:eval formica-eval
+   (define (find-root f #:method (method secant))
+     (fixed-point (method f) #:same-test almost-equal?))
+
+  (parameterize ([tolerance 1e-10])
+    ((find-root (λ (x)(- (cos x) x))
+                #:method secant) 0. 1.))
+                                                  
+  (parameterize ([tolerance 1e-10])
+    ((find-root (λ (x)(- (cos x) x)) 
+                #:method bisection) 0. 1.))
+                                           
+  (parameterize ([tolerance 1e-10])
+    ((find-root (λ (x)(- (cos x) x)) 
+                #:method newton) 1.))]
+
+The @racketidfont{find-root} function inherits arity of it's methods:
+@interaction[#:eval formica-eval
+ (procedure-arity 
+  (find-root (λ (x)(- (cos x) x))
+             #:method secant))
+ 
+ (procedure-arity 
+  (find-root (λ (x)(- (cos x) x)) 
+             #:method bisection))
+ 
+ (procedure-arity 
+  (find-root (λ (x)(- (cos x) x)) 
+                #:method newton))]
