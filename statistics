@@ -8,13 +8,13 @@ tst_files () {
 	find {examples,tests}/*.rkt
 }
 
-code=`rkt_files | xargs egrep -v -e '^ *$' -e ' *^;' | wc -l`
+code=`rkt_files | xargs egrep -v -e '^ *$' -e '^ *;' | wc -l`
 echo $code" code lines"
 
-defs=`rkt_files | xargs egrep -e '^ *\(define' | wc -l`
+defs=`rkt_files | xargs egrep -e '^\(define' | wc -l`
 echo $defs" definitions"
 
-tests=`tst_files | xargs egrep -v -e '^ *$' -e ' *^;' | wc -l`
+tests=`tst_files | xargs egrep -v -e '^ *$' -e '^ *;' | wc -l`
 echo $tests" test lines"
 
 comm=`rkt_files | xargs egrep '^ *;'  | wc -l`
@@ -22,3 +22,22 @@ echo $comm" comment lines"
 
 docs=`egrep -v -e '^ *$'  doc/eng/*.scrbl | wc -l`
 echo $docs" documentation lines"
+
+words () {
+	rkt_files | 
+	xargs egrep -h -v -e '^ *$' -e '^ *;' |
+	egrep -o '\b[-+/*?<>=a-z]+\b' |
+	egrep -v 'racket/' |
+	sort -u | wc -l
+}
+
+def_words () {
+	rkt_files | 
+	xargs egrep -h -v -e '^ *$' -e '^ *;' |
+	egrep '^\(def' |
+	sed -r -e 's/\(def[^ ]+ \(([^)]+)\).*/\1/' -e 's/\(def[^ ]+ ([^ ]+).*/\1/'
+
+}
+
+#echo `words`
+#echo `def_words` | egrep -o '[^ ]+' | sort -u | wc -l
