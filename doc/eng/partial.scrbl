@@ -17,11 +17,9 @@
 
 The bindings documented in this section are provided by the @racket[formica/partial-app] library and @racket[formica] language.
 
-In order to get Formica language without syntax for partial application, use @racket{#lang formica/regular-app} at the header of the file
-or @racket[(require formica/regular-app)]. It will load all bindings from  @racket[formica] language except for those provided in
-@racket[formica/partial-app] library.
+In order to get Formica language without syntax for partial application, use @racket{#lang formica/regular-app} at the header of the file or @racket[(require formica/regular-app)]. It will load all bindings from  @racket[formica] language except for those provided in @racket[formica/partial-app] library.
 
-One of features making Formica different from Racket, is simplified syntax for @deftech{partial application}, which is close to Haskell or Qi programming languages.
+One of features making Formica different from Racket, is simplified syntax for @deftech{partial application}, which is close to @emph{Haskell} or @emph{Qi} programming languages.
 
 For example, function @racket[cons], expects two arguments:
 @interaction[#:eval formica-eval
@@ -67,3 +65,5 @@ Applies function @racket[_f] to a list of arguments @racket[_v ...]. If the numb
   (apply cons '(1 2))
   (apply cons '(1))
   (apply cons '(1 2 3))]
+
+The syntax for partial application may make compilation time of a program be longer then usual. However, usually it does not affect the run-time efficiency.

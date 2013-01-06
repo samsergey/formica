@@ -1,5 +1,5 @@
 6021
-#hash(((def ((lib "formica/main.rkt") Str)) . ((2068 . 2))) ((def ((lib "formica/main.rkt") or/c)) . ((2304 . 3))) ((def ((lib "formica/main.rkt") and/c)) . ((2364 . 3))) ((def ((lib "formica/tags.rkt") tagged?)) . ((6028 . 3))) ((form ((lib "formica/main.rkt") ::)) . ((2907 . 2))) ((form ((lib "formica/main.rkt") define-type)) . ((2140 . 6))) ((def ((lib "formica/main.rkt") not/c)) . ((2425 . 3))) ((def ((lib "formica/tools.rkt") I3)) . ((4490 . 4))) ((form ((lib "formica/rewrite.rkt") rewrite)) . ((652 . 6))) ((def ((lib "formica/main.rkt") hold)) . ((1408 . 4))) ((def ((lib "formica/tools.rkt") >>)) . ((4714 . 3))) ((def ((lib "formica/main.rkt") *)) . ((2936 . 7))) ((def ((lib "formica/main.rkt") n/f-pair?)) . ((1683 . 5))) ((def ((lib "formica/main.rkt") Fun)) . ((2116 . 2))) ((def ((lib "formica/tags.rkt") check-tag)) . ((6125 . 4))) ((def ((lib "formica/main.rkt") formal-function?)) . ((1558 . 3))) ((def ((lib "formica/arity.rkt") min-arity)) . ((6713 . 3))) ((def ((lib "formica/main.rkt") Sym)) . ((2092 . 2))) ((def ((lib "formica/tools.rkt") any-args)) . ((5249 . 3))) ((form ((lib "formica/main.rkt") is)) . ((1849 . 5))) ((def ((lib "formica/arity.rkt") inherit-arity)) . ((6851 . 3))) ((def ((lib "formica/tools.rkt") ∘)) . ((4643 . 2))) ((def ((lib "formica/main.rkt") ≈)) . ((3631 . 2))) ((def ((lib "formica/main.rkt") all?)) . ((3127 . 7))) ((def ((lib "formica/arity.rkt") unary?)) . ((6612 . 3))) ((def ((lib "formica/main.rkt") n/f-list?)) . ((1683 . 5))) ((def ((lib "formica/tools.rkt") fork)) . ((5088 . 7))) ((def ((lib "formica/main.rkt") Bool)) . ((1920 . 2))) ((def ((lib "formica/tools.rkt") orf)) . ((5024 . 4))) ((form ((lib "formica/tacit.rkt") define/c)) . ((66 . 16))) ((def ((lib "formica/tools.rkt") arg)) . ((4448 . 3))) ((def ((lib "formica/main.rkt") Any)) . ((2256 . 3))) ((def ((lib "formica/main.rkt") pair<?)) . ((4287 . 4))) ((def ((lib "formica/main.rkt") ordered?)) . ((3734 . 3))) ((def ((lib "formica/memoize.rkt") memoized?)) . ((5866 . 3))) ((def ((lib "formica/tools.rkt") -<)) . ((5088 . 7))) ((def ((lib "formica/tools.rkt") id)) . ((4407 . 3))) ((def ((lib "formica/tools.rkt") curried)) . ((5296 . 7))) ((def ((lib "formica/tools.rkt") function?)) . ((4358 . 3))) ((form ((lib "formica/main.rkt") ->)) . ((2668 . 10))) ((def ((lib "formica/main.rkt") Real)) . ((1969 . 2))) ((def ((lib "formica/main.rkt") eq?)) . ((3341 . 7))) ((form ((lib "formica/main.rkt") ==>)) . ((3314 . 2))) ((form ((lib "formica/rewrite.rkt") define//.)) . ((1229 . 2))) ((form ((lib "formica/memoize.rkt") define/memo)) . ((5915 . 3))) ((def ((lib "formica/tools.rkt") curry)) . ((5296 . 7))) ((def ((lib "formica/main.rkt") almost-equal?)) . ((3551 . 4))) ((form ((lib "formica/rewrite.rkt") rewrite-repeated)) . ((923 . 9))) ((def ((lib "formica/tools.rkt") composition)) . ((4588 . 3))) ((def ((lib "formica/tools.rkt") all-args)) . ((5202 . 3))) ((def ((lib "formica/tags.rkt") set-tag*)) . ((6298 . 4))) ((def ((lib "formica/arity.rkt") fixed-arity?)) . ((6398 . 3))) ((form ((lib "formica/rewrite.rkt") rewrite-all-repeated)) . ((1154 . 2))) ((form ((lib "formica/main.rkt") and)) . ((3290 . 2))) ((def ((lib "formica/main.rkt") type-ordering)) . ((3791 . 4))) ((def ((lib "formica/main.rkt") any?)) . ((3127 . 7))) ((def ((lib "formica/main.rkt") Nat)) . ((2018 . 2))) ((form ((lib "formica/main.rkt") formal-out)) . ((1771 . 2))) ((def ((lib "formica/tools.rkt") r-curried)) . ((5464 . 7))) ((form ((lib "formica/main.rkt") list:)) . ((2564 . 5))) ((def ((lib "formica/main.rkt") Index)) . ((2042 . 2))) ((def ((lib "formica/tools.rkt") curryr)) . ((5464 . 7))) ((def ((lib "formica/main.rkt") add-to-type-ordering)) . ((3962 . 7))) ((def ((lib "formica/arity.rkt") nullary?)) . ((6560 . 3))) ((form ((lib "formica/main.rkt") or)) . ((3267 . 2))) ((def ((lib "formica/arity.rkt") variadic?)) . ((6454 . 3))) ((def ((lib "formica/main.rkt") different?)) . ((3474 . 4))) ((def ((lib "formica/tools.rkt") andf)) . ((4959 . 4))) ((def ((lib "formica/main.rkt") symbol<?)) . ((4218 . 4))) ((def ((lib "formica/tools.rkt") fixed-point)) . ((5687 . 4))) ((form ((lib "formica/main.rkt") define-formal)) . ((1268 . 8))) ((def ((lib "formica/arity.rkt") max-arity)) . ((6778 . 3))) ((def ((lib "formica/main.rkt") cons:)) . ((2481 . 4))) ((def ((lib "formica/main.rkt") Num)) . ((1945 . 2))) ((def ((lib "formica/main.rkt") tolerance)) . ((3659 . 4))) ((def ((lib "formica/tools.rkt") fif)) . ((4883 . 5))) ((def ((lib "formica/main.rkt") contract?)) . ((1800 . 3))) ((def ((lib "formica/tools.rkt") I1)) . ((4490 . 4))) ((form ((lib "formica/rewrite.rkt") /.)) . ((857 . 2))) ((def ((lib "formica/main.rkt") equal?)) . ((3341 . 7))) ((def ((lib "formica/tools.rkt") const)) . ((4544 . 3))) ((def ((lib "formica/main.rkt") $)) . ((1541 . 2))) ((form ((lib "formica/main.rkt") formal)) . ((1661 . 2))) ((def ((lib "formica/tools.rkt") flipped)) . ((4837 . 3))) ((def ((lib "formica/tags.rkt") set-tag)) . ((6195 . 4))) ((def ((lib "formica/partial-app.rkt") apply)) . ((0 . 4))) ((def ((lib "formica/main.rkt") +)) . ((2936 . 7))) ((def ((lib "formica/memoize.rkt") memoized)) . ((5813 . 3))) ((def ((lib "formica/tools.rkt") I2)) . ((4490 . 4))) ((form ((lib "formica/rewrite.rkt") //.)) . ((1200 . 2))) ((form ((lib "formica/rewrite.rkt") define/.)) . ((885 . 2))) ((def ((lib "formica/arity.rkt") binary?)) . ((6662 . 3))) ((def ((lib "formica/arity.rkt") polyadic?)) . ((6507 . 3))) ((def ((lib "formica/tags.rkt") tag?)) . ((6078 . 3))) ((def ((lib "formica/main.rkt") Int)) . ((1994 . 2))) ((def ((lib "formica/tools.rkt") curried?)) . ((5635 . 3))) ((def ((lib "formica/tools.rkt") greedy)) . ((4669 . 3))) ((def ((lib "formica/tools.rkt") ¬)) . ((4760 . 5))) ((def ((lib "formica/main.rkt") map)) . ((3052 . 4))) ((form ((lib "formica/memoize.rkt") define/memo/c)) . ((5984 . 2))) ((form ((lib "formica/rewrite.rkt") rewrite-all)) . ((820 . 2))) ((def ((lib "formica/main.rkt") formal?)) . ((1614 . 3))) ((def ((lib "formica/tools.rkt") negated)) . ((4760 . 5))))
+#hash(((def ((lib "formica/main.rkt") *)) . ((2936 . 7))) ((def ((lib "formica/main.rkt") almost-equal?)) . ((3555 . 4))) ((form ((lib "formica/main.rkt") define-formal)) . ((1268 . 8))) ((def ((lib "formica/main.rkt") cons:)) . ((2481 . 4))) ((def ((lib "formica/tools.rkt") fork)) . ((5104 . 7))) ((def ((lib "formica/arity.rkt") binary?)) . ((6678 . 3))) ((def ((lib "formica/main.rkt") not/c)) . ((2425 . 3))) ((form ((lib "formica/main.rkt") and)) . ((3290 . 2))) ((form ((lib "formica/rewrite.rkt") rewrite)) . ((652 . 6))) ((form ((lib "formica/rewrite.rkt") rewrite-all)) . ((820 . 2))) ((def ((lib "formica/main.rkt") +)) . ((2936 . 7))) ((def ((lib "formica/tags.rkt") set-tag)) . ((6211 . 4))) ((def ((lib "formica/main.rkt") Bool)) . ((1920 . 2))) ((def ((lib "formica/arity.rkt") polyadic?)) . ((6523 . 3))) ((def ((lib "formica/tags.rkt") check-tag)) . ((6141 . 4))) ((def ((lib "formica/main.rkt") Num)) . ((1945 . 2))) ((form ((lib "formica/main.rkt") list:)) . ((2564 . 5))) ((def ((lib "formica/partial-app.rkt") apply)) . ((0 . 4))) ((def ((lib "formica/main.rkt") Nat)) . ((2018 . 2))) ((form ((lib "formica/main.rkt") or)) . ((3267 . 2))) ((def ((lib "formica/arity.rkt") nullary?)) . ((6576 . 3))) ((def ((lib "formica/main.rkt") hold)) . ((1408 . 4))) ((def ((lib "formica/main.rkt") equal?)) . ((3341 . 7))) ((def ((lib "formica/arity.rkt") max-arity)) . ((6794 . 3))) ((form ((lib "formica/main.rkt") ::)) . ((2907 . 2))) ((def ((lib "formica/arity.rkt") variadic?)) . ((6470 . 3))) ((def ((lib "formica/tools.rkt") ∘)) . ((4659 . 2))) ((def ((lib "formica/tools.rkt") any-args)) . ((5265 . 3))) ((form ((lib "formica/main.rkt") formal)) . ((1661 . 2))) ((def ((lib "formica/tools.rkt") greedy)) . ((4685 . 3))) ((def ((lib "formica/tools.rkt") composition)) . ((4604 . 3))) ((def ((lib "formica/main.rkt") n/f-pair?)) . ((1683 . 5))) ((def ((lib "formica/tools.rkt") I3)) . ((4506 . 4))) ((def ((lib "formica/arity.rkt") unary?)) . ((6628 . 3))) ((def ((lib "formica/tools.rkt") -<)) . ((5104 . 7))) ((def ((lib "formica/main.rkt") contract?)) . ((1800 . 3))) ((def ((lib "formica/main.rkt") Index)) . ((2042 . 2))) ((form ((lib "formica/rewrite.rkt") /.)) . ((857 . 2))) ((def ((lib "formica/main.rkt") $)) . ((1541 . 2))) ((def ((lib "formica/tools.rkt") curried)) . ((5312 . 7))) ((def ((lib "formica/main.rkt") formal-function?)) . ((1558 . 3))) ((def ((lib "formica/main.rkt") Fun)) . ((2116 . 2))) ((def ((lib "formica/main.rkt") and/c)) . ((2364 . 3))) ((def ((lib "formica/tools.rkt") curried?)) . ((5651 . 3))) ((form ((lib "formica/memoize.rkt") define/memo)) . ((5931 . 3))) ((def ((lib "formica/tools.rkt") I1)) . ((4506 . 4))) ((def ((lib "formica/tools.rkt") negated)) . ((4776 . 5))) ((form ((lib "formica/tacit.rkt") define/c)) . ((66 . 16))) ((def ((lib "formica/tags.rkt") set-tag*)) . ((6314 . 4))) ((def ((lib "formica/memoize.rkt") memoized?)) . ((5882 . 3))) ((def ((lib "formica/arity.rkt") min-arity)) . ((6729 . 3))) ((def ((lib "formica/main.rkt") Str)) . ((2068 . 2))) ((form ((lib "formica/rewrite.rkt") rewrite-repeated)) . ((923 . 9))) ((def ((lib "formica/main.rkt") Real)) . ((1969 . 2))) ((def ((lib "formica/tools.rkt") const)) . ((4560 . 3))) ((def ((lib "formica/tools.rkt") I2)) . ((4506 . 4))) ((def ((lib "formica/arity.rkt") fixed-arity?)) . ((6414 . 3))) ((def ((lib "formica/tools.rkt") fif)) . ((4899 . 5))) ((form ((lib "formica/memoize.rkt") define/memo/c)) . ((6000 . 2))) ((def ((lib "formica/tools.rkt") andf)) . ((4975 . 4))) ((def ((lib "formica/main.rkt") ordered?)) . ((3742 . 3))) ((def ((lib "formica/main.rkt") ≈)) . ((3639 . 2))) ((def ((lib "formica/tools.rkt") function?)) . ((4374 . 3))) ((def ((lib "formica/main.rkt") all?)) . ((3127 . 7))) ((def ((lib "formica/main.rkt") Sym)) . ((2092 . 2))) ((form ((lib "formica/main.rkt") is)) . ((1849 . 5))) ((def ((lib "formica/main.rkt") any?)) . ((3127 . 7))) ((def ((lib "formica/main.rkt") map)) . ((3052 . 4))) ((def ((lib "formica/tools.rkt") orf)) . ((5040 . 4))) ((def ((lib "formica/main.rkt") pair<?)) . ((4299 . 4))) ((def ((lib "formica/main.rkt") n/f-list?)) . ((1683 . 5))) ((def ((lib "formica/tools.rkt") curry)) . ((5312 . 7))) ((def ((lib "formica/memoize.rkt") memoized)) . ((5829 . 3))) ((def ((lib "formica/tags.rkt") tagged?)) . ((6044 . 3))) ((def ((lib "formica/tools.rkt") flipped)) . ((4853 . 3))) ((def ((lib "formica/tools.rkt") curryr)) . ((5480 . 7))) ((form ((lib "formica/rewrite.rkt") rewrite-all-repeated)) . ((1154 . 2))) ((def ((lib "formica/main.rkt") add-to-type-ordering)) . ((3970 . 7))) ((def ((lib "formica/tools.rkt") fixed-point)) . ((5703 . 4))) ((def ((lib "formica/main.rkt") tolerance)) . ((3667 . 4))) ((def ((lib "formica/main.rkt") symbol<?)) . ((4226 . 4))) ((form ((lib "formica/main.rkt") ->)) . ((2668 . 10))) ((def ((lib "formica/main.rkt") different?)) . ((3474 . 4))) ((form ((lib "formica/main.rkt") ==>)) . ((3314 . 2))) ((form ((lib "formica/rewrite.rkt") define/.)) . ((885 . 2))) ((form ((lib "formica/rewrite.rkt") //.)) . ((1200 . 2))) ((def ((lib "formica/tools.rkt") >>)) . ((4730 . 3))) ((def ((lib "formica/arity.rkt") inherit-arity)) . ((6867 . 3))) ((def ((lib "formica/main.rkt") or/c)) . ((2304 . 3))) ((def ((lib "formica/main.rkt") Any)) . ((2256 . 3))) ((def ((lib "formica/main.rkt") eq?)) . ((3341 . 7))) ((def ((lib "formica/tools.rkt") r-curried)) . ((5480 . 7))) ((form ((lib "formica/main.rkt") formal-out)) . ((1771 . 2))) ((form ((lib "formica/rewrite.rkt") define//.)) . ((1229 . 2))) ((def ((lib "formica/tools.rkt") id)) . ((4423 . 3))) ((def ((lib "formica/tags.rkt") tag?)) . ((6094 . 3))) ((def ((lib "formica/main.rkt") Int)) . ((1994 . 2))) ((def ((lib "formica/tools.rkt") arg)) . ((4464 . 3))) ((def ((lib "formica/tools.rkt") all-args)) . ((5218 . 3))) ((def ((lib "formica/main.rkt") formal?)) . ((1614 . 3))) ((def ((lib "formica/main.rkt") type-ordering)) . ((3799 . 4))) ((form ((lib "formica/main.rkt") define-type)) . ((2140 . 6))) ((def ((lib "formica/tools.rkt") ¬)) . ((4776 . 5))))
 procedure
 (apply f v ...) -> Any
   f : Fun
@@ -59,7 +59,7 @@ procedure
 (hold f [arity]) -> formal-function?
   f : (or/c Fun Sym)
   arity : procedure-arity? = (arity-at-least 0)
-value
+alias
 $ : hold
 procedure
 (formal-function? x) -> Bool
@@ -177,13 +177,13 @@ procedure
   x : Any
   y : Any
 procedure
-(different? x y ...+) -> boolean?
-  x : Any
-  y : Any
+(different? v1 v2 ...+) -> boolean?
+  v1 : Any
+  v2 : Any
 procedure
-(almost-equal? x y ...+) -> boolean?
-  x : Any
-  y : Any
+(almost-equal? v1 v2 ...+) -> boolean?
+  v1 : Any
+  v2 : Any
 value
 ≈ : almost-equal?
 parameter
@@ -191,8 +191,8 @@ parameter
 (tolerance x) -> void?
   x : real?
 procedure
-(ordered? x ...) -> boolean?
-  x : Any
+(ordered? v ...) -> boolean?
+  v : Any
 parameter
 (type-ordering) -> (list: (cons: contract? (Any Any -> Bool)))
 (type-ordering p) -> void?
@@ -205,13 +205,13 @@ procedure
   prec-type : contract? = 'last
   ord-fun : (Any Any -> Bool) = (cons #f)
 procedure
-(symbol<? x y) -> boolean?
-  x : Sym
-  y : Sym
+(symbol<? s1 s2) -> boolean?
+  s1 : Sym
+  s2 : Sym
 procedure
-(pair<? x y) -> boolean?
-  x : pair?
-  y : pair?
+(pair<? p1 p2) -> boolean?
+  p1 : pair?
+  p2 : pair?
 procedure
 (function? x) -> Bool
   x : Any
@@ -324,20 +324,20 @@ procedure
   t : Sym
   n : (or/c symbol? #f) = #f
 procedure
-(fixed-arity? f) -> boolean?
-  f : Any
+(fixed-arity? v) -> boolean?
+  v : Any
 procedure
-(variadic? f) -> boolean?
-  f : Any
+(variadic? v) -> boolean?
+  v : Any
 procedure
-(polyadic? f) -> boolean?
-  f : Any
+(polyadic? v) -> boolean?
+  v : Any
 procedure
-(nullary? f) -> boolean?
-  f : Any
+(nullary? v) -> boolean?
+  v : Any
 procedure
-(unary? f) -> boolean?
-  f : Any
+(unary? v) -> boolean?
+  v : Any
 procedure
 (binary? f) -> boolean?
   f : Any
