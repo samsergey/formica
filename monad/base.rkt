@@ -5,55 +5,75 @@
 ;;                   ~//~ ((_)// // / / // ((_ ((_/_
 ;;                 (_//
 ;;..............................................................
-;; Provides tools to work with monads.
+;; Provides basic tools to work with monads.
 ;;==============================================================
-(require "../tools.rkt"
-         "../tags.rkt"
-         "../types.rkt"
+(require "../tags.rkt"
          racket/match
+         racket/contract
          (for-syntax racket/base racket/syntax ))
 
 (provide (rename-out (make-monad monad)
                      (make-monad-plus monad-plus))
+         ; forms
          >>=
          do
          collect
          define-monad
          define-monad-plus
-         monad? monad-plus?
-         using-monad using
-         return lift lifted? bind
-         mzero mplus msum 
-         m-compose
-         fold-m filter-m 
-         map-m lift-m
-         guard guardf
-         Id)
+         using
+         ; functional forms
+         return
+         bind
+         mzero
+         mplus
+         lift/m
+         compose/m
+         ;functions
+         (contract-out 
+          (monad? predicate/c)
+          (monad-plus? predicate/c)
+          (using-monad (parameter/c monad?))
+          (lift (-> procedure? lifted?))
+          (lifted? predicate/c)
+          (fold/m (-> (-> any/c any/c any/c) any/c list? any/c))
+          (filter/m (-> (-> any/c any/c) list? any/c))
+          (map/m (-> (-> any/c any/c) list? any/c))
+          (guard (-> any/c any/c))
+          (guardf (-> (-> any/c any/c) (-> any/c any/c)))
+          (Id monad?)))
 ;;;==============================================================
 ;;; General definitions
 ;;;==============================================================
 ;; monad is an abstract data type with return and bind operations
-(struct monad (type return bind))
+(struct monad (return bind))
 ;; monad-plus is a monad with generalized operation mplus and neutral element
 (struct monad-plus monad (mzero mplus))
 
 ;;;==============================================================
 ;;; monad constructors
 ;;;==============================================================
-(define (make-monad #:type (type any/c) #:bind bind #:return return)
-  (monad type return bind))
+(define (make-monad #:bind bind 
+                    #:return return)
+  (monad 
+   (procedure-rename return 'return)
+   (procedure-rename bind 'bind)))
 
-(define (make-monad-plus #:type (type any/c) #:bind bind #:return return #:mzero mzero #:mplus mplus)
-  (monad-plus type return bind mzero mplus))
+(define (make-monad-plus #:bind bind
+                         #:return return 
+                         #:mzero mzero 
+                         #:mplus mplus)
+  (monad-plus 
+   (procedure-rename return 'return)
+   (procedure-rename bind 'bind)
+   mzero
+   (procedure-rename mplus 'mplus)))
 
-;; helper function for define-monad syntax
-(define (make-monad* M name #:type (type any/c) #:bind bind #:return return)
-  (M type     
-     (procedure-rename return 'return) 
-     (procedure-rename (λ (x f) 
-                         (unless (is x type) (error name "!!"))
-                         (bind x f))
-                       'bind)))
+;; named monad constructor
+(define (make-named-monad name 
+                           #:bind bind 
+                           #:return return)
+  (name (procedure-rename return 'return) 
+        (procedure-rename bind 'bind)))
 
 (define-syntax (define-monad stx)
   (syntax-case stx ()
@@ -61,20 +81,18 @@
      (with-syntax ([mn (format-id #'id "monad:~a" (syntax-e #'id))])
        #`(begin
            (struct mn monad ())
-           (define id (make-monad* mn 'id args ...))))]))
+           (define id (make-named-monad mn args ...))))]))
 
-;; helper function for define-monad-plus syntax
-(define (make-monad-plus* M name #:type (type any/c) #:bind bind #:return return #:mzero mzero #:mplus mplus)
-  (M type 
-     (procedure-rename return 'return)
-     (procedure-rename (λ (x f) 
-                         (unless (is x type) (raise-argument-error 'bind (format "monadic type ~a (monad ~a)" type name) x))
-                         (bind x f)) 
-                       'bind)
-     (begin
-       (unless (is mzero type) (raise-argument-error 'monad-plus (format "mzero, having monadic type ~a (monad ~a)" type name) mzero))
-       mzero)
-     (procedure-rename mplus 'mplus)))
+;; named monad-plus constructor
+(define (make-named-monad-plus* name 
+                                #:bind bind 
+                                #:return return 
+                                #:mzero mzero 
+                                #:mplus mplus)
+  (name (procedure-rename return 'return)
+        (procedure-rename bind 'bind)
+        mzero
+        (procedure-rename mplus 'mplus)))
 
 (define-syntax (define-monad-plus stx)
   (syntax-case stx ()
@@ -82,20 +100,31 @@
      (with-syntax ([mn (format-id #'id "monad-plus:~a" (syntax-e #'id))])
        #`(begin
            (struct mn monad-plus ())
-           (define id (make-monad-plus* mn 'id args ...))))]))
+           (define id (make-named-monad-plus* mn args ...))))]))
 
 ;;;===============================================================================
 ;;; The Id monad
 ;;;===============================================================================
 (define-monad Id
-  #:type Any
-  #:return id 
+  #:return (λ (x) x) 
   #:bind   (λ(x f) (f x)))
+
+;;;===============================================================================
+;;; Managing the used monad
+;;;===============================================================================
+;; the monad used by default
+(define using-monad (make-parameter Id))
+
+;; locally used monad
+(define-syntax-rule (using M expr ...) 
+  (parameterize ([using-monad M]) expr ...))
 
 ;;;==============================================================
 ;;; Syntax sugar for monadic functions
+;;; functions return, bind, mzero and mplus
+;;; are syntax forms in order to track the current monad
 ;;;==============================================================
-;; lifting a value into the current monad
+;; return in the current monad
 (define-syntax return
   (syntax-id-rules ()
     ((return expr ...) ((monad-return (using-monad)) expr ...))
@@ -128,8 +157,8 @@
     (mplus (monad-plus-mplus (using-monad)))))
 
 ;; do syntax
-;; Haskel: do { p1 <- m; p2 <- f; ...;  g p1 p2}
-;; Formica: (do (p1 <- m) (p2 <- f) ...  (g p1 p2))
+;; Haskel: do { p1 <- m; p2 <- f; ...;  expr}
+;; Formica: (do (p1 <- m) (p2 <- f) ...  expr)
 (define-syntax (do stx)
   (syntax-case stx ()
     [(do b r) #'(do* b r)]
@@ -149,6 +178,8 @@
     [(do* (b ...) r) (bind (b ...) >> r)]))
 
 ;; monadic generator
+;; Haskel: [expr | p1 <- m; p2 <- f]
+;; Formica: (collect expr [p1 <- m] [p2 <- f])
 (define-syntax-rule (collect res x ...)
   (collect* x ... (return res)))
 
@@ -172,19 +203,19 @@
 ;;; Monadic functions
 ;;;==============================================================
 ;; monadic composition 
-(define-syntax (m-compose stx)
+(define-syntax (compose/m stx)
   (syntax-case stx (>>=)
     [(_ f) #'(procedure-rename
               (λ x (bind (apply return x) >>= f))
-              'm-composed)]
+              'composed/m)]
     [(_ f g) #'(procedure-rename
                 (λ x (bind (apply return x) >>= g >>= f))
-                'm-composed)]
+                'composed/m)]
     [(_ f ...) (with-syntax ([(s ...) (local-expand 
                                        #'(seq f ...) 'expression #f)])
                  #'(procedure-rename
                     (λ x (bind (apply return x) >>= s ...))
-                    'm-composed))]))
+                    'composed/m))]))
 
 (define-syntax (seq stx)
   (syntax-case stx (>>=)
@@ -201,9 +232,9 @@
 
 (define (lifted? f) (check-tag 'lifted f))
 
-(define-syntax (lift-m stx)
+(define-syntax (lift/m stx)
   (syntax-case stx ()
-    [(lift-m f x ...) 
+    [(_ f x ...) 
      (with-syntax ([(x-id ...) (generate-temporaries #'(x ...))])
        #'(do (x-id <- x) ... 
              (return (f x-id ...))))]))
@@ -220,35 +251,24 @@
 
 
 ;; monadic folds
-(define (msum lst) (foldr mplus mzero lst))
-
-(define fold-m
+(define fold/m
   (procedure-rename
    (match-lambda*
      [(list f a '()) (return a)]
      [(list f a (cons x xs)) (do [y <- (f a x)] 
-                                 (fold-m f y xs))])
-   'fold-m))
+                                 (fold/m f y xs))])
+   'fold/m))
 
-(define filter-m
+(define filter/m
   (procedure-rename
    (match-lambda*
      [(list _ '()) (return '())]
      [(list p (cons x xs)) (do [b <- (p x)]
-                               [ys <- (filter-m p xs) ]
+                               [ys <- (filter/m p xs) ]
                                (return (if b (cons x ys) ys)))])
-   'filter-m))
+   'filter/m))
 
-(define (map-m f ms)
+(define (map/m f ms)
   (for/fold ((res mzero)) ((x ms))
     (mplus (f x) res)))
 
-;;;===============================================================================
-;;; Managing the used monad
-;;;===============================================================================
-;; the monad used by default
-(define using-monad (make-parameter Id))
-
-;; locally used monad
-(define-syntax-rule (using M expr ...) 
-  (parameterize ([using-monad M]) expr ...))
