@@ -171,7 +171,7 @@
   (syntax-rules (<- <-: <<- <<-:)
     [(do* ((p ...) <<- m) r) (do (p <- m) ... r)]
     [(do* ((p ...) <<-: m) r) (do (p <-: m) ... r)]
-    [(do* (p <- m) r) (bind m >>= (match-lambda 
+    [(do* (p <- m) r) (bind m >>= (match-lambda
                                     [p r] 
                                     [expr (error "do: no matching clause for" 'p)]))]
     [(do* (p <-: m) r) (do* (p <- (return m)) r)]
@@ -250,24 +250,26 @@
   (bind (guard (pred? x)) >> (return x)))
 
 
-;; monadic folds
+;; monadic fold
 (define fold/m
   (procedure-rename
-   (match-lambda*
-     [(list f a '()) (return a)]
-     [(list f a (cons x xs)) (do [y <- (f a x)] 
-                                 (fold/m f y xs))])
+   (match-lambda**
+     [(f a '()) (return a)]
+     [(f a (cons x xs)) (do [y <- (f a x)] 
+                            (fold/m f y xs))])
    'fold/m))
 
+;; monadic filtering
 (define filter/m
   (procedure-rename
-   (match-lambda*
-     [(list _ '()) (return '())]
-     [(list p (cons x xs)) (do [b <- (p x)]
-                               [ys <- (filter/m p xs) ]
-                               (return (if b (cons x ys) ys)))])
+   (match-lambda**
+     [(_ '()) (return '())]
+     [(p (cons x xs)) (do [b <- (p x)]
+                          [ys <- (filter/m p xs) ]
+                          (return (if b (cons x ys) ys)))])
    'filter/m))
 
+;; monadic map
 (define (map/m f ms)
   (for/fold ((res mzero)) ((x ms))
     (mplus (f x) res)))

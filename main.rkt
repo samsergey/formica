@@ -16,7 +16,8 @@
          "tacit.rkt"
          "memoize.rkt"
          "types.rkt"
-         "ordering.rkt")
+         "ordering.rkt"
+         "monad.rkt")
 (provide
  (except-out (all-from-out
               racket/base
@@ -31,7 +32,16 @@
               "tacit.rkt"
               "memoize.rkt"
               "types.rkt"
-              "ordering.rkt")
-             procedure? lazy delay)
+              "ordering.rkt"
+              "monad.rkt")
+             procedure? lazy delay eval)
  (rename-out [procedure? function?]
-             [lazy delay]))
+             [lazy delay]
+             [eval* eval]))
+
+(define-namespace-anchor anch)
+(define nms (namespace-anchor->namespace anch))
+(define eval*
+  (case-lambda
+    [(expr) (eval expr nms)]
+    [(expr n) (eval expr n)]))
