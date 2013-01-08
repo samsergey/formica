@@ -14,7 +14,7 @@ It is based on the [Racket programming language](http://planet.racket-lang.org/)
 
 The main goal of designing the Formica language is to have a functional programming language as flexible as *Racket* and *Wolfram Mathematica*, and almost as syntactically clean as *Qi* or *Haskell*.
 
-Even though it is mainly educational language, some of it's features (such as **formal functions**, **abstract rewriting systems**, **generalized composition** etc.) could be used in various practical applications.
+Even though it is mainly educational language, some of it's features (such as **formal functions**, **abstract rewriting systems** etc.) could be used in various practical applications.
 
 Why Racket?
 -----------
@@ -75,7 +75,7 @@ This is a rewriting-based definition of the `map` function:
 ```Scheme
   (define map
     (/. f (cons h t) --> (cons (f h) (map f t))
-       _ '() --> '()))
+        _ '()        --> '()))
 ```
   
   **c)** Simplified syntax for **partial application** (as in *Qi*):
@@ -85,13 +85,13 @@ This is a rewriting-based definition of the `map` function:
   (map (map (* 2)) '((1 2) (3 4) (5))) ==> '((2 4) (6 8) (10))
 ```
 
-  **d) Tacit definitions** (almost as in *Haskell*):
+  **d) Tacit definitions**:
 
 ```Scheme
   (define/c (map f) (fold (∘ cons f) '()))
-  (define/c (fold f x0)
+  (define/c (fold f x0) 
     (/. (cons h t) --> (f h (fold f x0 t))
-        '() --> x0))
+        '()        --> x0))
 ```
 
   **e)** Contract-based **dynamical typing system**. Not strict, but instructive:
@@ -104,6 +104,9 @@ This is a rewriting-based definition of the `map` function:
 
  (:: add1 (natural? -> natural?)
    (define (add1 n) (+ 1 n)))
+   
+ (:: map ((a -> b) (list: a ..) -> (list: b ..))
+   (define/c (map f) (/. (cons h t) --> (cons (f h) (map f t)))))
  ``` 
   
  Building abstract algebraic types with formal functions:
@@ -145,19 +148,20 @@ This is a rewriting-based definition of the `map` function:
 Switch between monads:
 
 ```Scheme
+;; by default the List monad is used
 (collect (+ x y)
-    [(x y) <- '(1 2 3 4)]
+    [(x y) <<- '(1 2 3 4)]
     (odd? x))               ==> '(2 3 4 5 4 5 6 7)
 
 (using Set
   (collect (+ x y)
-    [(x y) <- '(1 2 3 4)]
+    [(x y) <<- '(1 2 3 4)]
     (odd? x)))              ==>  (set 2 3 4 5 6 7)
 
 
 (using Amb
   (collect (even? (+ x y))
-    [(x y) <- '(1 2 3 4)]
+    [(x y) <<- '(1 2 3 4)]
     (odd? x)))              ==> '(2 . #<promise>)
 ```
 
@@ -166,17 +170,24 @@ Define new monads:
 ```Scheme
 (define-monad-plus Or
   #:return (fif boolean? id in-value)
-  #:bind (/. #f _ --> #f
-             #t f --> (f #t)
+  #:bind (/. #t _ --> #t
+             #f f --> (f #f)
               m f --> (for/or ([x m]) (f x)))
   #:mzero #f
   #:mplus (λ (a b) (or a b)))
 
 (using Or
   (collect (even? (+ x y))
-    [(x y) <- '(1 2 3 4)]
+    [(x y) <<- '(1 2 3 4)]
     (odd? x)))              ==> #t
 ```
+Use monadic functions and operators
+```Scheme
+(define powerset (filter/m (const #t #f)))
+
+(powerset '(1 2 3)) ==> '((1 2 3) (1 2) (1 3) (1) (2 3) (2) (3) ())
+```
+
 
   **g)** A handful of functional tools:
 
