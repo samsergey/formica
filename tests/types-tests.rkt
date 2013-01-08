@@ -1,5 +1,6 @@
 #lang formica
-(require "test-utils.rkt")
+(require "../private/types/types.rkt"
+         "test-utils.rkt")
 
 ; simple contracts
 (:: f ((between/c -1 1) -> Num)

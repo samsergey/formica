@@ -1,5 +1,5 @@
 #lang racket/base
-(require "../tools.rkt"
+(require "../private/tools/tools.rkt"
          "test-utils.rkt"
          racket/list)
 

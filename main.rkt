@@ -16,7 +16,6 @@
          "tacit.rkt"
          "memoize.rkt"
          "types.rkt"
-         "ordering.rkt"
          "monad.rkt")
 (provide
  (except-out (all-from-out
@@ -32,7 +31,6 @@
               "tacit.rkt"
               "memoize.rkt"
               "types.rkt"
-              "ordering.rkt"
               "monad.rkt")
              procedure? lazy delay eval)
  (rename-out [procedure? function?]

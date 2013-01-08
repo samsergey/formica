@@ -7,7 +7,7 @@
 ;;..............................................................
 ; Provides curried and r-curried functions.
 ;;;=============================================================
-(require "tags.rkt"
+(require "../../tags.rkt"
          "arity.rkt"
          (only-in racket/list argmin argmax)
          racket/contract)

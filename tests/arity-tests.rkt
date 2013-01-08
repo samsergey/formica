@@ -1,5 +1,5 @@
 #lang racket/base
-(require "../arity.rkt"
+(require "../private/tools/arity.rkt"
          "test-utils.rkt")
 
 (define-syntax-rule (==> a b) (if a b #t))

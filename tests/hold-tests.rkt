@@ -1,6 +1,6 @@
 #lang racket/base
 (require "test-utils.rkt"
-         "../hold.rkt")
+         "../private/formal/hold.rkt")
 
 (test-case 
  "hold testing"

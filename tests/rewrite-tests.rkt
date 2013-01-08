@@ -1,6 +1,6 @@
 #lang racket/base
 (require "../rewrite.rkt"
-         "../curry.rkt"
+         "../tools.rkt"
          rackunit)
 
 (test-case

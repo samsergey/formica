@@ -13,7 +13,7 @@
 
 @title[#:tag "arity"]{Managing the function arity}
 
-@declare-exporting[formica/arity]
+@declare-exporting[formica/tools]
 
 The bindings documented in this section are provided by the @racket[formica/tools] library and @racket[formica] language.
 

@@ -9,7 +9,7 @@
 ;;==============================================================
 (require racket/match
          "base.rkt"
-         "../formal.rkt"
+         (only-in "../../formal.rkt" formal?)
          racket/set
          racket/contract)
 
@@ -39,7 +39,7 @@
 (define-monad-plus Set
   #:return (λ (x) (if (set-empty? x) x (set x)))
   #:bind (λ (m f) 
-           (unless (and (sequence? m) (n/f-list? m)) 
+           (unless (and (sequence? m) (not (formal? m))) 
              (raise-type-error 'bind "sequence" m)) 
            (for*/set ([x m] [fx (f x)]) fx))
   #:mzero (set)
@@ -53,7 +53,7 @@
   #:bind (match-lambda*
            [(list #t _)  #t]
            [(list #f f) (f #f)]
-           [(list m f) (unless (and (sequence? m) (n/f-list? m)) 
+           [(list m f) (unless (and (sequence? m) (not (formal? m))) 
                          (raise-type-error 'bind "sequence" m)) 
                        (for/or ([x m]) (f x))])
   #:mzero #f
@@ -67,7 +67,7 @@
   #:bind (match-lambda*
            [(list #f _) #f]
            [(list #t f) (f #t)]
-           [(list m f)  (unless (and (sequence? m) (n/f-list? m)) 
+           [(list m f)  (unless (and (sequence? m) (not (formal? m))) 
                           (raise-type-error 'bind "sequence" m)) 
                         (for/and ([x m]) (f x))])
   #:mzero #t

@@ -13,6 +13,8 @@
 
 @title[#:style '(toc) #:tag "types"]{The contract-based type system}
 
+@declare-exporting[formica/types]
+
 The bindings documented in this section are provided by the @racket[formica/types] library and @racket[formica] language.
 
 Formica has @emph{strict dynamic type system}, with type checking being done at run-time.

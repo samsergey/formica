@@ -1,5 +1,5 @@
 #lang racket/base
-(require "../nest.rkt" "test-utils.rkt")
+(require "../private/tools/nest.rkt" "test-utils.rkt")
 (define (two-functions)
 (test-case "nesting two functions"
   (check-exn exn:fail:contract? (λ () ((∘ u n) 0)))

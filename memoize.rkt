@@ -10,7 +10,7 @@
 (require (for-syntax racket/base)
          racket/contract
          "tags.rkt"
-         "arity.rkt"
+         (only-in "private/tools/arity.rkt" inherit-arity)
          "tacit.rkt")
 
 ;;;==============================================================

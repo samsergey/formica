@@ -1,6 +1,6 @@
 #lang racket/base
 (require rackunit
-         "../regular-app/formal.rkt"
+         "../private/regular-app/formal.rkt"
          racket/list
          racket/match)
 

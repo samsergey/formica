@@ -4,12 +4,11 @@
          racket/promise
          racket/string
          "tools.rkt"
-         "regular-app/formal.rkt"
+         "private/regular-app/formal.rkt"
          "rewrite.rkt"
          "tacit.rkt"
          "memoize.rkt"
          "types.rkt"
-         "ordering.rkt"
          "monad.rkt")
 (provide 
  (except-out 
@@ -19,12 +18,11 @@
                 racket/promise
                 racket/string
                 "tools.rkt"
-                "regular-app/formal.rkt"
+                "private/regular-app/formal.rkt"
                 "rewrite.rkt"
                 "tacit.rkt"
                 "memoize.rkt"
                 "types.rkt"
-                "ordering.rkt"
                 "monad.rkt")
   procedure? lazy delay)
  (rename-out [procedure? function?]

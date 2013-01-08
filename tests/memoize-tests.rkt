@@ -1,7 +1,7 @@
 #lang racket/base
 (require "../memoize.rkt"
          "test-utils.rkt"
-         "../functionals.rkt"
+         "../tools.rkt"
          "../rewrite.rkt")
 
 (test-case

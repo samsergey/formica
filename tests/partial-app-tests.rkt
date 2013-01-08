@@ -1,9 +1,7 @@
 #lang racket/base
 (require "test-utils.rkt"
          "../partial-app.rkt"
-         "../curry.rkt"
-         ;"../nest.rkt"
-         "../arity.rkt"
+         "../tools.rkt"
          "../formal.rkt"
          racket/list)
 

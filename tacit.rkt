@@ -9,7 +9,7 @@
 ;;==============================================================
 (require (for-syntax racket/base)
          "rewrite.rkt"
-         (only-in "arity.rkt" reduce-arity))
+         (only-in "private/tools/arity.rkt" reduce-arity))
 
 (provide define/c)
 

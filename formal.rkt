@@ -17,13 +17,13 @@
                      racket/list
                      racket/syntax
                      "tags.rkt"
-                     "hold.rkt")
+                     "private/formal/hold.rkt")
          (prefix-in part: "partial-app.rkt")
          "tags.rkt"
-         "hold.rkt")
+         "private/formal/hold.rkt")
 
 (provide 
- (all-from-out "hold.rkt")
+ (all-from-out "private/formal/hold.rkt")
  (contract-out
   (formals (parameter/c (listof predicate/c)))
   (formal? predicate/c)

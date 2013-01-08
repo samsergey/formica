@@ -1,7 +1,7 @@
 #lang racket/base
 (require rackunit
          "../formal.rkt"
-         "../curry.rkt"
+         "../private/tools/curry.rkt"
          racket/list
          racket/match)
 

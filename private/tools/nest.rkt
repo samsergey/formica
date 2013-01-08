@@ -10,10 +10,8 @@
 (require racket/list
          racket/contract
          "arity.rkt"
-         "tags.rkt"
-         (only-in "functionals.rkt" andf -<)
-         rackunit
-         "tests/test-utils.rkt")
+         "../../tags.rkt"
+         (only-in "functionals.rkt" andf -<))
 
 
 (provide 

@@ -9,7 +9,7 @@
 ;;;=============================================================
 (require racket/contract
          racket/match
-         "tags.rkt"
+         "../../tags.rkt"
          "arity.rkt")
 
 (provide

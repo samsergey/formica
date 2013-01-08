@@ -1,5 +1,5 @@
 #lang racket
-(require "../curry.rkt"
+(require "../private/tools/curry.rkt"
          "test-utils.rkt")
 
 (test-case 

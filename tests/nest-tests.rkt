@@ -1,5 +1,5 @@
 #lang racket/base
-(require "../nest.rkt"
+(require "../private/tools/nest.rkt"
          "automatic-nest-tests.rkt"
          "test-utils.rkt"
          rackunit)

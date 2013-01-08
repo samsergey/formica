@@ -1,5 +1,5 @@
 #lang racket/base
-(require "../ordering.rkt"
+(require "../private/types/ordering.rkt"
          "test-utils.rkt"
          racket/list)
 

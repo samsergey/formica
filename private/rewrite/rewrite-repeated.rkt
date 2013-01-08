@@ -9,7 +9,7 @@
 ;;==============================================================
 (require racket/match
          (for-syntax racket/base)
-         (only-in "../functionals.rkt" fixed-point))
+         (only-in "../tools/functionals.rkt" fixed-point))
 
 
 (provide rewrite-repeated

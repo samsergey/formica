@@ -1,10 +1,6 @@
 #lang racket/base
-(require "../nest.rkt"
-         "../curry.rkt"
-         "../arity.rkt"
-         (except-in "test-utils.rkt" sufficient-argument-list)
+(require (except-in "test-utils.rkt" sufficient-argument-list)
          "../tools.rkt"
-         "../functionals.rkt"
          racket/list)
 
 (define (sufficient-argument-list f)
@@ -26,7 +22,7 @@
 
 (current-output-port out)
 (displayln "#lang racket/base")
-(displayln "(require \"../nest.rkt\" \"test-utils.rkt\")") 
+(displayln "(require \"../private/tools/nest.rkt\" \"test-utils.rkt\")") 
 
 (displayln "(define (two-functions)")
 (displayln "(test-case \"nesting two functions\"")

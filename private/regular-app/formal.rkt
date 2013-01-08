@@ -14,13 +14,13 @@
                      racket/match
                      racket/list
                      racket/syntax
-                     "../tags.rkt"
-                     "../hold.rkt")
-         "../tags.rkt"
-         "../hold.rkt")
+                     "../../tags.rkt"
+                     "../formal/hold.rkt")
+         "../../tags.rkt"
+         "../formal/hold.rkt")
 
 (provide 
- (all-from-out "../hold.rkt")
+ (all-from-out "../formal/hold.rkt")
  (contract-out
   (formals (parameter/c (listof predicate/c)))
   (formal? predicate/c)

@@ -7,11 +7,11 @@
 ;;..............................................................
 ;; Provides formica/rewrite module.
 ;;==============================================================
-(require "rewrite/rewrite.rkt"
-         "rewrite/rewrite-repeated.rkt")
+(require "private/rewrite/rewrite.rkt"
+         "private/rewrite/rewrite-repeated.rkt")
  
-(provide (all-from-out "rewrite/rewrite.rkt"
-                       "rewrite/rewrite-repeated.rkt")
+(provide (all-from-out "private/rewrite/rewrite.rkt"
+                       "private/rewrite/rewrite-repeated.rkt")
          (protect-out --> -->.))
 
 (define-syntax -->

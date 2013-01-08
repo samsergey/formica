@@ -9,7 +9,7 @@
 ;;;=============================================================
 (require racket/dict
          "types.rkt"
-         "functionals.rkt")
+         "../tools/functionals.rkt")
 
 (provide
  ordered?

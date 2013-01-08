@@ -9,8 +9,8 @@
 ;;;=============================================================
 (require (for-syntax racket/base racket/contract)
          racket/contract
-         "curry.rkt"
-         "arity.rkt")
+         (only-in "private/tools/curry.rkt" curry)
+         (only-in "private/tools/arity.rkt" max-arity))
 
 (provide
  (rename-out [#%app #%app*] ; regular application
