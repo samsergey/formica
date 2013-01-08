@@ -44,8 +44,8 @@
                               [(< g e) (#%app curry f args ...)]
                               [else (raise exn)])))]
                        ; This test is done to catch exceptions raised by contracts
-                       ; TODO sufficiently lags at compile-time
-                       [exn:fail:contract:blame? 
+                       ; TODO sufficiently lags at compile-time (commented out)
+                       #;[exn:fail:contract:blame? 
                         (lambda (exn)
                           (if (regexp-match #rx"Signature violation:  received [0-9]+ argument" (exn-message exn))
                               (let* ([e (max-arity f)]
