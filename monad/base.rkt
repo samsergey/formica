@@ -29,12 +29,13 @@
          lift/m
          compose/m
          ;functions
+         lift
          (contract-out 
           (monad? predicate/c)
           (monad-plus? predicate/c)
           (using-monad (parameter/c monad?))
-          (lift (-> procedure? lifted?))
-          (lifted? predicate/c)
+          ;(lift (-> procedure? lifted?))
+          ;(lifted? predicate/c)
           (fold/m (-> (-> any/c any/c any/c) any/c list? any/c))
           (filter/m (-> (-> any/c any/c) list? any/c))
           (map/m (-> (-> any/c any/c) list? any/c))
@@ -225,12 +226,13 @@
                     #`(f >>= expanded-seq ...))]))
 
 ;; lifting the function
-(define (lift f)
-  (if (lifted? f) 
+(define (lift f) 
+  (compose1 return f)
+  #;(if (lifted? f) 
       f
       ((set-tag 'lifted (or (object-name f) 'λ)) (compose1 return f))))
 
-(define (lifted? f) (check-tag 'lifted f))
+#;(define (lifted? f) (check-tag 'lifted f))
 
 (define-syntax (lift/m stx)
   (syntax-case stx ()
@@ -255,7 +257,7 @@
   (procedure-rename
    (match-lambda**
      [(f a '()) (return a)]
-     [(f a (cons x xs)) (do [y <- (f a x)] 
+     [(f a (cons x xs)) (do [y <- (f x a)] 
                             (fold/m f y xs))])
    'fold/m))
 
