@@ -8,6 +8,7 @@
 ;; Provides basic tools to work with monads.
 ;;==============================================================
 (require "../../tags.rkt"
+         (only-in "../../types.rkt" is)
          racket/match
          racket/contract
          (for-syntax racket/base racket/syntax ))
@@ -47,24 +48,28 @@
 ;;; General definitions
 ;;;==============================================================
 ;; monad is an abstract data type with return and bind operations
-(struct monad (return bind))
+(struct monad (type return bind))
 ;; monad-plus is a monad with generalized operation mplus and neutral element
 (struct monad-plus monad (mzero mplus))
 
 ;;;==============================================================
 ;;; monad constructors
 ;;;==============================================================
-(define (make-monad #:bind bind 
+(define (make-monad #:type (type #f)
+                    #:bind bind 
                     #:return return)
   (monad 
+   type
    (procedure-rename return 'return)
    (procedure-rename bind 'bind)))
 
-(define (make-monad-plus #:bind bind
+(define (make-monad-plus #:type (type #f)
+                         #:bind bind
                          #:return return 
                          #:mzero mzero 
                          #:mplus mplus)
   (monad-plus 
+   type
    (procedure-rename return 'return)
    (procedure-rename bind 'bind)
    mzero
@@ -72,10 +77,39 @@
 
 ;; named monad constructor
 (define (make-named-monad name 
-                           #:bind bind 
-                           #:return return)
-  (name (procedure-rename return 'return) 
-        (procedure-rename bind 'bind)))
+                          #:type (type #f)
+                          #:bind bind 
+                          #:return return)
+  (if type
+      (name type 
+            (procedure-rename 
+             (λ x (let ([res (apply return x)])
+                    (if (is res type)
+                        res
+                        (raise-arguments-error 
+                         'return 
+                         (format "the result should have type ~a" type)
+                         "received" res))))
+             'return) 
+            (procedure-rename 
+             (λ (m f)
+               (unless (is m type) 
+                 (raise-arguments-error 
+                  'bind 
+                  (format "the argument should have type ~a" type)
+                  "given" m))
+               (let ([res (bind m f)])
+                 (if (is res type)
+                     res
+                     (raise-arguments-error 
+                      'bind 
+                      (format "the result should have type ~a" type)
+                      "received" res
+                      "function" f))))
+             'bind))
+      (name type 
+            (procedure-rename return 'return) 
+            (procedure-rename bind 'bind))))
 
 (define-syntax (define-monad stx)
   (syntax-case stx ()
@@ -87,14 +121,45 @@
 
 ;; named monad-plus constructor
 (define (make-named-monad-plus* name 
+                                #:type (type #f)
                                 #:bind bind 
                                 #:return return 
                                 #:mzero mzero 
                                 #:mplus mplus)
-  (name (procedure-rename return 'return)
+  (if type 
+      (name type
+            (procedure-rename 
+             (λ x (let ([res (apply return x)])
+                    (if (is res type)
+                        res
+                        (raise-arguments-error 
+                         'return 
+                         (format "the result should have type ~a" type)
+                         "received" res))))
+             'return)
+            (procedure-rename 
+             (λ (m f)
+               (unless (is m type) 
+                 (raise-arguments-error 
+                  'bind 
+                  (format "the argument should have type ~a" type)
+                  "given" m))
+               (let ([res (bind m f)])
+                 (if (is res type)
+                     res
+                     (raise-arguments-error 
+                      'bind 
+                      (format "the result should have type ~a" type)
+                      "received" res
+                      "function" f))))
+             'bind)
+            mzero
+            (procedure-rename mplus 'mplus))
+      (name type
+        (procedure-rename return 'return)
         (procedure-rename bind 'bind)
         mzero
-        (procedure-rename mplus 'mplus)))
+        (procedure-rename mplus 'mplus))))
 
 (define-syntax (define-monad-plus stx)
   (syntax-case stx ()
@@ -121,6 +186,10 @@
 (define-syntax-rule (using M expr ...) 
   (parameterize ([using-monad M]) expr ...))
 
+(define-syntax-rule (when-monad-plus expr id)
+  (if (monad-plus? (using-monad))
+      expr
+      (error id (format "~a is not of a type monad-plus!" (using-monad)))))
 ;;;==============================================================
 ;;; Syntax sugar for monadic functions
 ;;; functions return, bind, mzero and mplus
@@ -156,13 +225,13 @@
 ;; mzero of the current monad
 (define-syntax mzero
   (syntax-id-rules ()
-    (mzero (monad-plus-mzero (using-monad)))))
+    [mzero (when-monad-plus (monad-plus-mzero (using-monad)) 'mzero)]))
 
 ;; mplus of the current monad
 (define-syntax mplus
   (syntax-id-rules ()
-    ((mplus expr ...) ((monad-plus-mplus (using-monad)) expr ...))
-    (mplus (monad-plus-mplus (using-monad)))))
+    [(mplus expr ...) (when-monad-plus ((monad-plus-mplus (using-monad)) expr ...) 'mplus)]
+    [mplus (when-monad-plus (monad-plus-mplus (using-monad)) 'mplus)]))
 
 ;; do syntax
 ;; Haskel: do { p1 <- m; p2 <- f; ...;  expr}
@@ -244,7 +313,7 @@
   (syntax-case stx (>>=)
     [(_ f g) #'(g >>= f)]
     [(_ g ... f)  (with-syntax ([(expanded-seq ...) (local-expand 
-                                               #'(seq g ...) 'expression #f)])
+                                                     #'(seq g ...) 'expression #f)])
                     #`(f >>= expanded-seq ...))]))
 
 ;; lifting the function
@@ -264,32 +333,32 @@
 
 ;; guarding operator
 (define (guard test)
-  (unless (monad-plus? (using-monad))
-    (error 'guard (format "~a is not of a type monad-plus!" (using-monad))))
-  (if test (return 'null) mzero))
+  (when-monad-plus (if test (return 'null) mzero) 'guard))
 
 ;; guarding function
-(define ((guardf pred?) x)
-  (bind (guard (pred? x)) >> (return x)))
+(define (guardf pred?)
+  (when-monad-plus 
+   (λ (x) (bind (guard (pred? x)) >> (return x))) 
+   'guardf))
 
 
 ;; monadic fold
 (define fold/m
   (procedure-rename
    (match-lambda**
-     [(f a '()) (return a)]
-     [(f a (cons x xs)) (do [y <- (f x a)] 
-                            (fold/m f y xs))])
+    [(f a '()) (return a)]
+    [(f a (cons x xs)) (do [y <- (f x a)] 
+                           (fold/m f y xs))])
    'fold/m))
 
 ;; monadic filtering
 (define filter/m
   (procedure-rename
    (match-lambda**
-     [(_ '()) (return '())]
-     [(p (cons x xs)) (do [b <- (p x)]
-                          [ys <- (filter/m p xs) ]
-                          (return (if b (cons x ys) ys)))])
+    [(_ '()) (return '())]
+    [(p (cons x xs)) (do [b <- (p x)]
+                         [ys <- (filter/m p xs) ]
+                         (return (if b (cons x ys) ys)))])
    'filter/m))
 
 ;; monadic sequencing
@@ -300,5 +369,6 @@
 (define (map/m f lst) (seq/m (map f lst)))
 
 ;; monadic sum
-(define (sum/m lst) (foldr mplus mzero lst))
+(define (sum/m lst) 
+  (when-monad-plus (foldr mplus mzero lst) 'sum/m))
 
