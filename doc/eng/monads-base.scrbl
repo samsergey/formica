@@ -17,37 +17,43 @@
 
 @section{Constructing monads}
 
-Following two functions return anonymous monads which could be used for creation of parameterized monads.
+Following two functions return anonymous monads which could be used to create parameterized monads.
 
 @defproc[(monad [#:return return (Any -> Any)]
-                [#:bind bind (Any (Any-> Any) -> Any)]) monad?]
-Returns a monad with given @racket[return] and @racket[bind] functions.
+                [#:bind bind (Any (Any-> Any) -> Any)]
+                [#:type type contract? #f]) monad?]
+Returns a monad with given @racket[return] and @racket[bind] functions. If the @racket[type] is given monadic values are restricted to satisfy the given contract.
 
 @defproc[(monad-plus [#:return return (Any -> Any)]
                 [#:bind bind (Any (Any-> Any) -> Any)]
                 [#:mzero mzero Any]
-                [#:mplus mplus (Any Any -> Any)]) monad-plus?]
-Returns an additive monad with given @racket[return], @racket[bind], @racket[mplus] functions and neutral element @racket[mzero].
+                [#:mplus mplus (Any Any -> Any)]
+                [#:type type contract? #f]) monad-plus?]
+Returns an additive monad with given @racket[return], @racket[bind], @racket[mplus] functions and neutral element @racket[mzero]. If the @racket[type] is given monadic values are restricted to satisfy the given contract.
 
 @defform[(define-monad id 
            #:return return 
-           #:bind bind)
+           #:bind bind
+           [#:type type])
          #:contracts ([return (Any -> Any)]
-                      [bind (Any (Any-> Any) -> Any)])]
+                      [bind (Any (Any-> Any) -> Any)]
+                      [type contract?])]
 Defines a monad with name @racket[_id] and given @racket[return] and @racket[bind] functions.
 
 @defform[(define-monad-plus id 
            #:return return 
            #:bind bind 
            #:mzero mzero
-           #:mplus mplus)
+           #:mplus mplus
+           [#:type type])
          #:contracts ([return (Any -> Any)]
                       [bind (Any (Any-> Any) -> Any)]
                       [mzero Any]
-                      [mplus (Any Any -> Any)])]
+                      [mplus (Any Any -> Any)]
+                      [type contract?])]
 Defines an additive monad with name @racket[_id] and given @racket[return], @racket[bind], @racket[mplus] functions and neutral element @racket[mzero].
 
-The keywords in definition forms are used for clarity and can't be omitted, however they could be given in arbitrary order.
+All keywords except @racket[#:type] in definition forms are used for clarity and can't be omitted, however they could be given in arbitrary order.
 
 @bold{Examples:}
 
@@ -78,7 +84,9 @@ Monadic functions:
 A simple additive monad (equivalent to Maybe):
 @defs+int[#:eval formica-eval
   ((define-formal (m 1))
+   (define-type A/M? (m: Any) 'z)
    (define-monad-plus A/M
+     #:type A/M?
      #:return (/. 'z --> 'z
                    x --> (m x))
      #:bind (/. 'z    f --> 'z
@@ -118,6 +126,33 @@ Monadic functions:
   ((compose/m (lift f) (lift g)) 'a)
   (lift/m f (m 'a) (m 'b))
   (lift/m f (m 'a) 'z)]
+
+The definition of the @racket[A/M] monad declares the type of monadic values. It makes the error reports more clear.
+@interaction[#:eval formica-eval
+  (bind 'a >>= (lift f))
+  (bind (m 'a) >>= f)
+  (lift/m f (m 'a) 'b)]
+
+A parameterized monad (equivalent to (Maybe a)):
+@defs+int[#:eval formica-eval
+  ((define-type (A/M? a) (m: a) 'z)
+   (define (A/M a)
+     (monad-plus
+      #:type (A/M? a)
+      #:return (/. 'z --> 'z
+                   x --> (m x))
+      #:bind (/. 'z    f --> 'z
+                 (m x) f --> (f x))
+      #:mzero 'z
+      #:mplus (/. 'z _ --> 'z
+                  _ 'z --> 'z
+                  x  _ --> x))))
+  (using-monad (A/M Int))
+  (bind (m 2) >>= (lift sqr) >>= (lift (* 2)))
+  (bind 'z >>= (lift sqr) >>= (lift (* 2)))
+  (bind 4 >>= (lift sqrt))
+  (bind (m 2) >>= (lift sqrt))
+  (bind (m 2) >>= (guardf even?) >>= (lift (* 2)))]
 
 @defproc*[([(monad? [v Any]) Bool]
            [(monad-plus? [v Any]) Bool])]

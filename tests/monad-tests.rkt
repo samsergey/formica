@@ -26,24 +26,28 @@
  (check-equal? (do [(cons x y) <- '(a . b)]
                    [z <- (f x y)]
                    (return (g z))) (g (f 'a 'b)))
- (check-equal? ((compose/m f g) 'x) ((compose f g) 'x)))
+ (check-equal? ((compose/m f g) 'x) ((compose f g) 'x))
+ (check-exn exn:fail? (λ () mzero))
+ (check-exn exn:fail? (λ () (mplus 'a 'b)))
+ (check-exn exn:fail? (λ () (guard #f)))
+ (check-exn exn:fail? (λ () (guardf odd?)))
+ (check-exn exn:fail? (λ () (sum/m '(1 2 3)))))
 
 
 (test-case
  "Monad M (simple contaner)"
  (define-formal m f g)
- (:: m-return (-> a (m: a))
-   (define m-return m))
- (:: m-bind (-> (m: a) (-> a (m: b)) (m: b))
-   (define m-bind (/. (m x) f --> (f x))))
  (define-monad M
-   #:return m-return
-   #:bind m-bind)
+   #:type m?
+   #:return m
+   #:bind (/. (m x) f --> (f x)))
  
  (using-monad M)
  (check-equal? (return 'x) (m 'x))
  (check-equal? (bind (m 'x) >>= return) (m 'x))
  (check-equal? (bind (m 'x) >>= (lift f)) (m (f 'x)))
+ (check-exn exn:fail:contract? (λ () (bind 'x >>= (lift f))))
+ (check-exn exn:fail:contract? (λ () (bind (m 'x) >>= f)))
  (check-equal? (bind (m 'x) >>= (lift f) >>= (lift g)) (m (g (f 'x))))
  (check-equal? (do [x <- (return 'x)]
                    [y <- ((lift f) x)]
@@ -62,10 +66,13 @@
  (check-equal? ((compose/m (lift f) (lift g)) 'x) (m (f (g 'x))))
  (check-equal? (lift/m f (m 'x)) (m (f 'x)))
  (check-equal? (lift/m f (m 'x) (m 'y)) (m (f 'x 'y)))
- (check-exn exn:fail:contract? (λ () (lift/m f (m 'x) (m 'y) 't) 'z))
  (check-equal? (seq/m (map m '(a b c))) '(m (a b c)))
  (check-equal? (map/m (lift f) '(a b c)) '(m ((f a) (f b) (f c))))
- )
+ (check-exn exn:fail? (λ () mzero))
+ (check-exn exn:fail? (λ () (mplus 'a 'b)))
+ (check-exn exn:fail? (λ () (guard #f)))
+ (check-exn exn:fail? (λ () (guardf odd?)))
+ (check-exn exn:fail? (λ () (sum/m '(1 2 3)))))
 
 (test-case
  "Monad MZ"
@@ -133,6 +140,31 @@
  (check-equal? (lift/m f (m 'x) (m 'y)) (m (f 'x 'y)))
  (check-equal? (lift/m f (m 'x) (m 'y) 'z) 'z)
  (check-exn exn:fail:contract? (λ () (lift/m f (m 'x) (m 'y) 't))))
+
+(test-case
+ "Parameterized monad"
+ (define-formal m)
+ (define-type (A/M? a) (m: a) 'z)
+ (define (A/M a)
+   (monad-plus
+    #:type (A/M? a)
+    #:return (/. 'z --> 'z
+                 x --> (m x))
+    #:bind (/. 'z    f --> 'z
+               (m x) f --> (f x))
+    #:mzero 'z
+    #:mplus (/. 'z _ --> 'z
+                _ 'z --> 'z
+                x  _ --> x)))
+  (using-monad (A/M Int))
+  (check-equal? (bind (m 2) >>= (lift (curry + 2)) >>= (lift (curry * 2))) (m 8))
+  (check-equal? (bind (m 2) >>= (guardf odd?) >>= (lift (curry * 2))) 'z)
+  (check-equal? (bind (m 2) >>= (guardf even?) >>= (lift (curry * 2))) (m 4))
+  (check-equal? (bind 'z >>= (lift (curry + 2)) >>= (lift (curry * 2))) 'z)
+  (check-exn exn:fail:contract? (λ () (bind 4 >>= (lift sqrt))))
+  (check-exn exn:fail:contract? (λ () (bind (m 2) >>= (lift sqrt))))
+  (check-exn exn:fail:contract? (λ () (lift/m + (m 2) (m 4.5))))
+  (check-equal? (bind (m 4) >>= (lift sqrt) >>= (lift (curry * 2))) (m 4)))
 
 (test-case
  "Monad List"

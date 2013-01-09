@@ -9,7 +9,8 @@
 ;;==============================================================
 (require racket/match
          "base.rkt"
-         (only-in "../../formal.rkt" formal?)
+         (only-in "../../formal.rkt" formal? n/f-list?)
+         (only-in "../../types.rkt" check-result)
          racket/set
          racket/contract)
 
@@ -18,22 +19,27 @@
   (List monad-plus?)  
   (Set monad-plus?)
   (Or monad-plus?)
-  (And monad-plus?))
+  (And monad-plus?)
+  (listable? contract?))
  (all-from-out racket/set))
 
 ;;;===============================================================================
 ;;; List monad
 ;;;===============================================================================
+(define listable?
+  (flat-named-contract 
+   'listable?
+   (and/c sequence? (not/c formal?))))
+
 (define-monad-plus List
+  #:type listable?
   #:return list
-  #:bind (λ (m f) 
-           (unless (and (sequence? m) (not (formal? m))) 
-             (raise-arguments-error 'bind "argument should have type <sequence>" "given" m)) 
+  #:bind (λ (m f)            
            (for*/list ([x m] 
-                       [fx (let ([res (f x)])
-                             (unless (and (sequence? res) (not (formal? res))) 
-                               (raise-arguments-error 'bind "the result should have type <sequence>" "received" res "function" f))
-                             res)]) 
+                       [fx (check-result 
+                            'bind 
+                            (flat-named-contract 'n/f-list? n/f-list?)
+                            (f x))])
              fx))
   #:mzero null
   #:mplus append)

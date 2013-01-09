@@ -20,7 +20,7 @@
  (rename-out (.->. ->))
  Any Bool Num Real Int Nat Index Str Sym Fun Fun/c
  ∩ ∪
- is
+ is check-result check-argument check-type
  list: cons:
  (except-out (all-from-out racket/contract)
              ->
@@ -131,10 +131,28 @@
     [(_ x type) 
      (with-syntax ([c (parse-infix-contract #'type)])
        #'(cond
-           [(contract? c) 
-            (with-handlers ([exn:fail? (lambda (exn) #f)])
-              (contract-first-order-passes? c x))]
-           [else (raise-type-error 'is "predicate" 1 x type)]))]))
+               [(contract? c) 
+                (with-handlers ([exn:fail? (lambda (exn) #f)])
+                  (contract-first-order-passes? c x))]
+               [else (raise-type-error 'is "predicate" 1 x type)]))]))
+
+(define check-type (make-parameter #t))
+
+(define-syntax-rule (check-result id type expr)
+  (let ([res expr])
+    (if (or (not (check-type)) (is res type))
+        res
+        (raise-arguments-error 
+         id 
+         (format "the result should have type ~a"  (build-compound-type-name type))
+         "received" res))))
+
+(define-syntax-rule (check-argument id type x)
+  (unless (or (not (check-type)) (is x type)) 
+    (raise-arguments-error 
+     id 
+     (format "the argument should have type ~a" (build-compound-type-name type))
+     "given" x)))
 
 ;;;=================================================================
 ;;; Blaming text
