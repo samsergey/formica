@@ -15,7 +15,7 @@
 (provide (rename-out (make-monad monad)
                      (make-monad-plus monad-plus))
          ; forms
-         >>=
+         >>= >> <- <-: <<- <<-:
          do
          collect
          define-monad
@@ -29,16 +29,17 @@
          lift/m
          compose/m
          ;functions
-         lift
          (contract-out 
           (monad? predicate/c)
           (monad-plus? predicate/c)
           (using-monad (parameter/c monad?))
-          ;(lift (-> procedure? lifted?))
-          ;(lifted? predicate/c)
+          (lift (-> procedure? lifted?))
+          (lifted? predicate/c)
           (fold/m (-> (-> any/c any/c any/c) any/c list? any/c))
           (filter/m (-> (-> any/c any/c) list? any/c))
           (map/m (-> (-> any/c any/c) list? any/c))
+          (seq/m (-> list? any/c))
+          (sum/m (-> list? any/c))
           (guard (-> any/c any/c))
           (guardf (-> (-> any/c any/c) (-> any/c any/c)))
           (Id monad?)))
@@ -108,7 +109,7 @@
 ;;;===============================================================================
 (define-monad Id
   #:return (λ (x) x) 
-  #:bind   (λ(x f) (f x)))
+  #:bind   (λ (x f) (f x)))
 
 ;;;===============================================================================
 ;;; Managing the used monad
@@ -136,15 +137,21 @@
 ;; Formica: (bind m >>= f >>= g)
 (define-syntax bind
   (syntax-id-rules (>>= >>)
+    ((bind m ar1 f ar2 fs ...) (bind (bind m ar1 f) ar2 fs ...))
     ((bind m >>= f) ((monad-bind (using-monad)) m f))
     ((bind m >> f) ((monad-bind (using-monad)) m (λ (_) f)))
-    ((bind m ar1 f ar2 fs ...) (bind (bind m ar1 f) ar2 fs ...))
     (bind (monad-bind (using-monad)))))
 
 ;; single >>=
 (define-syntax >>=
   (syntax-id-rules ()
     [>>= (raise-syntax-error '>>= "could be used only in bind form")]))
+
+;; single >>=
+(define-syntax >>
+  (syntax-id-rules ()
+    [>> (raise-syntax-error '>> "could be used only in bind form")]))
+
 
 ;; mzero of the current monad
 (define-syntax mzero
@@ -177,6 +184,21 @@
                                     [expr (error "do: no matching clause for" 'p)]))]
     [(do* (p <-: m) r) (do* (p <- (return m)) r)]
     [(do* (b ...) r) (bind (b ...) >> r)]))
+
+;; single arrows
+(define-syntax <-
+  (syntax-id-rules ()
+    [<- (raise-syntax-error '<- "could be used only in do form")]))
+(define-syntax <-:
+  (syntax-id-rules ()
+    [<-: (raise-syntax-error '<-: "could be used only in do form")]))
+(define-syntax <<-
+  (syntax-id-rules ()
+    [<<- (raise-syntax-error '<<- "could be used only in do form")]))
+(define-syntax <<-:
+  (syntax-id-rules ()
+    [<<-: (raise-syntax-error '<<-: "could be used only in do form")]))
+
 
 ;; monadic generator
 ;; Haskel: [expr | p1 <- m; p2 <- f]
@@ -227,12 +249,11 @@
 
 ;; lifting the function
 (define (lift f) 
-  (compose1 return f)
-  #;(if (lifted? f) 
+  (if (lifted? f) 
       f
       ((set-tag 'lifted (or (object-name f) 'λ)) (compose1 return f))))
 
-#;(define (lifted? f) (check-tag 'lifted f))
+(define (lifted? f) (check-tag 'lifted f))
 
 (define-syntax (lift/m stx)
   (syntax-case stx ()
@@ -271,8 +292,13 @@
                           (return (if b (cons x ys) ys)))])
    'filter/m))
 
+;; monadic sequencing
+(define (seq/m lst) 
+  (foldr (λ (x y) (lift/m cons x y)) (return '()) lst))
+
 ;; monadic map
-(define (map/m f ms)
-  (for/fold ((res mzero)) ((x ms))
-    (mplus (f x) res)))
+(define (map/m f lst) (seq/m (map f lst)))
+
+;; monadic sum
+(define (sum/m lst) (foldr mplus mzero lst))
 

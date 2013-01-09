@@ -26,8 +26,7 @@
   (orf (->* () #:rest (listof procedure?) procedure?))
   (fork (-> procedure? unary? procedure?))
   (-< (-> procedure? unary? procedure?))
-  (fixed-point (->* (procedure?) (#:same-test (-> any/c any/c boolean?)) procedure?))
-  (>> (->* () #:rest (listof procedure?) procedure?))))
+  (fixed-point (->* (procedure?) (#:same-test (-> any/c any/c boolean?)) procedure?))))
 
 ;;;-------------------------------------------------------------
 ;;; id

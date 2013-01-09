@@ -120,14 +120,6 @@ Examples:
   ((∘ f (greedy g) h) 1 2 3 4)
   ((∘ remove-duplicates (greedy append)) '(1 2 3) '(2 3 2 4))]
 
-@defproc[(>> (f Fun) ...) Fun]
-Like @racket[∘] but composes functions @racket[_f ...] in reverse order. Equivalent to @centered{@tt{(flipped ∘)}.}
-
-Examples:
-@interaction[#:eval formica-eval
-  (define-formal f g h)
-  ((∘ f g h) 1 2 3 4)
-  ((>> f g h) 1 2 3 4)]
 
 @defproc*[([(negated (p Fun)) Fun]
            [(¬ (p Fun)) Fun])]

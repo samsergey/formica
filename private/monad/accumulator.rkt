@@ -28,8 +28,13 @@
   #:return list
   #:bind (λ (m f) 
            (unless (and (sequence? m) (not (formal? m))) 
-             (raise-type-error 'bind "sequence" m)) 
-           (for*/list ([x m] [fx (f x)]) fx))
+             (raise-arguments-error 'bind "argument should have type <sequence>" "given" m)) 
+           (for*/list ([x m] 
+                       [fx (let ([res (f x)])
+                             (unless (and (sequence? res) (not (formal? res))) 
+                               (raise-arguments-error 'bind "the result should have type <sequence>" "received" res "function" f))
+                             res)]) 
+             fx))
   #:mzero null
   #:mplus append)
 

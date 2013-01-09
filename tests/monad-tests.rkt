@@ -62,7 +62,10 @@
  (check-equal? ((compose/m (lift f) (lift g)) 'x) (m (f (g 'x))))
  (check-equal? (lift/m f (m 'x)) (m (f 'x)))
  (check-equal? (lift/m f (m 'x) (m 'y)) (m (f 'x 'y)))
- (check-exn exn:fail:contract? (λ () (lift/m f (m 'x) (m 'y) 't) 'z)))
+ (check-exn exn:fail:contract? (λ () (lift/m f (m 'x) (m 'y) 't) 'z))
+ (check-equal? (seq/m (map m '(a b c))) '(m (a b c)))
+ (check-equal? (map/m (lift f) '(a b c)) '(m ((f a) (f b) (f c))))
+ )
 
 (test-case
  "Monad MZ"
@@ -89,8 +92,8 @@
  (define-monad-plus MZ
    #:return mz-return
    #:bind mz-bind
-   #:mzero 'z
-   #:mplus mz-mplus)
+   #:mplus mz-mplus
+   #:mzero 'z)
  
  (using-monad MZ)
  (check-equal? (return 'x) (m 'x))
@@ -119,9 +122,13 @@
  (check-equal? (filter/m (lift (/. 'b --> #f)) '(a b c d)) (m '(a c d)))
  (check-equal? (filter/m (lift odd?) '(1 2 3 4 5)) (m '(1 3 5)))
  (check-equal? (filter/m (lift odd?) '(1 2 3 4 5 6)) (m '(1 3 5)))
- (check-equal? (map/m (lift ($ 'f)) '(a b c)) '(m (+ (m (f c)) (m (+ (m (f b)) (m (f a)))))))
- (check-equal? (map/m return '(a b c)) '(m (+ (m c) (m (+ (m b) (m a))))))
- (check-equal? (map/m return '(a z c)) '(m (+ (m c) (m a))))
+ (check-equal? (map/m (lift f) '(a b c)) '(m ((f a) (f b) (f c))))
+ (check-equal? (map/m return '(a b c)) '(m (a b c)))
+ (check-equal? (map/m return '(a z c)) 'z)
+ (check-equal? (seq/m '((m a) (m b) (m c))) '(m (a b c)))
+ (check-equal? (seq/m '((m a) z (m c))) 'z)
+ (check-equal? (sum/m '((m a) (m b) (m c))) '(m (+ (m a) (m (+ (m b) (m c))))))
+ (check-equal? (sum/m '((m a) z (m c))) '(m (+ (m a) (m c))))
  (check-equal? (lift/m f (m 'x)) (m (f 'x)))
  (check-equal? (lift/m f (m 'x) (m 'y)) (m (f 'x 'y)))
  (check-equal? (lift/m f (m 'x) (m 'y) 'z) 'z)
@@ -157,13 +164,18 @@
  (check-equal? (filter/m (lift odd?) '(1 2 3 4 5)) '((1 3 5)))
  (check-equal? (filter/m (lift odd?) '(1 2 3 4 5 6)) '((1 3 5)))
  (check-equal? (filter/m (λ (x) (list #t #f)) '(1 2 3)) '((1 2 3) (1 2) (1 3) (1) (2 3) (2) (3) ()))
- (check-equal? (map/m (lift ($ 'f)) '(a b c)) '((f c) (f b) (f a)))
- (check-equal? (map/m return '(a b c)) '(c b a))
+ (check-equal? (map/m (lift f) '(a b c)) '(((f a) (f b) (f c))))
+ (check-equal? (map/m return '(a b c)) '((a b c)))
+ (check-equal? (seq/m '((a) (b) (c))) '((a b c)))
+ (check-equal? (seq/m '((a) () (c))) '())
+ (check-equal? (sum/m '((a) (b) (c))) '(a b c))
+ (check-equal? (sum/m '((a) () (c))) '(a c))
  (check-equal? (lift/m f '(x)) '((f x)))
  (check-equal? (lift/m f '(x) '(y)) '((f x y)))
  (check-equal? (lift/m f '(x) '(y) '()) '())
  (check-equal? (lift/m f '(x y) '(a b)) '((f x a) (f x b) (f y a) (f y b)))
  (check-equal? (lift/m f '(x y) '(a)) '((f x a) (f y a)))
+ 
  )
 
 (require "../examples/List-examples.rkt")

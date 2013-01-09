@@ -45,11 +45,11 @@
      (= N (op1 (op2 (op3 (op4 1 2) 3) 4) 5))))
  
  (check-equal? (express 9) '(((((1 / 2) + 3) * 4) - 5 = 9)))
- (check-equal? (map/m express (range 20))
-               '(((((1 / 2) + 3) * 4) - 5 = 9) 
-                 ((((1 + 2) * 3) - 4) / 5 = 1)
-                 ((((1 + 2) - 3) / 4) * 5 = 0)
-                 ((((1 + 2) - 3) * 4) / 5 = 0))))
+ (check-equal? (bind (range 20) >>= express)
+               '(((((1 + 2) - 3) / 4) * 5 = 0) 
+                 ((((1 + 2) - 3) * 4) / 5 = 0) 
+                 ((((1 + 2) * 3) - 4) / 5 = 1) 
+                 ((((1 / 2) + 3) * 4) - 5 = 9))))
 
 
 ;;;==========================================================
@@ -137,7 +137,7 @@
  ;; we can parse three different types of terms
  (define-type Parsed (Hex: Int) (Dec: Int) (Word: Str))
  
- ; predicates for characters
+ ; predicates for types of characters
  (define hex-char? (regexp-match? #rx"[0-9a-f]"))
  (define dec-char? (regexp-match? #rx"[0-9]"))
  (define alph-char? (regexp-match? #rx"[a-z]"))
