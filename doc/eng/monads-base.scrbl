@@ -17,31 +17,38 @@
 
 @section{Constructing monads}
 
+Monads are first-class objects in Formica. Following function returns anonymous monad which could be used to create parameterized monads as mixins.
+
+@defproc[(monad [#:return return (Any -> Any)]
+                [#:bind bind (Any (Any-> Any) -> Any)]
+                [#:mzero mzero Any 'undefined]
+                [#:mplus mplus (Any Any -> Any) 'undefined]
+                [#:type type contract? #f]
+                [#:failure failure (Any -> any) raise-match-error]) monad?]
+Returns a monad or an additive monad with given @racket[_return] and @racket[_bind] functions, complemented by @racket[_mplus] operation and zero element @racket[_mzero] in case of additive monads.
+
+Keywords @racket[#:return] and @racket[#:bind] are used for clarity and can't be omitted, however they could be mixed in arbitrary order with others.
+
+If the @racket[_type] contract is given, monadic values are restricted to satisfy the contract. The concept of monads fits the type system very well, providing type consistency in sequential computations. The type specification helps to debug programs using monads and makes them more robust.
+
+If the @racket[_failure] function is given, it will be called in case of failure of pattern-matching in @racket[do] and @racket[collect] forms. By default it raises an exception.
+
 @defform[(define-monad id 
            #:return return 
-           #:bind bind
-           [#:type type])
-         #:contracts ([return (Any -> Any)]
-                      [bind (Any (Any-> Any) -> Any)]
-                      [type contract?])]
-Defines a monad with name @racket[_id] and given @racket[_return] and @racket[_bind] functions.
-
-All keywords except @racket[#:type] in definition forms are used for clarity and can't be omitted, however they could be given in arbitrary order.
-
-If the @racket[_type] is given monadic values are restricted to satisfy the given contract. The concept of monads fits the type system very well, providing type consistency in sequential computations. The type specification helps to debug programs using monads and makes them more robust.
-
-@defform[(define-monad-plus id 
-           #:return return 
            #:bind bind 
-           #:mzero mzero
-           #:mplus mplus
-           [#:type type])
+           [#:mzero mzero]
+           [#:mplus mplus]
+           [#:type type]
+           [#:failure failure])
          #:contracts ([return (Any -> Any)]
                       [bind (Any (Any-> Any) -> Any)]
                       [mzero Any]
                       [mplus (Any Any -> Any)]
-                      [type contract?])]
-Like @racket[define-monad], but defines an additive monad with name @racket[_id] and given @racket[_return], @racket[_bind], @racket[_mplus] functions and zero element @racket[_mzero].
+                      [type contract?]
+                      [failure (Any -> Any)])]
+
+Defines named monad in the same way as @racket[monad] constructor.
+
 
 @bold{Examples:}
 
@@ -72,7 +79,7 @@ A simple additive monad (equivalent to @tt{Maybe}). In this example the type of 
 @defs+int[#:eval formica-eval
   ((define-formal (m 1))
    (define-type A/M? (m: Any) 'z)
-   (define-monad-plus A/M
+   (define-monad A/M
      #:type A/M?
      #:return (/. 'z --> 'z
                    x --> (m x))
@@ -119,17 +126,7 @@ The definition of the @racket[A/M] monad declares the type of monadic values. It
   (bind (m 'a) >>= f)
   (lift/m f (m 'a) 'b)]
 
-Monads are first-class objects in Formica. Following two functions return anonymous monads which could be used to create parameterized monads as mixins.
 
-@defproc[(monad [#:return return (Any -> Any)]
-                [#:bind bind (Any (Any-> Any) -> Any)]
-                [#:type type contract? #f]) monad?]
-@defproc[(monad-plus [#:return return (Any -> Any)]
-                [#:bind bind (Any (Any-> Any) -> Any)]
-                [#:mzero mzero Any]
-                [#:mplus mplus (Any Any -> Any)]
-                [#:type type contract? #f]) monad-plus?]
-Return a monad or an additive monad with given @racket[return], @racket[bind] (complemented by @racket[mplus] and @racket[mzero] in case of additive monad). If the @racket[type] is given monadic values are restricted to satisfy the given contract.
 
 Example:
 
@@ -138,7 +135,7 @@ A monad with parameterized type (@tt{Maybe a}):
   ((define-formal Maybe Just)
    (define-type (Maybe? a) (Just: a) 'Nothing)
    (define (Maybe a)
-     (monad-plus
+     (monad
       #:type (Maybe? a)
       #:return (/. 'Nothing --> 'Nothing
                     x       --> (Just x))
@@ -165,14 +162,17 @@ We may use any type inside Maybe:
 (using (Maybe Sym) (map mplus '(x y z) '(y z x)))]
 
 @defproc*[([(monad? [v Any]) Bool]
+           [(monad-zero? [v Any]) Bool]
            [(monad-plus? [v Any]) Bool])]
-Return @racket[#t] if @racket[_v] is monad or additive monad, respectively. Otherwise return @racket[#f]. Any additive monad satisfies the @racket[monad?] predicate.
+Return @racket[#t] if @racket[_v] is monad, monad with zero element or additive monad, respectively. Otherwise return @racket[#f].
 
 Examples:
 @interaction[#:eval formica-eval
   (monad? Id)
-  (monad? List)
+  (monad-zero? Id)
   (monad-plus? Id)
+  (monad? List)
+  (monad-zero? List)
   (monad-plus? List)]
 
 @section{Switching between monads}
@@ -239,7 +239,11 @@ When called without subform, @racket[bind] evaluates to a binding function of th
    (apply bind (list '(a b c) (lift f))))]
 
 @defform/subs[#:literals (<- <- <<- <<-:) (do ops ...+ res) 
-([ops (pat <- expr) (pat <-: expr) ((pat1 pat2 ...) <<- expr) ((pat1 pat2 ...) <<-: expr) (expr)])]
+([ops (pat <- expr) 
+      (pat <-: expr) 
+      ((pat1 pat2 ...) <<- expr) 
+      ((pat1 pat2 ...) <<-: expr) 
+      expr])]
 Performs sequential computations in the context of the @tech{currently used monad}.
 Mimics do-syntax of @emph{Haskell} language.
 
@@ -269,6 +273,7 @@ Using pattern-matching
    (do [(cons x y) <- '((1 . 2) (3 . 4))]
        (return (f x y))))]
 
+
 Here the @racket[x] is binds to a whole list, not to it's elements:
 @interaction[#:eval formica-eval
  (using List
@@ -295,6 +300,40 @@ Guarding
        (guard (< x y))
        (return (f x y))))]
 
+
+@defform/subs[#:literals (<- <- <<- <<-:) 
+  (collect expr ops ...+)
+  ([ops (pat <- expr) 
+        (pat <-: expr) 
+        ((pat1 pat2 ...) <<- expr) 
+        ((pat1 pat2 ...) <<-: expr) 
+        guard-expr])]
+Performs monadic set comprehension. Defined for monads with zero element.
+
+Uses the same binding syntax as @racket[do] form, except for guarding. Any @racket[_guard-expr] is evaluated and used as am argument of the @racket[guard] function.
+
+Examples:
+@interaction[#:eval formica-eval
+ (using List
+   (collect (cons x y) [x <- '(1 2)] [y <- '(a b c)]))]
+     
+Sequential binding:
+@interaction[#:eval formica-eval
+ (using List
+   (collect (cons x y) [(x y) <<- '(1 2 3)]))]
+  
+Using guard:
+@interaction[#:eval formica-eval
+ (using List
+   (collect (cons x y) [(x y) <<- '(1 2 3)] (< x y)))]
+  
+@interaction[#:eval formica-eval
+ (using List
+   (collect `((gcd ,x ,y) = ,z)
+     [(x y) <<- (range 8)]
+     [z <- (range 2 x)]
+     (= z (gcd x y))))]
+
 @section{Monadic functions and operators}
 
 @defproc[(return [x Any]) any]
@@ -313,10 +352,21 @@ Examples:
  (using List mzero)
  (using Id mzero)]
 
-
 @defproc[(mplus [x Any] [y Any]) Any]
 A monadic plus operation of the @tech{currently used monad}.
 
 Examples:
 @interaction[#:eval formica-eval
  (using List (mplus '(1 2 3) '(3 4 5)))]
+
+@defproc[(lift [f (Any -> any)]) lifted?]
+Returns a function @racket[_f] lifted into the @tech{currently used monad}. Evaluated as @centered{@tt{lift @math{f} = return ∘ @math{f}}.}
+
+@defproc[(lifted? [v Any]) Bool]
+Returns @racket[#t] if @racket[v] is a lifted function, and @racket[#f] otherwise.
+
+Examples:
+@interaction[#:eval formica-eval
+ (lift +)
+ (lifted? (lift +))
+ (using List ((lift +) 1 2))]

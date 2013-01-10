@@ -16,14 +16,12 @@
          racket/contract
          (for-syntax racket/base racket/syntax ))
 
-(provide (rename-out (make-monad monad)
-                     (make-monad-plus monad-plus))
+(provide (rename-out (make-monad monad))
          ; forms
          >>= >> <- <-: <<- <<-:
          do
          collect
          define-monad
-         define-monad-plus
          using
          check-result
          ; functional forms
@@ -31,12 +29,13 @@
          bind
          mzero
          mplus
-         fail
+         failure
          lift/m
          compose/m
          ;functions
          (contract-out 
           (monad? predicate/c)
+          (monad-zero? predicate/c)
           (monad-plus? predicate/c)
           (using-monad (parameter/c monad?))
           (lift (-> procedure? lifted?))
@@ -52,95 +51,69 @@
 ;;;==============================================================
 ;;; General definitions
 ;;;==============================================================
-;; monad is an abstract data type with return and bind operations
-(struct monad (type return bind fail))
-;; monad-plus is a monad with generalized operation mplus and neutral element
-(struct monad-plus monad (mzero mplus))
+;; monad is an abstract data type
+(struct monad (type return bind failure mzero mplus))
 
 (define (raise-match-error x)
   (error "do: no matching clause for" x))
+
+(define (monad-zero? v)
+  (and (monad? v) (not (eq? 'undefined (monad-mzero v)))))
+
+(define (monad-plus? v)
+  (and (monad-zero? v) (not (eq? 'undefined (monad-mplus v)))))
 ;;;==============================================================
 ;;; monad constructors
 ;;;==============================================================
-(define (make-monad #:type (type #f)
-                    #:bind bind 
-                    #:return return
-                    #:fail (fail raise-match-error))
-  (if type
-      (monad 
-       type 
-       (procedure-rename 
-        (procedure-reduce-arity
-         (λ x (check-result 'return type (apply return x)))
-         (procedure-arity return))
-        'return) 
-       (procedure-rename 
-        (λ (m f)
-          (check-argument 'bind type m)
-          (check-result 'bind type (bind m f)))
-        'bind)
-       fail)
-      (monad 
-       type 
-       (procedure-rename return 'return) 
-       (procedure-rename bind 'bind)
-       fail)))
-
-(define (make-monad-plus #:type (type #f)
-                         #:bind bind
-                         #:return return 
-                         #:mzero mzero 
-                         #:mplus mplus
-                         #:fail (fail raise-match-error))
-  (if type 
-      (monad-plus 
-       type
-       (procedure-rename 
+;; named monad constructor
+(define (make-named-monad name
+                          #:type (type #f)
+                          #:bind bind 
+                          #:return return
+                          #:mzero (mzero 'undefined)
+                          #:mplus (mplus 'undefined)
+                          #:failure (failure raise-match-error))
+  (define return*
+    (if type 
         (procedure-reduce-arity
          (λ x (if (and (pair? x) (eq? (car x) '⊤))
                   (return '⊤)
                   (check-result 'return type (apply return x))))
          (procedure-arity return))
-        'return)
-       (procedure-rename 
+        return))
+  
+  (define bind*
+    (if type 
         (λ (m f)
           (unless (equal? m (return '⊤)) (check-argument 'bind type m))
           (check-result 'bind type (bind m f)))
-        'bind)
-       fail
-       mzero
-       (procedure-rename mplus 'mplus))
-      (monad-plus 
-       type
-       (procedure-rename return 'return)
-       (procedure-rename bind 'bind)
-       fail
-       mzero
-       (procedure-rename mplus 'mplus))))
+        bind))
+  
+  (name 
+   type
+   (procedure-rename return* 'return)
+   (procedure-rename bind* 'bind)
+   failure
+   mzero
+   (if (procedure? mplus) 
+       (procedure-rename mplus 'mplus) 
+       mplus)))
 
-;; named monad constructor
-(define (make-named-monad name 
-                          #:type (type #f)
-                          #:bind bind 
-                          #:return return
-                          #:fail (fail raise-match-error))
-  (if type
-      (name type
-            (procedure-rename 
-             (procedure-reduce-arity
-              (λ x (check-result 'return type (apply return x)))
-              (procedure-arity return))
-             'return) 
-            (procedure-rename 
-             (λ (m f)
-               (check-argument 'bind type m)
-               (check-result 'bind type (bind m f)))
-             'bind)
-            fail)
-      (name type 
-            (procedure-rename return 'return) 
-            (procedure-rename bind 'bind)
-            fail)))
+;; anonymous monad constructor
+(define (make-monad #:type (type #f)
+                    #:bind bind 
+                    #:return return
+                    #:mzero (mzero 'undefined)
+                    #:mplus (mplus 'undefined)
+                    #:failure (failure raise-match-error))
+  (make-named-monad monad 
+                    #:type type
+                    #:bind bind 
+                    #:return return
+                    #:mzero mzero
+                    #:mplus mplus
+                    #:failure failure))
+
 
 (define-syntax (define-monad stx)
   (syntax-case stx ()
@@ -149,46 +122,6 @@
        #`(begin
            (struct mn monad ())
            (define id (make-named-monad mn args ...))))]))
-
-;; named monad-plus constructor
-(define (make-named-monad-plus* name 
-                                #:type (type #f)
-                                #:bind bind 
-                                #:return return 
-                                #:mzero mzero 
-                                #:mplus mplus
-                                #:fail (fail raise-match-error))
-  (if type 
-      (name type
-            (procedure-rename 
-             (procedure-reduce-arity
-              (λ x (if (and (pair? x) (eq? (car x) '⊤))
-                       '⊤
-                       (check-result 'return type (apply return x)))(check-result 'return type (apply return x)))
-              (procedure-arity return))
-             'return)
-            (procedure-rename 
-             (λ (m f)
-               (unless (eq? m '⊤) (check-argument 'bind type m))
-               (check-result 'bind type (bind m f)))
-             'bind)
-            fail
-            mzero
-            (procedure-rename mplus 'mplus))
-    (name type
-            (procedure-rename return 'return)
-            (procedure-rename bind 'bind)
-            fail
-            mzero
-            (procedure-rename mplus 'mplus))))
-
-(define-syntax (define-monad-plus stx)
-  (syntax-case stx ()
-    [(define-monad-plus id args ...) 
-     (with-syntax ([mn (format-id #'id "monad-plus:~a" (syntax-e #'id))])
-       #`(begin
-           (struct mn monad-plus ())
-           (define id (make-named-monad-plus* mn args ...))))]))
 
 ;;;===============================================================================
 ;;; The Id monad
@@ -207,10 +140,15 @@
 (define-syntax-rule (using M expr ...) 
   (parameterize ([using-monad M]) expr ...))
 
+(define-syntax-rule (when-monad-zero expr id)
+  (if (monad-zero? (using-monad))
+      expr
+      (error id (format "~a is not of a type <monad-zero?>" (using-monad)))))
+
 (define-syntax-rule (when-monad-plus expr id)
   (if (monad-plus? (using-monad))
       expr
-      (error id (format "~a is not of a type monad-plus!" (using-monad)))))
+      (error id (format "~a is not of a type <monad-plus?>" (using-monad)))))
 ;;;==============================================================
 ;;; Syntax sugar for monadic functions
 ;;; functions return, bind, mzero and mplus
@@ -246,19 +184,19 @@
 ;; mzero of the current monad
 (define-syntax mzero
   (syntax-id-rules ()
-    [mzero (when-monad-plus (monad-plus-mzero (using-monad)) 'mzero)]))
+    [mzero (when-monad-zero (monad-mzero (using-monad)) 'mzero)]))
 
 ;; mplus of the current monad
 (define-syntax mplus
   (syntax-id-rules ()
-    [(mplus expr ...) (when-monad-plus ((monad-plus-mplus (using-monad)) expr ...) 'mplus)]
-    [mplus (when-monad-plus (monad-plus-mplus (using-monad)) 'mplus)]))
+    [(mplus expr ...) (when-monad-plus ((monad-mplus (using-monad)) expr ...) 'mplus)]
+    [mplus (when-monad-plus (monad-mplus (using-monad)) 'mplus)]))
 
 ;; mplus of the current monad
-(define-syntax fail
+(define-syntax failure
   (syntax-id-rules ()
-    [(fail expr) ((monad-fail (using-monad)) expr)]
-    [fail (monad-fail (using-monad))]))
+    [(failure expr) ((monad-failure (using-monad)) expr)]
+    [failure (monad-failure (using-monad))]))
 
 ;; do syntax
 ;; Haskel: do { p1 <- m; p2 <- f; ...;  expr}
@@ -277,7 +215,7 @@
     [(do* ((p ...) <<-: m) r) (do (p <-: m) ... r)]
     [(do* (p <- m) r) (bind m >>= (match-lambda
                                     [p r] 
-                                    [expr (fail expr)]))]
+                                    [expr (failure expr)]))]
     [(do* (p <-: m) r) (do* (p <- (return m)) r)]
     [(do* (b ...) r) (bind (b ...) >> r)]))
 
@@ -360,11 +298,11 @@
 
 ;; guarding operator
 (define (guard test)
-  (when-monad-plus (if test (return '⊤) mzero) 'guard))
+  (when-monad-zero (if test (return '⊤) mzero) 'guard))
 
 ;; guarding function
 (define (guardf pred?)
-  (when-monad-plus 
+  (when-monad-zero 
    (λ (x) (bind (guard (pred? x)) >> (return x))) 
    'guardf))
 

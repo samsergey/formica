@@ -50,5 +50,6 @@ The syntax tools for monads are limited by binding (@racket[>>=]) and sequential
 
 Thus, even though the Racket language does not need monads for imperative programming or list comprehension, as Haskell do, monads provide useful and powerful concept for program design.
 
+@local-table-of-contents[]
 
 @include-section["monads-base.scrbl"]

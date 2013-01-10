@@ -31,7 +31,8 @@
  (check-exn exn:fail? (λ () (mplus 'a 'b)))
  (check-exn exn:fail? (λ () (guard #f)))
  (check-exn exn:fail? (λ () (guardf odd?)))
- (check-exn exn:fail? (λ () (sum/m '(1 2 3)))))
+ (check-exn exn:fail? (λ () (sum/m '(1 2 3))))
+ (check-exn exn:fail? (λ () (do [1 <- 2] 3))))
 
 
 (test-case
@@ -72,7 +73,8 @@
  (check-exn exn:fail? (λ () (mplus 'a 'b)))
  (check-exn exn:fail? (λ () (guard #f)))
  (check-exn exn:fail? (λ () (guardf odd?)))
- (check-exn exn:fail? (λ () (sum/m '(1 2 3)))))
+ (check-exn exn:fail? (λ () (sum/m '(1 2 3))))
+ (check-exn exn:fail? (λ () (do [1 <-: 2] 3))))
 
 (test-case
  "Monad MZ"
@@ -96,7 +98,7 @@
      x 'z --> x
      x y --> (m (($ +) x y))))
  
- (define-monad-plus MZ
+ (define-monad MZ
    #:return mz-return
    #:bind mz-bind
    #:mplus mz-mplus
@@ -146,7 +148,7 @@
  (define-formal m)
  (define-type (A/M? a) (m: a) 'z)
  (define (A/M a)
-   (monad-plus
+   (monad
     #:type (A/M? a)
     #:return (/. 'z --> 'z
                  x --> (m x))
@@ -207,8 +209,8 @@
  (check-equal? (lift/m f '(x) '(y) '()) '())
  (check-equal? (lift/m f '(x y) '(a b)) '((f x a) (f x b) (f y a) (f y b)))
  (check-equal? (lift/m f '(x y) '(a)) '((f x a) (f y a)))
- 
- )
+ (check-equal? (do [1 <- '(1 2 3 2 1 2 3)] (return 'y)) '(y y))
+ (check-equal? (collect x [(? odd? x) <- '(1 2 3 2 1 2 3)]) '(1 3 1 3)))
 
 (require "../examples/List-examples.rkt")
 (require "../examples/nondeterministic-examples.rkt")

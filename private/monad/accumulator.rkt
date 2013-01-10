@@ -31,7 +31,7 @@
    'listable?
    (and/c sequence? (not/c formal?))))
 
-(define-monad-plus List
+(define-monad List
   #:type listable?
   #:return list
   #:bind (λ (m f)            
@@ -43,12 +43,12 @@
              fx))
   #:mzero null
   #:mplus append
-  #:fail (λ (_) null))
+  #:failure (λ (_) null))
 
 ;;;===============================================================================
 ;;; Set monad
 ;;;===============================================================================
-(define-monad-plus Set
+(define-monad Set
   #:return (λ (x) (if (set-empty? x) x (set x)))
   #:bind (λ (m f) 
            (unless (and (sequence? m) (not (formal? m))) 
@@ -60,7 +60,7 @@
 ;;;===============================================================================
 ;;; Or monad
 ;;;===============================================================================
-(define-monad-plus Or
+(define-monad Or
   #:return (λ (x) (if (boolean? x) x (in-value x)))
   #:bind (match-lambda*
            [(list #t _)  #t]
@@ -74,7 +74,7 @@
 ;;;===============================================================================
 ;;; And monad
 ;;;===============================================================================
-(define-monad-plus And
+(define-monad And
   #:return (λ (x) (if (boolean? x) x (in-value x)))
   #:bind (match-lambda*
            [(list #f _) #f]
