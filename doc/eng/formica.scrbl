@@ -30,6 +30,8 @@
 
 @include-section["types.scrbl"]
 
+@include-section["monads.scrbl"]
+
 @include-section["utils.scrbl"]
 
 @local-table-of-contents[]
