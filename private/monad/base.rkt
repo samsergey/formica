@@ -31,6 +31,7 @@
          bind
          mzero
          mplus
+         fail
          lift/m
          compose/m
          ;functions
@@ -52,16 +53,19 @@
 ;;; General definitions
 ;;;==============================================================
 ;; monad is an abstract data type with return and bind operations
-(struct monad (type return bind))
+(struct monad (type return bind fail))
 ;; monad-plus is a monad with generalized operation mplus and neutral element
 (struct monad-plus monad (mzero mplus))
 
+(define (raise-match-error x)
+  (error "do: no matching clause for" x))
 ;;;==============================================================
 ;;; monad constructors
 ;;;==============================================================
 (define (make-monad #:type (type #f)
                     #:bind bind 
-                    #:return return)
+                    #:return return
+                    #:fail (fail raise-match-error))
   (if type
       (monad 
        type 
@@ -74,17 +78,20 @@
         (λ (m f)
           (check-argument 'bind type m)
           (check-result 'bind type (bind m f)))
-        'bind))
+        'bind)
+       fail)
       (monad 
        type 
        (procedure-rename return 'return) 
-       (procedure-rename bind 'bind))))
+       (procedure-rename bind 'bind)
+       fail)))
 
 (define (make-monad-plus #:type (type #f)
                          #:bind bind
                          #:return return 
                          #:mzero mzero 
-                         #:mplus mplus)
+                         #:mplus mplus
+                         #:fail (fail raise-match-error))
   (if type 
       (monad-plus 
        type
@@ -100,12 +107,14 @@
           (unless (equal? m (return '⊤)) (check-argument 'bind type m))
           (check-result 'bind type (bind m f)))
         'bind)
+       fail
        mzero
        (procedure-rename mplus 'mplus))
       (monad-plus 
        type
        (procedure-rename return 'return)
        (procedure-rename bind 'bind)
+       fail
        mzero
        (procedure-rename mplus 'mplus))))
 
@@ -113,7 +122,8 @@
 (define (make-named-monad name 
                           #:type (type #f)
                           #:bind bind 
-                          #:return return)
+                          #:return return
+                          #:fail (fail raise-match-error))
   (if type
       (name type
             (procedure-rename 
@@ -125,10 +135,12 @@
              (λ (m f)
                (check-argument 'bind type m)
                (check-result 'bind type (bind m f)))
-             'bind))
+             'bind)
+            fail)
       (name type 
             (procedure-rename return 'return) 
-            (procedure-rename bind 'bind))))
+            (procedure-rename bind 'bind)
+            fail)))
 
 (define-syntax (define-monad stx)
   (syntax-case stx ()
@@ -144,7 +156,8 @@
                                 #:bind bind 
                                 #:return return 
                                 #:mzero mzero 
-                                #:mplus mplus)
+                                #:mplus mplus
+                                #:fail (fail raise-match-error))
   (if type 
       (name type
             (procedure-rename 
@@ -159,11 +172,13 @@
                (unless (eq? m '⊤) (check-argument 'bind type m))
                (check-result 'bind type (bind m f)))
              'bind)
+            fail
             mzero
             (procedure-rename mplus 'mplus))
-      (name type
+    (name type
             (procedure-rename return 'return)
             (procedure-rename bind 'bind)
+            fail
             mzero
             (procedure-rename mplus 'mplus))))
 
@@ -239,6 +254,12 @@
     [(mplus expr ...) (when-monad-plus ((monad-plus-mplus (using-monad)) expr ...) 'mplus)]
     [mplus (when-monad-plus (monad-plus-mplus (using-monad)) 'mplus)]))
 
+;; mplus of the current monad
+(define-syntax fail
+  (syntax-id-rules ()
+    [(fail expr) ((monad-fail (using-monad)) expr)]
+    [fail (monad-fail (using-monad))]))
+
 ;; do syntax
 ;; Haskel: do { p1 <- m; p2 <- f; ...;  expr}
 ;; Formica: (do (p1 <- m) (p2 <- f) ...  expr)
@@ -256,7 +277,7 @@
     [(do* ((p ...) <<-: m) r) (do (p <-: m) ... r)]
     [(do* (p <- m) r) (bind m >>= (match-lambda
                                     [p r] 
-                                    [expr (error "do: no matching clause for" 'p)]))]
+                                    [expr (fail expr)]))]
     [(do* (p <-: m) r) (do* (p <- (return m)) r)]
     [(do* (b ...) r) (bind (b ...) >> r)]))
 

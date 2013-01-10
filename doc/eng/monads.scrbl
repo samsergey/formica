@@ -48,6 +48,7 @@ The possibility to define and use arbitrary monads allows to separate semantics 
 In Racket there are 28 different @racket[for] iterators and creating an iterator with new semantics requires non-trivial syntax engeneering (according to examples in the Racket Refference Guide).
 The syntax tools for monads are limited by binding (@racket[>>=]) and sequential binding (@racket[do] and @racket[collect]) forms, which could be used in uniform way with @emph{any} monad. Moreover, for @emph{any} monad it is possible to use lifting and composition (@racket[lift], @racket[lift/m], @racket[compose/m]), folding (@racket[fold/m], @racket[map/m], @racket[filter/m]) and guarding (for additive monads). The semantics of all these forms and functions is completely defined only by setting the @racket[return] and @racket[bind] functions (complemented by @racket[mplus] and @racket[mzero] in case additive monads). 
 
-Thus, even though the Racket language does not need monads for imperative programming and list comprehension, as Haskell do, monads provide useful and powerful concept for program design.
+Thus, even though the Racket language does not need monads for imperative programming or list comprehension, as Haskell do, monads provide useful and powerful concept for program design.
+
 
 @include-section["monads-base.scrbl"]
