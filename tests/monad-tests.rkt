@@ -169,4 +169,4 @@
   (check-equal? (bind (m 4) >>= (lift sqrt) >>= (lift (curry * 2))) (m 4)))
 
 
-(require "monad-accumulator-tests.rkt")
+(require "monad-sequential-tests.rkt")

@@ -261,17 +261,23 @@
 ;;;==============================================================
 ;; monadic composition 
 (define-syntax (compose/m stx)
-  (syntax-case stx (>>=)
+  (syntax-case stx ()
     [(_ f) #'(procedure-rename
-              (λ x (bind (apply return x) >>= f))
+              (procedure-reduce-arity
+               (λ x (bind (apply return x) >>= f))
+               (procedure-arity f))
               'composed/m)]
     [(_ f g) #'(procedure-rename
+                (procedure-reduce-arity
                 (λ x (bind (apply return x) >>= g >>= f))
+                (procedure-arity g))
                 'composed/m)]
-    [(_ f ...) (with-syntax ([(s ...) (local-expand 
-                                       #'(seq f ...) 'expression #f)])
+    [(_ f ... g) (with-syntax ([(s ...) (local-expand 
+                                       #'(seq f ... g) 'expression #f)])
                  #'(procedure-rename
-                    (λ x (bind (apply return x) >>= s ...))
+                    (procedure-reduce-arity
+                     (λ x (bind (apply return x) >>= s ...))
+                     (procedure-arity g))
                     'composed/m))]))
 
 (define-syntax (seq stx)
