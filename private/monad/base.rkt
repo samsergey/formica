@@ -38,8 +38,7 @@
           (monad-zero? predicate/c)
           (monad-plus? predicate/c)
           (using-monad (parameter/c monad?))
-          (lift (-> procedure? lifted?))
-          (lifted? predicate/c)
+          (lift (-> procedure? procedure?))
           (fold/m (-> (-> any/c any/c any/c) any/c list? any/c))
           (filter/m (-> (-> any/c any/c) list? any/c))
           (map/m (-> (-> any/c any/c) list? any/c))
@@ -76,16 +75,17 @@
   (define return*
     (if type 
         (procedure-reduce-arity
-         (λ x (if (and (pair? x) (eq? (car x) '⊤))
-                  (return '⊤)
-                  (check-result 'return type (apply return x))))
+         (λ x (let ([res (apply return x)])
+                (if (equal? res (return ⊤))
+                    (return ⊤)
+                    (check-result 'return type res))))
          (procedure-arity return))
         return))
   
   (define bind*
     (if type 
         (λ (m f)
-          (unless (equal? m (return '⊤)) (check-argument 'bind type m))
+          (unless (equal? m (return ⊤)) (check-argument 'bind type m))
           (check-result 'bind type (bind m f)))
         bind))
   
@@ -222,16 +222,16 @@
 ;; single arrows
 (define-syntax <-
   (syntax-id-rules ()
-    [<- (raise-syntax-error '<- "could be used only in do form")]))
+    [<- (raise-syntax-error '<- "could be used only in do or collect form")]))
 (define-syntax <-:
   (syntax-id-rules ()
-    [<-: (raise-syntax-error '<-: "could be used only in do form")]))
+    [<-: (raise-syntax-error '<-: "could be used only in do or collect form")]))
 (define-syntax <<-
   (syntax-id-rules ()
-    [<<- (raise-syntax-error '<<- "could be used only in do form")]))
+    [<<- (raise-syntax-error '<<- "could be used only in do or collect form")]))
 (define-syntax <<-:
   (syntax-id-rules ()
-    [<<-: (raise-syntax-error '<<-: "could be used only in do form")]))
+    [<<-: (raise-syntax-error '<<-: "could be used only in do or collect form")]))
 
 
 ;; monadic generator
@@ -282,23 +282,22 @@
                     #`(f >>= expanded-seq ...))]))
 
 ;; lifting the function
-(define (lift f) 
-  (if (lifted? f) 
-      f
-      ((set-tag 'lifted (or (object-name f) 'λ)) (compose1 return f))))
-
-(define (lifted? f) (check-tag 'lifted f))
+(define (lift f) (compose1 return f))
 
 (define-syntax (lift/m stx)
   (syntax-case stx ()
-    [(_ f x ...) 
-     (with-syntax ([(x-id ...) (generate-temporaries #'(x ...))])
-       #'(do (x-id <- x) ... 
-             (return (f x-id ...))))]))
+    [(_ f x xs ...) 
+     (with-syntax ([(x-id x-ids ...) (generate-temporaries #'(x xs ...))])
+       #'(do (x-id <- x)
+             (x-ids <- xs) ... 
+             (return (f x-id x-ids ...))))]))
 
 ;; guarding operator
+;; The ⊤ symbol represents an instance that belongs to any type
+;; It is used for avoid type checking within binding.
+(define ⊤ '⊤)
 (define (guard test)
-  (when-monad-zero (if test (return '⊤) mzero) 'guard))
+  (when-monad-zero (if test (return ⊤) mzero) 'guard))
 
 ;; guarding function
 (define (guardf pred?)
@@ -336,4 +335,3 @@
 ;; monadic sum
 (define (sum/m lst) 
   (when-monad-plus (foldr mplus mzero lst) 'sum/m))
-

@@ -15,34 +15,45 @@
          racket/contract
          racket/generator
          racket/stream
-         racket/sequence)
+         racket/sequence
+         unstable/contract)
 
 (provide 
  (contract-out 
   (List monad-plus?)  
   (Set monad-plus?)
   (Amb monad-plus?)
-  (listable? contract?))
+  (listable? contract?)
+  (zip (->* (listable?) #:rest (listof listable?) (sequence/c list?))))
  (all-from-out racket/set))
 
 ;;;===============================================================================
-;;; List monad
+;;; helper functions
 ;;;===============================================================================
 (define listable?
   (flat-named-contract 
    'listable?
    (and/c sequence? (not/c formal?))))
 
+(define (concat-map f lst)
+  (for*/list 
+      ([x lst] 
+       [fx (in-list (check-result 
+                     'bind 
+                     (flat-named-contract 'n/f-list? n/f-list?)
+                     (f x)))])
+    fx))
+
+;; the tool for parallel sequencing in the Accumulating monads.
+(define zip (compose in-values-sequence in-parallel))
+
+;;;===============================================================================
+;;; List monad
+;;;===============================================================================
 (define-monad List
   #:type listable?
   #:return list
-  #:bind (λ (m f)            
-           (for*/list ([x m] 
-                       [fx (check-result 
-                            'bind 
-                            (flat-named-contract 'n/f-list? n/f-list?)
-                            (f x))])
-             fx))
+  #:bind (λ (m f) (concat-map f m))
   #:mzero null
   #:mplus append
   #:failure (λ (_) null))
@@ -51,13 +62,19 @@
 ;;; Set monad
 ;;;===============================================================================
 (define-monad Set
-  #:return (λ (x) (if (set-empty? x) x (set x)))
+  #:type listable?
+  #:return (λ (x) (if (and (set? x) (set-empty? x))
+                      x 
+                      (set x)))
   #:bind (λ (m f) 
-           (unless (and (sequence? m) (not (formal? m))) 
-             (raise-type-error 'bind "sequence" m)) 
-           (for*/set ([x m] [fx (f x)]) fx))
+           (for*/set ([x m] [fx (check-result 
+                                 'bind 
+                                 (flat-named-contract 'set? set?)
+                                 (f x))]) 
+                     fx))
   #:mzero (set)
-  #:mplus set-union)
+  #:mplus set-union
+  #:failure (λ (_) (set)))
 
 ;;;===============================================================================
 ;;; Amb monad
@@ -96,4 +113,3 @@
   #:mzero empty-stream
   #:mplus stream-append
   #:failure empty-stream)
-

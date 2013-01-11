@@ -359,14 +359,153 @@ Examples:
 @interaction[#:eval formica-eval
  (using List (mplus '(1 2 3) '(3 4 5)))]
 
-@defproc[(lift [f (Any -> any)]) lifted?]
-Returns a function @racket[_f] lifted into the @tech{currently used monad}. Evaluated as @centered{@tt{lift @math{f} = return ∘ @math{f}}.}
+@defproc[(lift [f Fun]) Fun]
+Returns a function @racket[_f] lifted into the @tech{currently used monad}. 
 
-@defproc[(lifted? [v Any]) Bool]
-Returns @racket[#t] if @racket[v] is a lifted function, and @racket[#f] otherwise.
+@centered{@racketblock[lift _f = return ∘ _f]}
 
 Examples:
 @interaction[#:eval formica-eval
- (lift +)
- (lifted? (lift +))
  (using List ((lift +) 1 2))]
+
+@defform[(lift/m f arg ...+)]
+Monadic application of function @racket[_f] to arguments @racket[_arg ...].
+
+@centered{@racketblock[(lift/m _f _a _b ...) ≡ (do [_x <- _a] 
+                                                   [_y <- _b] 
+                                                   ... 
+                                                   [return (_f _x _y ...)])]}
+
+In @emph{Scheme} the more suitable name for this form would be @racketidfont{apply/m}, but here we follow the @emph{Haskell} tradition.
+
+Examples:
+@interaction[#:eval formica-eval
+ (using List
+   (lift/m cons '(a b c) '(x y)))]
+
+@interaction[#:eval formica-eval
+ (using List
+   (lift/m or '(#t #f) '(#t #f)))]
+
+@defform[(compose/m fs ...+)]
+Monadic composition of functions @racket[_fs].
+
+@centered{@racketblock[(compose/m _f _g ...) ≡ 
+                         (λ (x) 
+                           (bind (return x) >>= _f >>= _g >>= ...))]}
+
+Example: monadic composition in the @racket[List] monad allows to compose functions returning several values:
+@defs+int[#:eval formica-eval
+ ((using-monad List)
+  (define (Sqrt x) 
+    (do (guard (positive? x))
+        [r <-: (sqrt x)]
+        (list r (- r)))))
+
+ (Sqrt 4)
+ ((compose/m Sqrt Sqrt) 16)]
+
+For more examples see @filepath{List-monad.rkt} file in the @filepath{examples/} forder.
+
+@defproc[(guard [test Bool]) Any]
+Guarding operator. Defined for monads with zero.
+
+@centered{@racket[(guard _test) ≡ (if _test (return ⊤) mzero)]}
+Here @racketidfont{⊤} represents an object which belongs to any type.
+
+Examples:
+@interaction[#:eval formica-eval
+ (using List
+   (do [(x y) <<- '(1 2 3)]
+       (guard (odd? x))
+       (guard (< x y))
+       (return (cons x y))))]
+
+Using @racket[guard] it is possible to perform a backtracking search:
+
+@interaction[#:eval formica-eval
+ (define tell (lift printf))
+ (using List
+   (collect (cons x y)
+     [x <- '(1 2 3 4)]
+     (tell "x: ~a\n" x)
+     (odd? x)
+     [y <- '(1 2 3)]
+     (tell "x: ~a\ty: ~a\n" x y)
+     (< x y)))]
+
+For more examples see @filepath{nondeterministic.rkt} file in the @filepath{examples/} forder.
+
+@defproc[(guardf [pred (Any --> Bool)]) any]
+Guarding function. Defined for monads with zero.
+
+@centered{@racket[(guardf _pred) = (bind (guard (_pred _x)) >> (return _x))]}
+
+Examples:
+@interaction[#:eval formica-eval
+ (using List
+   (bind '(1 2 3) >>= (guardf odd?) >>= (lift sqr)))]
+
+@defproc[(seq/m [lst list?]) Any]
+Monadic sequencing.
+
+@racketblock[(seq/m _lst) = (foldr (λ (_x _y) (lift/m cons _x _y)) (return '()) _lst)]
+
+Examples:
+@interaction[#:eval formica-eval
+ (using List
+   (seq/m '((1 2) (3 4 5))))]
+
+@defproc[(map/m [f (Any Any -> Any)] [lst list?]) Any]
+Monadic mapping.
+
+@racketblock[map/m _f = seq/m ∘ (map _f)]
+
+Example (definition of @racketidfont{Sqrt} function see in the example to the @racket[compose/m] operator):
+@interaction[#:eval formica-eval                  
+ (using List
+   (map/m Sqrt '(1 4 9)))]
+
+@defproc[(fold/m [f (Any Any -> Any)] [x0 Any] [lst list?]) Any]
+Monadic fold.
+
+@racketblock[(fold/m _f _x0 '()) = (return _x0)
+(fold/m _f _x0 (cons _h _t)) = (do [_y <- (_f _x0 _h)] 
+                                   (fold-m _f _y _t))]
+
+Примеры:
+@interaction[#:eval formica-eval
+ (using List
+   (fold/m (lift (hold +)) 0 '(1 2 3)))
+ (using List
+   (fold/m (lift/m + x (± y)) 0 '(1 2 3)))
+ (using List
+   (fold/m (λ(x y) (list (($ +) x y) 
+                         (($ -) x y))) 
+           0 
+           '(1 2 3)))]
+
+@defproc[(filter/m [f (Any Any -> Any)] [x0 Any] [lst list?]) Any]
+Monadic fiter.
+
+@racketblock[(filter/m _pred '()) = (return '())
+(filter/m _pred (cons _h _t)) = (do [_b <- (_pred _h)]
+                                    [_x <- (filter/m _pred _t)]
+                                    (return (if _b (cons _h _x) _x)))]
+
+Examples:
+@interaction[#:eval formica-eval
+ (using List
+   (filter/m (lift odd?) '(1 2 3 4 5)))
+ (using List
+   (filter/m (λ(x) (list #t #f)) '(1 2 3)))]
+
+@defproc[(sum/m [lst list?]) Any]
+Monadic sum, defined for applicative monads.
+
+@centered{@racket[(sum/m _lst) = (foldr mplus mzero _lst)]}
+
+Examples:
+@interaction[#:eval formica-eval
+ (using List
+   (sum/m '((1 2 3) (2 3 4) '(a b))))]
