@@ -12,14 +12,16 @@
          (only-in "../../formal.rkt" formal? n/f-list?)
          (only-in "../../types.rkt" check-result)
          racket/set
-         racket/contract)
+         racket/contract
+         racket/generator
+         racket/stream
+         racket/sequence)
 
 (provide 
  (contract-out 
   (List monad-plus?)  
   (Set monad-plus?)
-  (Or monad-plus?)
-  (And monad-plus?)
+  (Amb monad-plus?)
   (listable? contract?))
  (all-from-out racket/set))
 
@@ -58,30 +60,40 @@
   #:mplus set-union)
 
 ;;;===============================================================================
-;;; Or monad
+;;; Amb monad
 ;;;===============================================================================
-(define-monad Or
-  #:return (λ (x) (if (boolean? x) x (in-value x)))
-  #:bind (match-lambda*
-           [(list #t _)  #t]
-           [(list #f f) (f #f)]
-           [(list m f) (unless (and (sequence? m) (not (formal? m))) 
-                         (raise-type-error 'bind "sequence" m)) 
-                       (for/or ([x m]) (f x))])
-  #:mzero #f
-  #:mplus (λ (a b) (or a b)))
+;; a stream of ambient values
+(define amb
+  (case-lambda
+    ; works inside binding
+    [(x) (stream x)]
+    ; works once at at input
+    [(x . y) (sequence->stream (in-set (apply set (cons x y))))]))
 
-;;;===============================================================================
-;;; And monad
-;;;===============================================================================
-(define-monad And
-  #:return (λ (x) (if (boolean? x) x (in-value x)))
-  #:bind (match-lambda*
-           [(list #f _) #f]
-           [(list #t f) (f #t)]
-           [(list m f)  (unless (and (sequence? m) (not (formal? m))) 
-                          (raise-type-error 'bind "sequence" m)) 
-                        (for/and ([x m]) (f x))])
-  #:mzero #t
-  #:mplus (λ (a b) (and a b)))
+;; ambient binding
+(define (amb-bind m f) 
+  (define g 
+    (generator ()
+               ; the set of results
+               (define s (set))
+               (for* ([x m]
+                      [fx (check-result 
+                            'bind 
+                            (flat-named-contract 'stream? stream?)
+                            (f x))])
+                 (unless (set-member? s fx) 
+                   (set! s (set-add s fx))
+                   (yield fx)))
+               ; the for-cycle is over
+               (yield 'end-of-stream)))
+  ; return a stream, produced by the generator
+  (sequence->stream (in-producer g 'end-of-stream)))
+
+(define-monad Amb
+  #:type listable?
+  #:return amb
+  #:bind amb-bind
+  #:mzero empty-stream
+  #:mplus stream-append
+  #:failure empty-stream)
 
