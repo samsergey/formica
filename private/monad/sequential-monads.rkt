@@ -87,8 +87,8 @@
   (case-lambda
     ; works inside binding
     [(x) (stream x)]
-    ; works once at at input
-    [(x . y) (sequence->stream (in-list (cons x y)))]))
+    ; works once at the input
+    [(x y . z) (lazy-append (stream x y) z)]))
 
 ;; ambient binding
 (define (lazy-bind m f) 
@@ -133,7 +133,8 @@
     ; works inside binding
     [(x) (stream x)]
     ; works once at at input
-    [(x . y) (sequence->stream (in-set (apply set (cons x y))))]))
+    [(x . y) (lazy-set-union (stream x) y)]))
+     
 
 (define (lazy-set-bind m f) 
   (define g 
