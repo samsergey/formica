@@ -9,6 +9,7 @@
 ;;==============================================================
 (require racket/match
          "base.rkt"
+         (only-in "../../tools.rkt" fork)
          (only-in "../../formal.rkt" formal? n/f-list?)
          (only-in "../../types.rkt" check-result check-argument)
          racket/set
@@ -19,24 +20,39 @@
          unstable/contract)
 
 (provide 
+ amb
  (contract-out 
+  (concatenate (->* () #:rest (listof listable?) list?))
+  (concat-map (-> (-> any/c any/c) listable? list?))
   (List monad-plus?)  
+  (set-union-map (-> (-> any/c any/c) listable? set?))
   (Set monad-plus?)
-  (lazy-List monad-plus?)
-  (lazy-Set monad-plus?)
+  (stream-concat-map (-> (-> any/c any/c) listable? stream?)) 
+  (stream-concatenate (-> listable? listable? stream?))
+  (Stream monad-plus?)
+  (amb-union-map (-> (-> any/c any/c) listable? stream?))
+  (amb-union (-> listable? listable? stream?))
+  (Amb monad-plus?)
   (listable? contract?)
   (zip (->* (listable?) #:rest (listof listable?) (sequence/c list?))))
  (all-from-out racket/set
                racket/stream))
 
 ;;;===============================================================================
-;;; helper functions
+;;; general helper functions
 ;;;===============================================================================
 (define listable?
   (flat-named-contract 
    'listable?
    (and/c sequence? (not/c formal?))))
 
+
+;; the tool for parallel sequencing in the Accumulating monads.
+(define zip (compose in-values-sequence in-parallel))
+
+;;;===============================================================================
+;;; List monad
+;;;===============================================================================
 (define (concat-map f lst)
   (for*/list 
       ([x lst] 
@@ -46,52 +62,47 @@
                      (f x)))])
     fx))
 
-;; the tool for parallel sequencing in the Accumulating monads.
-(define zip (compose in-values-sequence in-parallel))
+(define concatenate (fork append sequence->list))
 
-;;;===============================================================================
-;;; List monad
-;;;===============================================================================
 (define-monad List
   #:type listable?
   #:return list
   #:bind (λ (m f) (concat-map f m))
   #:mzero null
-  #:mplus append
+  #:mplus concatenate
   #:failure (λ (_) null))
 
 ;;;===============================================================================
 ;;; Set monad
 ;;;===============================================================================
+(define (set-union-map f lst)
+  (for*/set ([x lst] 
+             [fx (check-result 
+                  'bind 
+                  (flat-named-contract 'set? set?)
+                  (f x))]) 
+            fx))
+
 (define-monad Set
   #:type listable?
   #:return set
-  #;(λ (x) (if (and (set? x) (set-empty? x))
-               x 
-               (set x)))
-  #:bind (λ (m f) 
-           (for*/set ([x m] [fx (check-result 
-                                 'bind 
-                                 (flat-named-contract 'set? set?)
-                                 (f x))]) 
-                     fx))
+  #:bind (λ (m f) (set-union-map f m))
   #:mzero (set)
   #:mplus set-union
   #:failure (λ (_) (set)))
 
 ;;;===============================================================================
-;;; lazy-List monad
+;;; Stream monad
 ;;;===============================================================================
-;; a stream of ambient values
-(define lazy-list
+
+(define make-stream
   (case-lambda
     ; works inside binding
     [(x) (stream x)]
     ; works once at the input
-    [(x y . z) (lazy-append (stream x y) z)]))
+    [(x y . z) (stream-concatenate (stream x y) z)]))
 
-;; ambient binding
-(define (lazy-bind m f) 
+(define (stream-concat-map f m) 
   (define g 
     (generator ()
                (for* ([x m]
@@ -105,7 +116,7 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define (lazy-append s1 s2) 
+(define (stream-concatenate s1 s2) 
   (define g 
     (generator ()
                (check-argument 'mplus (flat-named-contract 'listable? listable?) s1)
@@ -117,26 +128,29 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define-monad lazy-List
+(define-monad Stream
   #:type listable?
-  #:return lazy-list
-  #:bind lazy-bind
+  #:return make-stream
+  #:bind (λ (m f) (stream-concat-map f m))
   #:mzero empty-stream
-  #:mplus lazy-append
+  #:mplus stream-concatenate
   #:failure (λ (_) empty-stream))
 
 ;;;===============================================================================
-;;; lazy-Set monad
+;;; Amb monad
 ;;;===============================================================================
-(define lazy-set
-  (case-lambda
-    ; works inside binding
-    [(x) (stream x)]
+(define-syntax amb
+  (syntax-id-rules ()
+    [(amb x ...) (stream x ...)]
     ; works once at at input
-    [(x . y) (lazy-set-union (stream x) y)]))
-     
+    [amb (procedure-rename 
+          (case-lambda 
+            [(x) (amb x)]
+            [(x . y) (amb-union (stream x) y)])
+          'amb)]))
 
-(define (lazy-set-bind m f) 
+
+(define (amb-union-map f m) 
   (define g 
     (generator ()
                ; the set of results
@@ -154,7 +168,7 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define (lazy-set-union s1 s2) 
+(define (amb-union s1 s2) 
   (define g 
     (generator ()
                ; the set of results
@@ -174,10 +188,10 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define-monad lazy-Set
+(define-monad Amb
   #:type listable?
-  #:return lazy-set
-  #:bind lazy-set-bind
+  #:return amb
+  #:bind (λ (m f) (amb-union-map f m))
   #:mzero empty-stream
-  #:mplus lazy-set-union
+  #:mplus amb-union
   #:failure (λ (_) empty-stream))

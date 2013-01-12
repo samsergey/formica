@@ -7,6 +7,24 @@
          rackunit)
 
 (test-case
+ "listable? tests"
+ (check-true (listable? 3))
+ (check-true (listable? 0)) 
+ (check-true (listable? "abc")) 
+ (check-true (listable? (in-range 3)))
+ (check-true (listable? (in-naturals)))
+ (check-true (listable? '(a b c)))
+ (check-true (listable? (set 'a 'b 'c)))
+ (check-true (listable? (stream 'a 'b 'c)))
+ (check-true (listable? '(g x)))
+ 
+ (check-false (listable? -1))
+ (check-false (listable? 'x))
+ (define-formal f)
+ (check-false (listable? (f 'x)))
+ (check-false (listable? (f 'x 'y))))
+
+(test-case
  "Monad List"
  (using-monad List)
  (define-formal f g)
@@ -241,8 +259,8 @@
   (check-equal? (stream->list s1) (stream->list s2)))
 
 (test-case
- "Monad lazy-List"
- (using-monad lazy-List)
+ "Monad Stream"
+ (using-monad Stream)
  (define-formal f g)
  (define (F x) (return (f 1 x) (f 2 x)))
  (define (G x) (return (g 1 x) (g 2 x)))
@@ -391,8 +409,8 @@
                 (sort (stream->list s2) ordered?)))
 
 (test-case
- "Monad lazy-Set"
- (using-monad lazy-Set)
+ "Monad Amb"
+ (using-monad Amb)
  (define-formal f g)
  (define (F x) (return (f 1 x) (f 2 x)))
  (define (G x) (return (g 1 x) (g 2 x)))
@@ -507,21 +525,21 @@
  (check-exn exn:fail:contract? (λ () (stream->list (sum/m (list (return 'x) 'y)))))
 
  ;  lazyness
- (check-equal? (stream-ref (bind (stream 1 0 2) >>= (lift /)) 0) 1)
- (check-exn exn:fail? (λ () (stream-ref (bind (stream 1 0 2) >>= (lift /)) 1)))
- (check-equal? (stream-ref (bind (stream 1 0 2) >>= (lift /) >>= (lift g)) 0) (g 1))
+ (check-equal? (stream-ref (bind (amb 1 0 2) >>= (lift /)) 0) 1)
+ (check-exn exn:fail? (λ () (stream-ref (bind (amb 1 0 2) >>= (lift /)) 1)))
+ (check-equal? (stream-ref (bind (amb 1 0 2) >>= (lift /) >>= (lift g)) 0) (g 1))
  (check-equal? (stream-first ((compose/m (lift log) (lift (curry + 1))) 0 -1)) 0)
  (check-exn exn:fail? (λ () (stream-ref ((compose/m (lift log) (lift (curry + 1))) 0 -1) 1)))
- (check-equal? (stream-first (lift/m / (stream 1) (stream 1 0))) 1)
- (check-exn exn:fail? (λ () (stream-ref (lift/m / (stream 1) (stream 1 0)) 1)))
- (check-equal? (stream-first (seq/m (list (stream 1) (stream 0 (/ 0))))) '(1 0))
- (check-exn exn:fail? (λ () (stream-ref (seq/m (list (stream 1) (stream 0 (/ 0)))) 1)))
- (check-equal? (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 0) '(1 0 3))
- (check-equal? (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 1) '(1 0 1/3))
- (check-exn exn:fail? (λ () (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 2)))
- (check-equal? (stream-first (filter/m (λ (x) (stream x (/ x))) '(1 0 3))) '(1 0 3))
- (check-exn exn:fail? (λ () (stream-ref (filter/m (λ (x) (stream x (/ x))) '(1 0 3)) 1)))
- (check-equal? (stream-first (fold/m (λ (x y) (stream (+ x y) (+ (/ x) y))) 1 '(1 0 2))) 4)
- (check-equal? (stream-ref (fold/m (λ (x y) (stream (+ x y) (+ (/ x) y))) 1 '(1 0 2)) 1) 5/2)
- (check-exn exn:fail? (λ () (stream-ref (fold/m (λ (x y) (stream (+ x y) (+ (/ x) y))) 1 '(1 0 2)) 2)))
+ (check-equal? (stream-first (lift/m / (amb 1) (amb 1 0))) 1)
+ (check-exn exn:fail? (λ () (stream-ref (lift/m / (amb 1) (amb 1 0)) 1)))
+ (check-equal? (stream-first (seq/m (list (amb 1) (amb 0 (/ 0))))) '(1 0))
+ (check-exn exn:fail? (λ () (stream-ref (seq/m (list (amb 1) (amb 0 (/ 0)))) 1)))
+ (check-equal? (stream-ref (map/m (λ (x) (amb x (/ x))) '(1 0 3)) 0) '(1 0 3))
+ (check-equal? (stream-ref (map/m (λ (x) (amb x (/ x))) '(1 0 3)) 1) '(1 0 1/3))
+ (check-exn exn:fail? (λ () (stream-ref (map/m (λ (x) (amb x (/ x))) '(1 0 3)) 2)))
+ (check-equal? (stream-first (filter/m (λ (x) (amb x (/ x))) '(1 0 3))) '(1 0 3))
+ (check-exn exn:fail? (λ () (stream-ref (filter/m (λ (x) (amb x (/ x))) '(1 0 3)) 1)))
+ (check-equal? (stream-first (fold/m (λ (x y) (amb (+ x y) (+ (/ x) y))) 1 '(1 0 2))) 4)
+ (check-equal? (stream-ref (fold/m (λ (x y) (amb (+ x y) (+ (/ x) y))) 1 '(1 0 2)) 1) 5/2)
+ (check-exn exn:fail? (λ () (stream-ref (fold/m (λ (x y) (amb (+ x y) (+ (/ x) y))) 1 '(1 0 2)) 2)))
  )

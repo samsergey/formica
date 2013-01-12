@@ -30,8 +30,6 @@ A value belongs to a @deftech{functional type} if it belongs to
 Functional types which specify types for arguments and result of a function 
 could be declared using @tech{function signatures}.
 
-@section{Predefined primitive types}
-
 Some frequently used primitive types have short names, which denote sets, defined by predicates. They could be used in type definitions, signatures and contracts.
 
 @defthing[Bool contract?] defines a set of boolean values. Equivalent to @racket[boolean?].
