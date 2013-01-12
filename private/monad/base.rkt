@@ -18,10 +18,10 @@
 
 (provide (rename-out (make-monad monad))
          ; forms
+         define-monad
          >>= >> <- <-: <<- <<-:
          do
          collect
-         define-monad
          using
          check-result
          ; functional forms

@@ -51,6 +51,18 @@
 (define zip (compose in-values-sequence in-parallel))
 
 ;;;===============================================================================
+;;; Sequence monad
+;;;===============================================================================
+(define (Sequence #:return ret #:map app-map  #:append app)
+  (monad
+   #:type listable?
+   #:return ret
+   #:bind (λ (m f) (app-map f m))
+   #:mzero (ret)
+   #:mplus app
+   #:failure (λ (_) mzero)))
+
+;;;===============================================================================
 ;;; List monad
 ;;;===============================================================================
 (define (concat-map f lst)
@@ -64,13 +76,11 @@
 
 (define concatenate (fork append sequence->list))
 
-(define-monad List
-  #:type listable?
-  #:return list
-  #:bind (λ (m f) (concat-map f m))
-  #:mzero null
-  #:mplus concatenate
-  #:failure (λ (_) null))
+(define List 
+  (Sequence
+   #:return list
+   #:map concat-map
+   #:append concatenate))
 
 ;;;===============================================================================
 ;;; Set monad
@@ -83,13 +93,11 @@
                   (f x))]) 
             fx))
 
-(define-monad Set
-  #:type listable?
-  #:return set
-  #:bind (λ (m f) (set-union-map f m))
-  #:mzero (set)
-  #:mplus set-union
-  #:failure (λ (_) (set)))
+(define Set 
+  (Sequence
+   #:return set
+   #:map set-union-map
+   #:append set-union))
 
 ;;;===============================================================================
 ;;; Stream monad
@@ -97,6 +105,7 @@
 
 (define make-stream
   (case-lambda
+    [() empty-stream]
     ; works inside binding
     [(x) (stream x)]
     ; works once at the input
@@ -128,13 +137,11 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define-monad Stream
-  #:type listable?
-  #:return make-stream
-  #:bind (λ (m f) (stream-concat-map f m))
-  #:mzero empty-stream
-  #:mplus stream-concatenate
-  #:failure (λ (_) empty-stream))
+(define Stream 
+  (Sequence
+   #:return make-stream
+   #:map stream-concat-map
+   #:append stream-concatenate))
 
 ;;;===============================================================================
 ;;; Amb monad
@@ -145,7 +152,8 @@
     ; works once at at input
     [amb (procedure-rename 
           (case-lambda 
-            [(x) (amb x)]
+            [() empty-stream]
+            [(x) (stream x)]
             [(x . y) (amb-union (stream x) y)])
           'amb)]))
 
@@ -188,10 +196,8 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define-monad Amb
-  #:type listable?
-  #:return amb
-  #:bind (λ (m f) (amb-union-map f m))
-  #:mzero empty-stream
-  #:mplus amb-union
-  #:failure (λ (_) empty-stream))
+(define Amb 
+  (Sequence
+   #:return amb
+   #:map amb-union-map
+   #:append amb-union))
