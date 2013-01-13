@@ -19,12 +19,12 @@
 
 Monads are first-class objects in Formica. Following function returns anonymous monad which could be used to create parameterized monads as mixins.
 
-@defproc[(monad [#:return return (Any -> Any)]
-                [#:bind bind (Any (Any-> Any) -> Any)]
+@defproc[(monad [#:return return (Any → Any)]
+                [#:bind bind (Any (Any → Any) → Any)]
                 [#:mzero mzero Any 'undefined]
-                [#:mplus mplus (Any Any -> Any) 'undefined]
+                [#:mplus mplus (Any Any → Any) 'undefined]
                 [#:type type contract? #f]
-                [#:failure failure (Any -> any) raise-match-error]) monad?]
+                [#:failure failure (Any → any) raise-match-error]) monad?]
 Returns a monad or an additive monad with given @racket[_return] and @racket[_bind] functions, complemented by @racket[_mplus] operation and zero element @racket[_mzero] in case of additive monads.
 
 Keywords @racket[#:return] and @racket[#:bind] are used for clarity and can't be omitted, however they could be mixed in arbitrary order with others.
@@ -33,21 +33,24 @@ If the @racket[_type] contract is given, monadic values are restricted to satisf
 
 If the @racket[_failure] function is given, it will be called in case of failure of pattern-matching in @racket[do] and @racket[collect] forms. By default it raises an exception.
 
-@defform[(define-monad id 
-           #:return return 
-           #:bind bind 
-           [#:mzero mzero]
-           [#:mplus mplus]
-           [#:type type]
-           [#:failure failure])
-         #:contracts ([return (Any -> Any)]
-                      [bind (Any (Any-> Any) -> Any)]
+@defform*[[(define-monad id m-expr)
+           
+           (define-monad id 
+             #:return return 
+             #:bind bind 
+             [#:mzero mzero]
+             [#:mplus mplus]
+             [#:type type]
+             [#:failure failure])]
+         #:contracts ([m-expr monad?]
+                      [return (Any → Any)]
+                      [bind (Any (Any → Any) → Any)]
                       [mzero Any]
-                      [mplus (Any Any -> Any)]
+                      [mplus (Any Any → Any)]
                       [type contract?]
-                      [failure (Any -> Any)])]
-
-Defines named monad in the same way as @racket[monad] constructor.
+                      [failure (Any → Any)])]
+First form defines named monad as a result of @racket[m-expr].
+The secod form defines named monad in the same way as @racket[monad] constructor.
 
 
 @bold{Examples:}
@@ -456,7 +459,7 @@ Examples:
  (using List
    (seq/m '((1 2) (3 4 5))))]
 
-@defproc[(map/m [f (Any Any -> Any)] [lst list?]) Any]
+@defproc[(map/m [f (Any Any → Any)] [lst list?]) Any]
 Monadic mapping.
 
 @racketblock[map/m _f = seq/m ∘ (map _f)]
@@ -466,7 +469,7 @@ Example (definition of @racketidfont{Sqrt} function see in the example to the @r
  (using List
    (map/m Sqrt '(1 4 9)))]
 
-@defproc[(fold/m [f (Any Any -> Any)] [x0 Any] [lst list?]) Any]
+@defproc[(fold/m [f (Any Any → Any)] [x0 Any] [lst list?]) Any]
 Monadic fold.
 
 @racketblock[(fold/m _f _x0 '()) = (return _x0)
@@ -485,7 +488,7 @@ Monadic fold.
            0 
            '(1 2 3)))]
 
-@defproc[(filter/m [f (Any Any -> Any)] [x0 Any] [lst list?]) Any]
+@defproc[(filter/m [f (Any Any → Any)] [x0 Any] [lst list?]) Any]
 Monadic fiter.
 
 @racketblock[(filter/m _pred '()) = (return '())

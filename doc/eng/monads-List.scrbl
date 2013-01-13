@@ -15,8 +15,6 @@
 
 @declare-exporting[formica]
 
-@section{Id}
-
 @defthing[Id monad?] 
 The identity monad.
 
@@ -44,18 +42,20 @@ In the @racket[Id] monad @racket[do] form works like @racket[match-let*] form wi
      [(z t) <<- (reverse y)]
      (return (list x y z t)))]
 
-@section{List}
-
-@defthing[List monad-plus?] 
-The @racket[List] monad is used for list comprehension and in order to perform calculations with functions, returning more then one value. The main differenece between the @racket[List] and monad @tt{[]} in @emph{Haskell}, is the ability of @racket[List] to operate with any sequences as @racket[for] iterators do.
+@defproc[(Sequence [#:return ret (Any ... → listable?)]
+                   [#:map seq-append-map ((Any → listable?) listable? → listable?)]
+                   [#:append seq-append (listable? listable? → listable?)]) monad-plus?]
+Returns a monad which performs computations which may return zero or more then one possible results as a sequence (list, stream, set etc.).
 
 Definition:
-@codeblock{return = list
-           bind _m _f = (concat-map _f _m)
-           mzero = null
-           mplus = concatenate
+@codeblock{return = _ret
+           bind _s _f = (_seq-append-map _f _s)
+           mplus = _seq-append
+           mzero = (return)
            type = listable?
-           failure = (const null)}
+           failure = (const mzero)}
+
+The sequence of arguments is constructed by the @racket[_ret] function. The bound function @racket[_f] is applied to all possible values in the input sequence @racket[_s] and the resulting sequences are concatenated by the @racket[_seq-append] to produce a sequence of all possible results. The details of binding implementation are specified by the mapping function @racket[_seq-append-map].
 
 @defproc[(listable? (v Any)) Bool]
 Returns @racket[#t] if @racket[v] is a sequence but not the @tech{formal application}.
@@ -69,26 +69,8 @@ Examples:
   (define-formal g)
   (listable? (g 'x 'y))]
 
-@defproc[(concatenate (s listable?) ...) list?]
-Returns a result of @racket[_s ...] concatenation in a form of a list.
-
-Examples:
-@interaction[#:eval formica-eval
-  (concatenate '(1 2 3) '(a b c))
-  (concatenate 4 (stream 'a 'b 'c))
-  (concatenate (in-set (set 'x 'y 'z)) (in-value 8))
-  (concatenate 1 2 3)]
-
-@defproc[(concat-map (f (any/c -> n/f-list?)) (s listable?)) list?]
-Applies @racket[_f] to elements of @racket[_s] and returns the concatenation of results.
-
-Examples:
-@interaction[#:eval formica-eval
-  (concat-map (λ (x) (list x (- x))) '(1 2 3))
-  (concat-map (λ (x) (list x (- x))) 4)]
-
 @defproc[(zip (s listable?) ...) sequence?]
-Returns a sequence where each element is a list with as many values as the number of supplied seqs; the values, in order, are the values of each seq. Used to process sequences in parallel, as in @racket[for/list] iterator.
+Returns a sequence where each element is a list with as many values as the number of supplied sequences; the values, in order, are the values of each sequence. Used to process sequences in parallel, as in @racket[for/list] iterator.
 
 Example of using @racket[zip]:
 @interaction[#:eval formica-eval
@@ -102,7 +84,33 @@ The same with @racket[for/list] iterator.
             [y '(1 2 3 4)])
    (f x y))]
 
-@subsection{Examples}
+@defthing[List monad-plus?] 
+The @racket[List] monad is used for list comprehension and in order to perform calculations with functions, returning more then one value. The main differenece between the @racket[List] and monad @tt{[]} in @emph{Haskell}, is the ability of @racket[List] to operate with any sequences as @racket[for] iterators do.
+
+Definition:
+@codeblock{List = (Sequence #:return list
+                            #:map concat-map
+                            #:append concatenate)}
+
+@defproc[(concatenate (s listable?) ...) list?]
+Returns a result of @racket[_s ...] concatenation in a form of a list.
+
+Examples:
+@interaction[#:eval formica-eval
+  (concatenate '(1 2 3) '(a b c))
+  (concatenate 4 (stream 'a 'b 'c))
+  (concatenate (in-set (set 'x 'y 'z)) (in-value 8))
+  (concatenate 1 2 3)]
+
+@defproc[(concat-map (f (any/c → n/f-list?)) (s listable?)) list?]
+Applies @racket[_f] to elements of @racket[_s] and returns the concatenation of results.
+
+Examples:
+@interaction[#:eval formica-eval
+  (concat-map (λ (x) (list x (- x))) '(1 2 3))
+  (concat-map (λ (x) (list x (- x))) 4)]
+
+@bold{Examples}
 
 @def+int[#:eval formica-eval
  (using-monad List)]
@@ -168,18 +176,15 @@ It is easy to combine parallel and usual monadic processing:
 
 The use of monad @racket[List] goes beyond the simple list generation. The main purpose of monadic computations is to provide computation with functions which may return more then one value (or fail to produce any). The examples of various applications of this monad could be found in the @filepath{nondeterministic.rkt} file in the @filepath{examples/} folder.
 
-@section{Stream}
+
 
 @defthing[Stream monad-plus?] 
 Like @racket[List] monad, but provides lazy list processing. This monad is equivalent to monad @tt{[]} in @emph{Haskell} and could be used for operating with potentially infinite sequences.
 
 Definition:
-@codeblock{return = stream
-           bind _m _f = (stream-concat-map _f _m)
-           mzero = empty-stream
-           mplus = stream-concatenate
-           type = listable?
-           failure = (const empty-stream)}
+@codeblock{Stream = (Sequence #:return list
+                              #:map stream-concat-map
+                              #:append stream-concatenate)}
 
 @defproc[(stream-concatenate (s listable?) ...) list?]
 Returns a result of @racket[_s ...] lazy concatenation in a form of a stream.
@@ -197,7 +202,7 @@ Examples:
    (stream-concatenate (stream 1 (/ 0)) (in-naturals)) 
    1)]
 
-@defproc[(stream-concat-map (f (any/c -> n/f-list?)) (s listable?)) list?]
+@defproc[(stream-concat-map (f (any/c → n/f-list?)) (s listable?)) list?]
 Applies @racket[_f] to elements of @racket[_s] and lazily returns the concatenation of results.
 
 Examples:
@@ -218,3 +223,65 @@ Examples:
   (stream-ref 
    (stream-concat-map (λ (x) (stream x (/ x))) '(1 0 3)) 
    3)]
+
+@defproc[(stream-take (s stream?) (n Nat)) list?]
+Returns list of @racket[_n] first elements of stream (or sequence) @racket[s].
+
+Examples:
+@interaction[#:eval formica-eval
+  (stream-take (stream 'a 'b 'c) 2) 
+  (stream-take (stream 'a 'b (/ 0)) 2)
+  (stream-take (in-naturals) 3)]
+
+@defform[(scons h t)]
+A match expander which matches non-empty streams and binds the first element to @racket[_h], and the rest of stream to @racket[_t]. Only the first element is evaluated eagerly.
+
+Examples:
+@interaction[#:eval formica-eval
+ (require racket/match)
+ (match (in-naturals)
+   [(scons h t) (list h t)])
+ (match (stream 1 (/ 0))
+   [(scons h t) (list h t)])]
+
+@bold{Examples}
+
+@def+int[#:eval formica-eval
+ (using-monad Stream)]
+
+@interaction[#:eval formica-eval
+ (collect (sqr x) [x <- '(1 2 3 4)])
+ (stream-first (collect (sqr x) [x <- '(1 2 3 4)]))
+ (stream->list (collect (sqr x) [x <- '(1 2 3 4)]))]
+
+Two classical examples with infinite sequences.
+
+The infinite sequence of Pythagorean triples:
+@interaction[#:eval formica-eval
+ (define triangles 
+  (collect (list a b c) 
+    [a <- (in-naturals)]
+    [b <- (in-range (ceiling (/ a 2)) a)]
+    [c <-: (sqrt (- (sqr a) (sqr b)))]
+    (integer? c)
+    (> a b c)))
+(stream-take triangles 3)
+(stream-ref triangles 100)]
+
+The infinite sequence of primes:
+@interaction[#:eval formica-eval
+(define (primes r)
+  (do [(scons x xs) <-: r]
+      [p <-: (collect p 
+               [p <- xs] 
+               (not (zero? (modulo p x))))]
+      (stream-cons x (primes p))))
+
+(stream-take (primes (in-naturals 2)) 10)
+(stream-ref (primes (in-naturals 2)) 100)]
+
+Using monad @racket[Stream] all monadic functions work lazily however they still operate on eager lists:
+@interaction[#:eval formica-eval
+ (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 0)
+ (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 1)
+ (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 2)]
