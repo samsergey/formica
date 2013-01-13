@@ -117,9 +117,23 @@
 
 (define-syntax (define-monad stx)
   (syntax-case stx ()
+    [(define-monad id m-expr) 
+     (with-syntax ([mn (format-id #'id "monad:~a" (syntax-e #'id))])
+       #'(begin
+           (define M m-expr)
+           (unless (monad? M) (error "Expected a monad as a right-hand side of definition.\n given " M))
+           (struct mn monad ())
+           (define id (make-named-monad 
+                       mn 
+                       #:type (monad-type M)
+                       #:return (monad-return M)
+                       #:bind (monad-bind M)
+                       #:mzero (monad-mzero M)
+                       #:mplus (monad-mplus M)
+                       #:failure (monad-failure M)))))]
     [(define-monad id args ...) 
      (with-syntax ([mn (format-id #'id "monad:~a" (syntax-e #'id))])
-       #`(begin
+       #'(begin
            (struct mn monad ())
            (define id (make-named-monad mn args ...))))]))
 

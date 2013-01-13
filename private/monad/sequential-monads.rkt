@@ -21,6 +21,7 @@
 
 (provide 
  amb
+ scons
  (contract-out 
   (concatenate (->* () #:rest (listof listable?) list?))
   (concat-map (-> (-> any/c any/c) listable? list?))
@@ -28,7 +29,9 @@
   (set-union-map (-> (-> any/c any/c) listable? set?))
   (Set monad-plus?)
   (stream-concat-map (-> (-> any/c any/c) listable? stream?)) 
-  (stream-concatenate (-> listable? listable? stream?))
+  (stream-concatenate (-> listable? listable? stream?))  
+  (stream-take (-> stream? (and/c integer? (>/c 0)) list?))
+  (stream->pair (-> (and/c stream? (not/c stream-empty?)) (cons/c any/c stream?)))
   (Stream monad-plus?)
   (amb-union-map (-> (-> any/c any/c) listable? stream?))
   (amb-union (-> listable? listable? stream?))
@@ -76,7 +79,7 @@
 
 (define concatenate (fork append sequence->list))
 
-(define List 
+(define-monad List 
   (Sequence
    #:return list
    #:map concat-map
@@ -93,7 +96,7 @@
                   (f x))]) 
             fx))
 
-(define Set 
+(define-monad Set 
   (Sequence
    #:return set
    #:map set-union-map
@@ -137,11 +140,26 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define Stream 
+(define-monad Stream 
   (Sequence
    #:return make-stream
    #:map stream-concat-map
    #:append stream-concatenate))
+
+(define (stream->pair s)
+  (cons (stream-first s) (stream-rest s)))
+
+(define (stream-take s n)
+  (for/list ([i (in-range n)]
+             [x (in-stream s)]) x))
+
+(define-match-expander scons
+  (syntax-rules ()
+    [(scons x y) (and (? stream?) 
+                      (not (? stream-empty?))
+                      (app stream-first x)
+                      (app stream-rest y))]))
+                      
 
 ;;;===============================================================================
 ;;; Amb monad
@@ -196,7 +214,7 @@
   ; return a stream, produced by the generator
   (sequence->stream (in-producer g 'end-of-stream)))
 
-(define Amb 
+(define-monad Amb 
   (Sequence
    #:return amb
    #:map amb-union-map
