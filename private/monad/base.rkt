@@ -75,11 +75,10 @@
   (define return*
     (if type 
         (procedure-reduce-arity
-         (case-lambda
-           [x (let ([res (apply return x)])
+         (λ x (let ([res (apply return x)])
                 (if (equal? res (return ⊤))
                     (return ⊤)
-                    (check-result 'return type res)))])
+                    (check-result 'return type res))))
          (procedure-arity return))
         return))
   

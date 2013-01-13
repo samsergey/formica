@@ -36,12 +36,12 @@
   (concat-map (-> (-> any/c n/f-list?) listable? n/f-list?))
   ; Stream monad
   (Stream monad-plus?)
-  (stream-concat-map (-> (-> any/c any/c) listable? stream?)) 
+  (stream-concat-map (-> (-> any/c stream?) listable? stream?)) 
   (stream-concatenate (-> listable? listable? stream?))  
   (stream-take (-> stream? (and/c integer? (>/c 0)) list?))
   ; Amb monad
   (Amb monad-plus?)
-  (amb-union-map (-> (-> any/c any/c) listable? stream?))
+  (amb-union-map (-> (-> any/c stream?) listable? stream?))
   (amb-union (-> listable? listable? stream?)))
 
  (all-from-out racket/set
@@ -151,7 +151,9 @@
 ;;;===============================================================================
 (define-syntax amb
   (syntax-id-rules ()
-    [(amb x ...) (stream x ...)]
+    [(amb) (stream)]
+    [(amb x) (stream x)]
+    [(amb x y ...) (amb-union (stream x) (amb y ...))]
     ; works once at at input
     [amb (procedure-rename 
           (case-lambda 

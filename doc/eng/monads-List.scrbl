@@ -125,8 +125,8 @@ The @racket[List] monad is used for list comprehension and in order to perform c
 
 Definition:
 @codeblock{List = (Sequence #:return list
-                            #:map concat-map
-                            #:mplus concatenate)}
+                            #:mplus concatenate
+                            #:map concat-map)}
 
 @defproc[(concatenate (s listable?) ...) list?]
 Returns a result of @racket[_s ...] concatenation in a form of a list.
@@ -219,10 +219,10 @@ Like @racket[List] monad, but provides lazy list processing. This monad is equiv
 
 Definition:
 @codeblock{Stream = (Sequence #:return list
-                              #:map stream-concat-map
-                              #:mplus stream-concatenate)}
+                              #:mplus stream-concatenate
+                              #:map stream-concat-map)}
 
-@defproc[(stream-concatenate (s listable?) ...) list?]
+@defproc[(stream-concatenate (s listable?) ...) stream?]
 Returns a result of @racket[_s ...] lazy concatenation in a form of a stream.
 
 Examples:
@@ -238,7 +238,7 @@ Examples:
    (stream-concatenate (stream 1 (/ 0)) (in-naturals)) 
    1)]
 
-@defproc[(stream-concat-map (f (any/c → n/f-list?)) (s listable?)) list?]
+@defproc[(stream-concat-map (f (any/c → stream?)) (s listable?)) stream?]
 Applies @racket[_f] to elements of @racket[_s] and lazily returns the concatenation of results.
 
 Examples:
@@ -324,3 +324,77 @@ Using monad @racket[Stream] all monadic functions work lazily however they still
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 0)
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 1)
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 2)]
+
+@subsection{The Amb monad}
+
+@defthing[Amb monad-plus?] 
+Like @racket[Stream] monad, but tries to return a list of unique elements.
+
+Definition:
+@codeblock{Amb = (Sequence #:return amb
+                           #:mplus amb-union
+                           #:map amb-union-map)}
+
+@defproc[(amb (v any/c) ...) stream?]
+Returns a stream of arguments @racket[_v] removing duplicates (in terms of @racket[equal?]).
+
+Examples:
+@interaction[#:eval formica-eval
+ (stream->list (amb 1 3 2 2 3 2 1 2 4 3))
+ (stream-take (amb 1 2 (/ 0)) 2)]
+
+@defproc[(amb-union (s1 listable?) (s2 listable?)) stream?]
+Returns a stream of elements from @racket[_s1] and @racket[_s2], removing duplicates.
+
+Examples:
+@interaction[#:eval formica-eval
+  (stream->list 
+   (amb-union '(1 2 3) '(2 3 4)))
+  (stream->list 
+   (amb-union 4 (amb 'a 'b 'c)))
+  (stream-ref 
+   (amb-union (amb 1 (/ 0)) (in-naturals)) 
+   0)
+  (stream-ref 
+   (amb-union (amb 1 (/ 0)) (in-naturals)) 
+   1)]
+
+@defproc[(amb-union-map (f (any/c → stream?)) (s listable?)) stream?]
+Applies @racket[_f] to elements of @racket[_s] and lazily returns the union of results.
+
+Examples:
+@interaction[#:eval formica-eval
+  (stream->list 
+   (amb-union-map (lift sqr) '(-3 -2 -1 0 -1 2 3)))
+  (stream->list 
+   (amb-union-map (λ (x) (amb x (- x))) 4))
+  (stream-ref 
+   (amb-union-map (λ (x) (amb x (/ x))) '(1 0 3)) 
+   0)
+  (stream-ref 
+   (amb-union-map (λ (x) (amb x (/ x))) '(1 0 3)) 
+   1)
+  (stream-ref 
+   (amb-union-map (λ (x) (amb x (/ x))) '(1 0 3)) 
+   2)]
+
+@bold{Examples}
+
+@def+int[#:eval formica-eval
+ (using-monad Amb)]
+
+Proving logical statements by brute force
+@interaction[#:eval formica-eval
+ (stream->list 
+  (collect (eq? (==> A B) (or B (not A))) 
+    [(A B) <<- (amb #t #f)]))
+ (stream->list 
+  (collect (==> (==> (==> A B) C) (==> A (==> B C)))
+    [(A B C) <<- (amb #t #f)]))
+ (stream->list 
+  (collect (eq? (==> (==> A B) C) (==> A (==> B C)))
+    [(A B C) <<- (amb #t #f)]))
+ (stream->list 
+  (collect (list A B C)
+    [(A B C) <<- (amb #t #f)]
+    (not (eq? (==> (==> A B) C) (==> A (==> B C))))))]
