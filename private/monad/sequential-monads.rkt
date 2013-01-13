@@ -23,21 +23,27 @@
  amb
  scons
  (contract-out 
-  (concatenate (->* () #:rest (listof listable?) list?))
-  (concat-map (-> (-> any/c any/c) listable? list?))
+  ; Sequence monad
+  (Sequence (->* (#:return (->* () #:rest list? listable?)
+                  #:mplus (-> listable? listable? listable?)) 
+                 (#:map (-> (-> any/c listable?) listable? listable?)) monad-plus?))
+  (mplus-map (-> (-> any/c listable?) listable? any/c))
+  (listable? contract?)
+  (zip (->* (listable?) #:rest (listof listable?) (sequence/c list?)))
+  ; List monad
   (List monad-plus?)  
-  (set-union-map (-> (-> any/c any/c) listable? set?))
-  (Set monad-plus?)
+  (concatenate (->* () #:rest (listof listable?) n/f-list?))
+  (concat-map (-> (-> any/c n/f-list?) listable? n/f-list?))
+  ; Stream monad
+  (Stream monad-plus?)
   (stream-concat-map (-> (-> any/c any/c) listable? stream?)) 
   (stream-concatenate (-> listable? listable? stream?))  
   (stream-take (-> stream? (and/c integer? (>/c 0)) list?))
-  (stream->pair (-> (and/c stream? (not/c stream-empty?)) (cons/c any/c stream?)))
-  (Stream monad-plus?)
-  (amb-union-map (-> (-> any/c any/c) listable? stream?))
-  (amb-union (-> listable? listable? stream?))
+  ; Amb monad
   (Amb monad-plus?)
-  (listable? contract?)
-  (zip (->* (listable?) #:rest (listof listable?) (sequence/c list?))))
+  (amb-union-map (-> (-> any/c any/c) listable? stream?))
+  (amb-union (-> listable? listable? stream?)))
+
  (all-from-out racket/set
                racket/stream))
 
@@ -56,7 +62,12 @@
 ;;;===============================================================================
 ;;; Sequence monad
 ;;;===============================================================================
-(define (Sequence #:return ret #:map app-map  #:append app)
+(define (mplus-map f m)
+  (for/fold ([r mzero]) ([x m])
+     (let ([fx (f x)])
+       (mplus (f x) r))))
+
+(define (Sequence #:return ret #:map (app-map mplus-map)  #:mplus app)
   (monad
    #:type listable?
    #:return ret
@@ -69,13 +80,7 @@
 ;;; List monad
 ;;;===============================================================================
 (define (concat-map f lst)
-  (for*/list 
-      ([x lst] 
-       [fx (in-list (check-result 
-                     'bind 
-                     (flat-named-contract 'n/f-list? n/f-list?)
-                     (f x)))])
-    fx))
+  (for*/list ([x lst] [fx (in-list (f x))]) fx))
 
 (define concatenate (fork append sequence->list))
 
@@ -83,24 +88,7 @@
   (Sequence
    #:return list
    #:map concat-map
-   #:append concatenate))
-
-;;;===============================================================================
-;;; Set monad
-;;;===============================================================================
-(define (set-union-map f lst)
-  (for*/set ([x lst] 
-             [fx (check-result 
-                  'bind 
-                  (flat-named-contract 'set? set?)
-                  (f x))]) 
-            fx))
-
-(define-monad Set 
-  (Sequence
-   #:return set
-   #:map set-union-map
-   #:append set-union))
+   #:mplus concatenate))
 
 ;;;===============================================================================
 ;;; Stream monad
@@ -144,10 +132,7 @@
   (Sequence
    #:return make-stream
    #:map stream-concat-map
-   #:append stream-concatenate))
-
-(define (stream->pair s)
-  (cons (stream-first s) (stream-rest s)))
+   #:mplus stream-concatenate))
 
 (define (stream-take s n)
   (for/list ([i (in-range n)]
@@ -218,4 +203,4 @@
   (Sequence
    #:return amb
    #:map amb-union-map
-   #:append amb-union))
+   #:mplus amb-union))

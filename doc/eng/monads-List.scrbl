@@ -15,6 +15,8 @@
 
 @declare-exporting[formica]
 
+@section{The Identity monad}
+
 @defthing[Id monad?] 
 The identity monad.
 
@@ -42,10 +44,14 @@ In the @racket[Id] monad @racket[do] form works like @racket[match-let*] form wi
      [(z t) <<- (reverse y)]
      (return (list x y z t)))]
 
+@section{Ambiguous computations.}
+
+@subsection{The Sequence monad}
+
 @defproc[(Sequence [#:return ret (Any ... → listable?)]
-                   [#:map seq-append-map ((Any → listable?) listable? → listable?)]
-                   [#:append seq-append (listable? listable? → listable?)]) monad-plus?]
-Returns a monad which performs computations which may return zero or more then one possible results as a sequence (list, stream, set etc.).
+                   [#:mplus seq-append (listable? listable? → listable?)]
+                   [#:map seq-append-map ((Any → listable?) listable? → listable?) mplus-map]) monad-plus?]
+Returns a monad which performs computations which may return zero or more then one possible results as a sequence (list, stream, set etc.). This is a generalized monad, monads @racket[List], @racket[Stream] and @racket[Amb] are instances of the @racket[Sequence] monad.
 
 Definition:
 @codeblock{return = _ret
@@ -56,6 +62,30 @@ Definition:
            failure = (const mzero)}
 
 The sequence of arguments is constructed by the @racket[_ret] function. The bound function @racket[_f] is applied to all possible values in the input sequence @racket[_s] and the resulting sequences are concatenated by the @racket[_seq-append] to produce a sequence of all possible results. The details of binding implementation are specified by the mapping function @racket[_seq-append-map].
+
+@bold{Examples:}
+
+Using @racket[Sequence] it is easy to define monads working with different types of sequences: sets, vectors etc.
+@def+int[#:eval formica-eval
+ (define-monad Set
+   (Sequence
+    #:return set
+    #:mplus set-union))
+ (using Set
+   (collect (+ x y) [x <- '(1 2 3)] [y <- '(2 3 4)]))
+ (using Set
+   (lift/m cons '(a a b) '(x y y)))]
+
+@defs+int[#:eval formica-eval
+ ((require racket/vector)
+  (define-monad Vec
+   (Sequence
+    #:return vector
+    #:mplus vector-append)))
+ (using Vec
+   (collect (+ x y) [x <- '(1 2 3)] [y <- '(2 3 4)]))
+ (using Vec
+   (lift/m cons '(a a b) '(x y y)))]
 
 @defproc[(listable? (v Any)) Bool]
 Returns @racket[#t] if @racket[v] is a sequence but not the @tech{formal application}.
@@ -69,7 +99,11 @@ Examples:
   (define-formal g)
   (listable? (g 'x 'y))]
 
-@defproc[(zip (s listable?) ...) sequence?]
+@defproc[(mplus-map [f (Any → listable?)] [s listable?]) listable?]
+Generalized mapping function for the @tech{currently used monad}. Formally equal to 
+@codeblock{(mplus-map f s) = (foldl (∘ mplus f) mzero s)}
+
+@defproc[(zip [s listable?] ...) sequence?]
 Returns a sequence where each element is a list with as many values as the number of supplied sequences; the values, in order, are the values of each sequence. Used to process sequences in parallel, as in @racket[for/list] iterator.
 
 Example of using @racket[zip]:
@@ -84,13 +118,15 @@ The same with @racket[for/list] iterator.
             [y '(1 2 3 4)])
    (f x y))]
 
+@subsection{The List monad}
+
 @defthing[List monad-plus?] 
 The @racket[List] monad is used for list comprehension and in order to perform calculations with functions, returning more then one value. The main differenece between the @racket[List] and monad @tt{[]} in @emph{Haskell}, is the ability of @racket[List] to operate with any sequences as @racket[for] iterators do.
 
 Definition:
 @codeblock{List = (Sequence #:return list
                             #:map concat-map
-                            #:append concatenate)}
+                            #:mplus concatenate)}
 
 @defproc[(concatenate (s listable?) ...) list?]
 Returns a result of @racket[_s ...] concatenation in a form of a list.
@@ -176,7 +212,7 @@ It is easy to combine parallel and usual monadic processing:
 
 The use of monad @racket[List] goes beyond the simple list generation. The main purpose of monadic computations is to provide computation with functions which may return more then one value (or fail to produce any). The examples of various applications of this monad could be found in the @filepath{nondeterministic.rkt} file in the @filepath{examples/} folder.
 
-
+@subsection{The Stream monad}
 
 @defthing[Stream monad-plus?] 
 Like @racket[List] monad, but provides lazy list processing. This monad is equivalent to monad @tt{[]} in @emph{Haskell} and could be used for operating with potentially infinite sequences.
@@ -184,7 +220,7 @@ Like @racket[List] monad, but provides lazy list processing. This monad is equiv
 Definition:
 @codeblock{Stream = (Sequence #:return list
                               #:map stream-concat-map
-                              #:append stream-concatenate)}
+                              #:mplus stream-concatenate)}
 
 @defproc[(stream-concatenate (s listable?) ...) list?]
 Returns a result of @racket[_s ...] lazy concatenation in a form of a stream.
@@ -282,6 +318,9 @@ The infinite sequence of primes:
 
 Using monad @racket[Stream] all monadic functions work lazily however they still operate on eager lists:
 @interaction[#:eval formica-eval
+ (stream-first ((compose/m (lift /) (lift (curry * 2))) 1/2 0))
+ (stream-first (lift/m / (return 1) (return 1 0)))
+ (stream-ref (lift/m / (return 1) (return 1 0)) 1)
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 0)
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 1)
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 2)]

@@ -130,11 +130,12 @@
   (syntax-case stx ()
     [(_ x type) 
      (with-syntax ([c (parse-infix-contract #'type)])
-       #' (cond
-            [(contract? c) 
-             (with-handlers ([exn:fail? (lambda (exn) #f)])
-               (contract-first-order-passes? c x))]
-            [else (raise-type-error 'is "predicate" 1 x type)]))]))
+       #'(or (eq? x '⊤) 
+             (cond
+               [(contract? c) 
+                (with-handlers ([exn:fail? (lambda (exn) #f)])
+                  (contract-first-order-passes? c x))]
+               [else (raise-type-error 'is "predicate" 1 x type)])))]))
 
 (define check-type (make-parameter #t))
 
