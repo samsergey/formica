@@ -22,6 +22,8 @@
          
          Formica is available as both a language level and a module that can be used in other languages.}
 
+@include-section["intro.scrbl"]
+
 @include-section["syntax.scrbl"]
 
 @include-section["rewrite.scrbl"]

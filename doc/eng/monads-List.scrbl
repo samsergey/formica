@@ -65,27 +65,25 @@ The sequence of arguments is constructed by the @racket[_ret] function. The boun
 
 @bold{Examples:}
 
-Using @racket[Sequence] it is easy to define monads working with different types of sequences: sets, vectors etc.
+Using @racket[Sequence] it is easy to define monads working with different types of sequences: sets, vectors, strings etc.
 @def+int[#:eval formica-eval
  (define-monad Set
    (Sequence
     #:return set
     #:mplus set-union))
  (using Set
-   (collect (+ x y) [x <- '(1 2 3)] [y <- '(2 3 4)]))
- (using Set
-   (lift/m cons '(a a b) '(x y y)))]
+   (lift/m + '(1 2 3) '(2 3 4)))]
 
 @defs+int[#:eval formica-eval
- ((require racket/vector)
-  (define-monad Vec
+ ((define-monad String
    (Sequence
-    #:return vector
-    #:mplus vector-append)))
- (using Vec
-   (collect (+ x y) [x <- '(1 2 3)] [y <- '(2 3 4)]))
- (using Vec
-   (lift/m cons '(a a b) '(x y y)))]
+    #:return string
+    #:mplus (flipped string-append))))
+ (using String
+  (collect (char-upcase x)
+    [x <- "abc12xy"] 
+    (char-alphabetic? x)
+    [x <- (format "~a(~a)" x (char->integer x))]))]
 
 @defproc[(listable? (v Any)) Bool]
 Returns @racket[#t] if @racket[v] is a sequence but not the @tech{formal application}.
@@ -153,15 +151,14 @@ Examples:
 
 Examples of list comprehension
 @interaction[#:eval formica-eval
- (collect (sqr x) [x <- '(1 2 3 4)])]
-
-@interaction[#:eval formica-eval
- (collect (sqr x) [x <- '(1 2 3 4)] (odd? x))]
+ (collect (sqr x) [x <- '(1 2 5 13 4 24)] (odd? x))]
 
 @interaction[#:eval formica-eval
  (collect (cons x y) 
-   [x <- '(1 3 4)]
-   [y <- '(a b c)])]
+   [x <- '(1 3 4 8 2 4)]
+   [y <- '(3 1 6 4 3)]
+   (< x y)
+   (= (modulo x y) 2))]
 
 @interaction[#:eval formica-eval
  (collect (cons x y) 
@@ -171,17 +168,10 @@ Examples of list comprehension
 
 In place of a list any sequence could be used, but only a list is produced.
 @interaction[#:eval formica-eval
- (collect (sqr x) [x <- 5])]
+ (collect (cons x y) [(x y) <<- 10] (< 4 (+ (sqr x) (sqr y)) 9))]
 
 @interaction[#:eval formica-eval
- (collect (cons x y) 
-   [x <- 3] 
-   [y <- '(a b c)])]
-
-@interaction[#:eval formica-eval
- (collect (cons x y) 
-   [x <- 3] 
-   [y <- "abc"])]
+ (lift/m cons 2 "abc")]
 
 Forms @racket[do] and @racket[collect] in the @racket[List] monad work like @racket[for*/list] form:
 @interaction[#:eval formica-eval
@@ -285,32 +275,35 @@ Examples:
 @def+int[#:eval formica-eval
  (using-monad Stream)]
 
-@interaction[#:eval formica-eval
- (collect (sqr x) [x <- '(1 2 3 4)])
- (stream-first (collect (sqr x) [x <- '(1 2 3 4)]))
- (stream->list (collect (sqr x) [x <- '(1 2 3 4)]))]
-
 Two classical examples with infinite sequences.
 
 The infinite sequence of Pythagorean triples:
-@interaction[#:eval formica-eval
- (define triangles 
+@def+int[#:eval formica-eval
+ (define triples 
   (collect (list a b c) 
     [a <- (in-naturals)]
     [b <- (in-range (ceiling (/ a 2)) a)]
     [c <-: (sqrt (- (sqr a) (sqr b)))]
     (integer? c)
-    (> a b c)))
-(stream-take triangles 3)
-(stream-ref triangles 100)]
+    (> b c)))
+(stream-take triples 3)
+(stream-ref triples 100)]
+
+The first triangle with area exceeding 100: 
+@interaction[#:eval formica-eval
+  (stream-first 
+   (collect t 
+     [(and t (list _ b c)) <- triples] 
+     (> (* 1/2 b c) 100)))]
+
 
 The infinite sequence of primes:
-@interaction[#:eval formica-eval
+@def+int[#:eval formica-eval
 (define (primes r)
   (do [(scons x xs) <-: r]
-      [p <-: (collect p 
-               [p <- xs] 
-               (not (zero? (modulo p x))))]
+      [p <-: (collect y 
+               [y <- xs] 
+               (not (zero? (modulo y x))))]
       (stream-cons x (primes p))))
 
 (stream-take (primes (in-naturals 2)) 10)

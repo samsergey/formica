@@ -337,6 +337,14 @@ Using guard:
      [z <- (range 2 x)]
      (= z (gcd x y))))]
 
+@defproc[(undefined) undefined?]
+Represents an object which satisfies following relations in any monad:
+@centered{@racket[(return (undefined)) ≡ (undefined)]
+           
+          @racket[(bind (undefined) >>= _f) ≡ (_f (undefined))]}
+The @racket[(undefined)] object could be used as the @emph{unit type} @tt{()} in @emph{Haskell}.
+
+
 @section{Monadic functions and operators}
 
 @defproc[(return [x Any]) any]
@@ -361,6 +369,14 @@ A monadic plus operation of the @tech{currently used monad}.
 Examples:
 @interaction[#:eval formica-eval
  (using List (mplus '(1 2 3) '(3 4 5)))]
+
+@defproc[(failure [v Any]) any]
+A failure function which is called if pattern-matching fails in @racket[do] form.
+
+Examples:
+@interaction[#:eval formica-eval
+ (using Id (failure 'x))
+ (using List (failure 'x))]
 
 @defproc[(lift [f Fun]) Fun]
 Returns a function @racket[_f] lifted into the @tech{currently used monad}. 
@@ -413,8 +429,7 @@ For more examples see @filepath{List-monad.rkt} file in the @filepath{examples/}
 @defproc[(guard [test Bool]) Any]
 Guarding operator. Defined for monads with zero.
 
-@centered{@racket[(guard _test) ≡ (if _test (return ⊤) mzero)]}
-Here @racketidfont{⊤} represents an object which belongs to any type.
+@centered{@racket[(guard _test) ≡ (if _test (return (undefined)) mzero)]}
 
 Examples:
 @interaction[#:eval formica-eval

@@ -102,11 +102,9 @@
     ; parameterized type
     [(_ (name A ...) expr ...) 
      (define (name A ...)
-       (procedure-rename
         (flat-named-contract 
          (cons 'name (map object-name (list A ...)))
-         (λ (x) (or ((flat-contract expr) x) ...)))
-        'name))]
+         (λ (x) (or ((flat-contract expr) x) ...))))]
     ; primitive type or type product
     [(_ name expr) 
      (define name 
@@ -130,12 +128,11 @@
   (syntax-case stx ()
     [(_ x type) 
      (with-syntax ([c (parse-infix-contract #'type)])
-       #'(or (eq? x '⊤) 
-             (cond
-               [(contract? c) 
-                (with-handlers ([exn:fail? (lambda (exn) #f)])
-                  (contract-first-order-passes? c x))]
-               [else (raise-type-error 'is "predicate" 1 x type)])))]))
+       #'(cond
+           [(contract? c) 
+            (with-handlers ([exn:fail? (lambda (exn) #f)])
+              (contract-first-order-passes? c x))]
+           [else (raise-type-error 'is "predicate" 1 x type)]))]))
 
 (define check-type (make-parameter #t))
 

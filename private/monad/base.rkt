@@ -32,6 +32,7 @@
          failure
          lift/m
          compose/m
+         undefined
          ;functions
          (contract-out 
           (monad? predicate/c)
@@ -73,21 +74,24 @@
                           #:mplus (mplus 'undefined)
                           #:failure (failure raise-match-error))
   (define return*
-    (if type 
-        (procedure-reduce-arity
-         (λ x (let ([res (apply return x)])
-                (if (equal? res (return ⊤))
-                    (return ⊤)
-                    (check-result 'return type res))))
-         (procedure-arity return))
-        return))
+    (procedure-reduce-arity
+     (case-lambda
+       [() (return)]
+       [(x) (cond
+             [(undefined? x) x]
+             [type (check-result 'return type (return x))]
+             [else (return x)])]
+       [(x y . z) (if type 
+                      (check-result 'return type (apply return x y z))
+                      (apply return x y z))])
+     (procedure-arity return)))
   
-  (define bind*
-    (if type 
-        (λ (m f)
-          (unless (equal? m (return ⊤)) (check-argument 'bind type m))
-          (check-result 'bind type (bind m f)))
-        bind))
+  (define (bind* m f)
+    (cond
+      [(undefined? m) (f m)]
+      [type (check-argument 'bind type m)
+                    (check-result 'bind type (bind m f))]
+      [else (bind m f)]))
   
   (name 
    type
@@ -315,9 +319,9 @@
 ;; guarding operator
 ;; The ⊤ symbol represents an instance that belongs to any type
 ;; It is used for avoid type checking within binding.
-(define ⊤ '⊤)
+(struct undefined ())
 (define (guard test)
-  (when-monad-zero (if test (return ⊤) mzero) 'guard))
+  (when-monad-zero (if test (undefined) mzero) 'guard))
 
 ;; guarding function
 (define (guardf pred?)
