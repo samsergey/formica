@@ -13,21 +13,26 @@
 
 @title{Introduction}
 
-The Formica dialect was created for educational purposes while teaching the "Functional and logical programming" undergraduate course in the Kamchatka State Technical University (Russia).
+The @emph{Formica} language was created for educational purpose while teaching the "Functional and logical programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for following reasons. @emph{Racket} is elegant as a @emph{Scheme} and goes with educationally oriented IDE, which make newcomers feel comfortable. It has active community, reach libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finaly, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it was natural come to a new language, created specially for the coursework.
 
-The main goal of designing the Formica language is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as @emph{Qi} or @emph{Haskell}.
+The main goal of designing @emph{Formica} is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as Mark Tarver's @emph{Qi} or @emph{Haskell}. Being a dialect of @emph{Racket} it sould complement the parent language and make it possible to use any of @emph{Racket}'s tools.
 
 Even though it is mainly educational language, some of it's features (such as @tech{formal functions}, @tech{rewriting}, etc.) could be used in various practical applications.
 
+This guide is addressed to a reader which is familiar both to a @emph{Racket} and to functional programming concepts and presents only @emph{Formica}-specific aspects.
+
+@section{Brief tour}
 Here are the main features of the Formica dialect.
 
-@section{Formal functions:}
+@subsection{Formal functions:}
 
-This declares @racketidfont{f} to be a formal function:
-@interaction[#:eval formica-eval
-(define-formal f)]
+This declares @racketidfont{f} to be a @tech{formal function}: a function which doesn't perform any calculations, but just shows it's application.
+@def+int[#:eval formica-eval
+(define-formal f)
+(f 'x)
+(f 1 2 3)]
 
-Now we can see how some high-order functions work:
+Using the formal function we can see how some high-order functions work:
 @interaction[#:eval formica-eval
 (map f '(a b c))
 (foldr f 'x0 '(a b c))
@@ -37,77 +42,98 @@ In the following example the `+` function is made formal:
 @interaction[#:eval formica-eval
 (foldr (hold +) 0 '(1 2 3))]
 
+Together with pattern-matching and @tech{rewriting} thechnique, formal functions give a framework for designing complex abstract data types.
 
-@section{Rewriting:}
+@subsection{Rewriting:}
   
-This rewrites 1 to 2, 3 to 4, and 4 to 1.
+Suppose we have to define a function f that, if it receives 1 returns 0 and if it returns 0 returns 1. If all rules fail the argument is left unchanged:
+@def+int[#:eval formica-eval
+(define f 
+  (rewrite 1 --> 0
+           0 --> 1))
+(f 0)
+(f 1)
+(f 'x)
+(f '(0 1))]
+
+This function rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] anywhere in a list.
 @def+int[#:eval formica-eval
 (define r 
   (/. 1 --> 2
       3 --> 4
       4 --> 1))
-(r '(1 2 3 4))]
+(r '(1 2 (3 4)))]
 
-This rewrites 1 to 2, 3 to 4, and 4 to 1 repeatedly. The first rule is terminal (the rewriting process stops here).
+This rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] repeatedly, untill result stops changing.
 @def+int[#:eval formica-eval
 (define r 
-  (//. 1 -->. 2
+  (//. 1 --> 2
        3 --> 4
        4 --> 1))
 
-(r '(1 2 3 4))]
+(r '(1 2 (3 4)))]
+This rewriting system has a normal form: @racket[2].
 
 This is a rewriting-based definition of the `map` function:
 @def+int[#:eval formica-eval
-  (define map
-    (/. f (cons h t) --> (cons (f h) (map f t))
-        _ '()        --> '()))
+  (define/. map
+    _ '()        --> '()
+    f (cons h t) --> (cons (f h) (map f t)))
  (map f '(a b c))]
+
+Here is a simple implementation of symbolic η- and β-reduction rules for λ-calculus:
+@#reader scribble/comment-reader
+   (interaction #:eval formica-eval
+    (define//. reduce
+      ; η-reduction
+      `(λ. ,x (,f ,x)) --> f
+      ; β-reduction
+      `((λ. ,x ,B) ,A) --> (eval `((/. ',x --> ',A) ',B))))
+   
+@interaction[#:eval formica-eval              
+ (reduce '((λ. x (f x x)) a))                
+ (reduce '((λ. f (λ. x (f (f x)))) (λ. f (λ. y (f (f y))))))]
   
-@section{Simplified syntax for partial application and point-free definitions:}
+@subsection{Simplified syntax for partial application and point-free definitions:}
   
-Once you have written in Haskell on or the blackboard:
+Once you have written in @emph{Haskell} on or the blackboard:
 @codeblock{
- fold f x0 = F where F []     = x0
-                     F (x:xs) = f h (fold f x0 t)
+ fold _f _x0 = F where F []     = _x0
+                     F (_x:xs) = _f _x (fold _f _x0 _xs)
  
- map f = fold (cons . f) []
+ map _f = fold (cons . _f) []
  
  map (* 2) [1 2 3]}
                    
-it is difficult not to try it it Racket:
+it is difficult not to try it in @emph{Formica}:
 
 @defs+int[#:eval formica-eval
   ((define/c (fold f x0) (/. '()        --> x0
-                               (cons h t) --> (f h (fold f x0 t))))
+                             (cons h t) --> (f h (fold f x0 t))))
+   
    (define/c (map f) (fold (∘ cons f) '())))
   (map (* 2) '(1 2 3))
   (map (map (* 2)) '((1 2) (3 4) (5)))]
 
 
-@section{Contract-based dynamical typing system:}
+@subsection{Contract-based dynamical typing system:}
 
-Not so strict as in Typed Racket or Haskell, the contract typing system gives a flavor of rich type systems used in functional programming, including abstract, algebraic and polymorphic types.
+Not so strict as in @emph{Typed Racket} or @emph{Haskell}, the contract typing system gives a flavor of rich type systems used in functional programming, including abstract, algebraic and polymorphic types.
 
 @def+int[#:eval formica-eval
  (define-type Int-or-X
-   'X
-   integer?)
+   integer?
+   'X)
  (is 5 Int-or-X)
  (is 'X Int-or-X)
  (is 'x Int-or-X)]
 
 @def+int[#:eval formica-eval
- (:: add1 (Nat -> Nat)
-   (define add1 (+ 1)))
- (add1 5)
- (add1 2.3)]
-
-@def+int[#:eval formica-eval
  (:: map ((a -> b) (list: a ..) -> (list: b ..))
    (define/c (map f) 
      (/. (cons h t) --> (cons (f h) (map f t)))))
- (map (* 2) '(1 21 4 3))]
+ (map (* 2) '(1 21 4 3))
+ (map cons '(1 21 4 3))]
 
   
  Building abstract algebraic types with formal functions:
@@ -139,23 +165,30 @@ some functions to operate with klists
         (kons h t) --> (f h (kfold f x0 t))))
 
   (define/c (kfilter p) (kfold (fif (∘ p I1) kons I2) 'knull))
+  
   (define total (kfold + 0)))
 
 (kfold ($ 'f) 'x0 (klist 'x 'y 'z))
+
 (kfilter odd? (klist 1 2 3 4 5))
+
 (total (klist 1 2 3))]
 
-  @section{Monads}
+@subsection{Monads}
 
+Monads give a very usefull and elegant abstraction for sequential computations, allowing one to go deep into semantics, keeping syntax simple. Even though @emph{Racket} doesn't need monads to perform sequential computations, side effects or set comprehension, it is useful to have monads as a powerful tool for designing new semantic constructions.
+
+An example of sequential computations in the @racket[List] monad:
 @interaction[#:eval formica-eval
 (do [x <- '(1 2 3)]
     [x <- (return (+ x 6))]
-    (return x))
+    (return x))]
 
-(collect (sqr x) [x <- 6] (odd? x))]
+A simple list comprehension:
+@interaction[#:eval formica-eval
+(collect (sqr x) [x <- (in-range 6)] (odd? x))]
 
-Define generic functions
-
+Monads allow to define generic functions and then to use them with different semantics. Here is a function returning a sequence of Pythagorean triples:
 @def+int[#:eval formica-eval
  (define (find-triples r)
    (collect (list a b c) 
@@ -165,24 +198,35 @@ Define generic functions
      (integer? c)
      (> b c)))]
 
-Use eager @racket[List] monad:
+One may use @racket[find-triples] in eager @racket[List] monad, or in lazy @racket[Stream] monad, without changing a single line in the function definition.
 @interaction[#:eval formica-eval
 (using List (find-triples (in-range 20)))]
 
-Or lazy @racket[Stream] monad
 @def+int[#:eval formica-eval
  (define t
    (using Stream (find-triples (in-naturals))))
  (stream-take t 5)
  (stream-ref t 50)]
 
-Create new monads easily:
+As in @racket[Haskell], it is possible to use pattern-matching in list-comprehensions
+@def+int[#:eval formica-eval
+ (define primitive-triples
+   (using Stream 
+     (collect t 
+       [(and t (list a b _)) <- (find-triples (in-naturals))] 
+       (= 1 (gcd a b)))))
+ (stream-take primitive-triples 5)]
+
+
+It is easy to create new monads. Here is an example of defining the parameterized monad @tt{(Maybe a)}.
 
 @defs+int[#:eval formica-eval
   ((define-formal Maybe Just)
+   
    (define-type (Maybe? a) 
      (Just: a) 
      'Nothing)
+   
    (define (Maybe a)
      (monad
       #:type (Maybe? a)
@@ -197,7 +241,8 @@ Create new monads easily:
     (bind (Just 2) >>= (lift sqr) >>= (lift (* 2))))
   (using (Maybe Int)
     (bind 'Nothing >>= (lift sqr) >>= (lift (* 2))))]
-  
+
+This monad could be used to perform guarded computations:
 @def+int[#:eval formica-eval
  (define (safe-sqrt x)
    (bind (return x) >>= 
@@ -207,14 +252,21 @@ Create new monads easily:
    (map safe-sqrt  '(-1 4 3 9 -4 -9)))
  (using (Maybe Int) (safe-sqrt 3))]
 
-Use monadic functions and operators
-@interaction[#:eval formica-eval
+@emph{Formica} provides monadic functions and operators, such as @racket[lift/m], @racket[compose/m], @racket[fold/m], @racket[map/m], etc.
+@def+int[#:eval formica-eval
  (using-monad List)
+ (lift/m or '(#t #f) '(#t #f))
+ (fold/m (λ (x y) `((+ ,x ,y) (- ,x ,y))) 0 '(1 2 3))]
+
+@def+int[#:eval formica-eval
  (define powerset (filter/m (const '(#t #f))))
  (powerset '(1 2 3))]
 
 
- @section{Miscellaneous functional tools}
+@subsection{Miscellaneous functional tools}
+
+Formica is informally called to be "functially-oriented", meaning that it provides a lot of tools to operate with functions.
+
 
 This defines binary and unary @tech{formal functions}:
 @def+int[#:eval formica-eval
@@ -249,3 +301,5 @@ Some purely functional definitions
 (complex<? 0-i 2 4+i)
 (complex<? 2 1-i)
 (complex<? 2 'x 1-i)]
+
+See @filepath{examples/} folder in the @emph{Formica} distributuion for more examples. 

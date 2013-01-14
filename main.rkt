@@ -5,6 +5,13 @@
 ;;                   ~//~ ((_)// // / / // ((_ ((_/_
 ;;                 (_//
 ;;..............................................................
+(define-namespace-anchor anch)
+(define formica-namespace (namespace-anchor->namespace anch))
+(define eval*
+  (case-lambda
+    [(expr) (eval expr formica-namespace)]
+    [(expr n) (eval expr n)]))
+
 (require racket/list
          racket/math
          racket/promise
@@ -37,9 +44,3 @@
              [lazy delay]
              [eval* eval]))
 
-(define-namespace-anchor anch)
-(define nms (namespace-anchor->namespace anch))
-(define eval*
-  (case-lambda
-    [(expr) (eval expr nms)]
-    [(expr n) (eval expr n)]))

@@ -76,3 +76,6 @@ Returns binary boolean function if used not in a head position of application fo
 @defproc*[([(eq? [x Any] [y Any] ...+) boolean?]
            [(equal? [x Any] [y Any] ...+) boolean?])]
 Same as @racket[eq?] and @racket[equal?] provided @racket[racket/base], but if more then two arguments are given, arguments are compared pairwise from left to right.
+
+@defproc[(eval [expr Any] [ns namespace? formica-namespace]) any]
+Evaluates the expression @racket[_expr] like @racket[eval] provided @racket[racket/base], but uses predefined namespace contaning bindings provided by the @emph{Formica} language.

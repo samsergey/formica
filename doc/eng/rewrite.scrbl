@@ -101,20 +101,12 @@ The last example shows that we have implemented a sort of lazy evaluation. This 
 More examples could be found in the @filepath{formica/examples} folder within the package distribution.
 Examples include:
 @itemize{
-         
          @item{@filepath{rewrite.rkt} -- more basic examples.}
-          
           @item{@filepath{automata.rkt} -- finite automata defined with rewriting.}
-          
-          @item{@filepath{infix.rkt} -- transformation of algebraic expressions given in infix notation,
-                 to prefix notation with parenthesis and reverse polish notation.}
+          @item{@filepath{infix.rkt} -- transformation of algebraic expressions given in infix notation, to prefix notation with parenthesis and reverse polish notation.}
           @item{@filepath{peano.rkt} -- definition of Peano axioms.}
-          
           @item{@filepath{logics.rkt} -- simple tautology prover.}
-          
-          @item{@filepath{turing.rkt} -- a Turing machine interpreter.}
-          
-          }
+          @item{@filepath{turing.rkt} -- a Turing machine interpreter.}}
 
 @section{Rewriting Forms}
 
