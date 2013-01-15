@@ -19,7 +19,7 @@
  
  (check-equal? ((((curry) +) 1) 2) 3))
 
-#;(test-case 
+(test-case 
  "partial composition tests"
  (check-equal? (((∘ cons cons) 1) 2 3) '((1 . 2) . 3))
  (check-equal? (((∘ cons cons) 1 2) 3) '((1 . 2) . 3))
@@ -46,24 +46,24 @@
  (check-equal? ((apply +) '(1 2 3)) 6)
  (check-equal? ((apply) cons '(1 2)) '(1 . 2)))
 
+(define-formal (g 2) (h '(1 3)))
+
 (test-case
  "formal functions"
  (check-true (curried? ((hold 'f 2) 1)))
  (check-true (curried? ((hold cons) 1)))
  (check-equal? (((hold 'f 2) 1) 2)  '(f 1 2))
  (check-equal? (((hold cons) 1) 2)  '(cons 1 2))
- 
- (define-formal (g 2) (h '(1 3)))
- 
- (check-true (curried? (g 1)))
- (check-equal? ((g 1) 2)  '(g 1 2))
- (check-true (curried? (h)))
- (check-true (curried? (h 1 2)))
- (check-equal? ((h) 1)  '(h 1))
- (check-equal? (h 1) '(h 1))
- (check-equal? ((h 1 2) 3)  '(h 1 2 3))
- (check-equal? (map (g 1) '(x y z)) 
-               '((g 1 x) (g 1 y) (g 1 z))))
+ (check-true (curried? (b 1)))
+; (check-equal? ((g 1) 2)  '(g 1 2))
+; (check-true (curried? (h)))
+; (check-true (curried? (h 1 2)))
+; (check-equal? ((h) 1)  '(h 1))
+; (check-equal? (h 1) '(h 1))
+; (check-equal? ((h 1 2) 3)  '(h 1 2 3))
+; (check-equal? (map (g 1) '(x y z)) 
+;               '((g 1 x) (g 1 y) (g 1 z)))
+ )
 
 
 

@@ -12,7 +12,7 @@
          racket/path
          racket/match
          (for-syntax racket/base)
-         "../../tags.rkt")
+         "../tools/tags.rkt")
 
 (provide 
  ::
@@ -136,21 +136,23 @@
 
 (define check-type (make-parameter #t))
 
-(define-syntax-rule (check-result id type expr)
+(define-syntax-rule (check-result id type expr text ...)
   (let ([res expr])
     (if (or (not (check-type)) (is res type))
         res
         (raise-arguments-error 
          id 
          (format "the result should have type ~a"  (build-compound-type-name type))
-         "received" res))))
+         "received" res
+         text ...))))
 
-(define-syntax-rule (check-argument id type x)
+(define-syntax-rule (check-argument id type x text ...)
   (unless (or (not (check-type)) (is x type)) 
     (raise-arguments-error 
      id 
      (format "the argument should have type ~a" (build-compound-type-name type))
-     "given" x)))
+     "given" x
+     text ...)))
 
 ;;;=================================================================
 ;;; Blaming text

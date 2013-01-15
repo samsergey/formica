@@ -1,6 +1,78 @@
 #lang racket/base
-(require "private/monad/base.rkt"
-         "private/monad/sequential-monads.rkt")
-(provide (all-from-out "private/monad/base.rkt"
-                       "private/monad/sequential-monads.rkt"))
+;;______________________________________________________________
+;;                   ______ 
+;;                  (  //   _____ ____   .  __  __
+;;                   ~//~ ((_)// // / / // ((_ ((_/_
+;;                 (_//
+;;..............................................................
+;; Provides formica/monad module.
+;;==============================================================
+(require "types.rkt" "tools.rkt" "formal.rkt")
+(require "private/monad/base.rkt")
+(provide 
+ monad
+ ; forms
+ define-monad
+ >>= >> <- <-: <<- <<-:
+ do
+ collect
+ using
+ check-result
+ ; functional forms
+ return
+ bind
+ mzero
+ mplus
+ failure
+ lift/m
+ compose/m
+ undefined
+ ;functions
+ (contract-out 
+  (monad? predicate/c)
+  (monad-zero? predicate/c)
+  (monad-plus? predicate/c)
+  (using-monad (parameter/c monad?))
+  (lift (-> Fun Fun))
+  (fold/m (-> binary? Any list? Any))
+  (filter/m (-> unary? list? Any))
+  (map/m (-> unary? list? Any))
+  (seq/m (-> list? Any))
+  (sum/m (-> list? Any))
+  (guard (-> Any Any))
+  (guardf (-> unary? unary?))
+  (Id monad?)))
+
+
+(require "private/monad/sequential-monads.rkt"
+         racket/set
+         racket/stream)
+(provide 
+ amb
+ scons
+ zip
+ (contract-out 
+  (listable? contract?)
+  ; Sequence monad
+  (Sequence (->* (#:return (-> Any .. listable?)
+                  #:mplus (-> listable? listable? listable?)) 
+                 (#:map (-> (-> Any listable?) listable? listable?)) monad-plus?))
+  (mplus-map (-> (-> Any listable?) listable? Any))
+
+  ; List monad
+  (List monad-plus?)  
+  (concatenate (-> listable? .. n/f-list?))
+  (concat-map (-> (-> Any n/f-list?) listable? n/f-list?))
+  ; Stream monad
+  (Stream monad-plus?)
+  (stream-concat-map (-> (-> Any stream?) listable? stream?)) 
+  (stream-concatenate (-> listable? listable? stream?))  
+  (stream-take (-> stream? Index list?))
+  ; Amb monad
+  (Amb monad-plus?)
+  (amb-union-map (-> (-> Any stream?) listable? stream?))
+  (amb-union (-> listable? listable? stream?)))
+
+ (all-from-out racket/set
+               racket/stream))
 (using-monad List)

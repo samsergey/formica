@@ -182,7 +182,7 @@ Examples:
   ((-< + sqr) 1 2 3)]
 
 
-@defproc[(all-args [p Fun]) Fun]
+@defproc[(all-args [p unary?]) Fun]
 Returns @centered[@tt{(fork and p).}]
 
 Examples:
@@ -191,7 +191,7 @@ Examples:
   ((all-args real?) 2 'x 4.5)]
 
 
-@defproc[(any-args [f Fun]) Fun]
+@defproc[(any-args [f unary?]) Fun]
 Returns function @centered[@tt{(fork or p).}]
 
 Examples:

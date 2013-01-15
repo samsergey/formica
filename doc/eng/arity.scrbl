@@ -133,15 +133,3 @@ Examples:
   (max-arity not)
   (max-arity cons)
   (max-arity +)]
-
-@defproc[(inherit-arity [f Fun]) (Fun -> Fun)]
-Returns the operator which reduces the arity of given function to arity of @racket[_f], if it is possible.
-
-Examples:
-@interaction[#:eval formica-eval
-  (procedure-arity
-   ((inherit-arity cons) (case-lambda
-                           [() 0]
-                           [(x . y) (apply + x y)])))
-  (define (f . x) (cons 'f x))
-  (procedure-arity ((inherit-arity +) f))]

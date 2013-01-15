@@ -1,5 +1,6 @@
 #lang racket/base
 
+(require "monad-tests.rkt")
 (require "tag-tests.rkt")
 (require "arity-tests.rkt")
 (require "functionals-tests.rkt")
@@ -16,4 +17,3 @@
 (require "nest-tests.rkt")
 (require "types-tests.rkt")
 (require "ordering-tests.rkt")
-#;(require "monad-tests.rkt")

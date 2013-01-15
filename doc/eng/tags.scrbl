@@ -8,24 +8,21 @@
 
 @(define formica-eval
    (let ([sandbox (make-base-eval)])
-     (sandbox '(require formica/tags formica))
+     (sandbox '(require formica))
      sandbox))
 
 @title[#:tag "tags"]{Tagged functions}
 
-@declare-exporting[formica/tags]
+@declare-exporting[formica]
 
-The bindings documented in this section are provided by the @racket[formica/tags] library,
-but not @racket[formica] language.
-
-The @racket[formica/tags] module provides tools for creating tagged functions.
+The bindings documented in this section are provided by the @racket[formica/tools] library and @racket[formica] language.
 
 Tagging allows to distinguish functions and classes of functions.
 
 @defproc[(tagged? [f Fun]) tagged?]
 Returns @racket[#t] if @racket[_f] is tagged function, and @racket[#f] otherwise.
 
-@defproc[(tag? [f tagged?]) Sym]
+@defproc[(tag [f tagged?]) Sym]
 Returns a tag of a tagged function @racket[_f].
                               
 @defproc[(check-tag [f tagged?] [t Any]) Bool]

@@ -35,6 +35,7 @@
 
 (test-case
  "almost-equal? tests"
+ (tolerance 5e-16)
  (check-true (almost-equal? 1 1))
  (check-true (almost-equal? 1. 1.))
  (check-true (almost-equal? 0 0))

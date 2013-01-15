@@ -12,8 +12,8 @@
 (require racket/contract
          (for-syntax racket/base 
                      racket/match
-                     "../../tags.rkt")
-         "../../tags.rkt")
+                     "../tools/tags.rkt")
+         "../tools/tags.rkt")
 
 (provide 
  (contract-out

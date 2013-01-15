@@ -19,7 +19,7 @@ The bindings documented in this section are provided by the @racket[formica/part
 
 In order to get Formica language without syntax for partial application, use @racket{#lang formica/regular-app} at the header of the file or @racket[(require formica/regular-app)]. It will load all bindings from  @racket[formica] language except for those provided in @racket[formica/partial-app] library.
 
-One of features making Formica different from Racket, is simplified syntax for @deftech{partial application}, which is close to @emph{Haskell}'s sections.
+One feature which makes @emph{Formica} different from @emph{Racket}, is simplified syntax for @deftech{partial application}, which is close to @emph{Haskell}'s sections.
 
 For example, function @racket[cons], expects two arguments:
 @interaction[#:eval formica-eval
@@ -44,7 +44,7 @@ That's how it is possible to define the increment function:
   (inc 3)
   (map (+ 1) '(1 2 3))] 
 
-The simplified syntax makes possible only "left" partial application by fixing arguments from left to right. 
+The simplified syntax makes possible only "left" sections by fixing arguments from left to right. 
 For fixing the sequence of arguments "from the right" one has to use explicit partial application using 
 @racket[curryr] function.
                        

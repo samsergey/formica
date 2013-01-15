@@ -42,10 +42,7 @@
   ; Amb monad
   (Amb monad-plus?)
   (amb-union-map (-> (-> any/c stream?) listable? stream?))
-  (amb-union (-> listable? listable? stream?)))
-
- (all-from-out racket/set
-               racket/stream))
+  (amb-union (-> listable? listable? stream?))))
 
 ;;;===============================================================================
 ;;; general helper functions

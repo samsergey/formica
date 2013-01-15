@@ -10,7 +10,7 @@
 (require racket/list
          racket/contract
          "arity.rkt"
-         "../../tags.rkt"
+         "tags.rkt"
          (only-in "functionals.rkt" andf -<))
 
 

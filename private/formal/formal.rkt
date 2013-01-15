@@ -10,17 +10,19 @@
 (require racket/match 
          racket/contract
          racket/syntax
-         (for-syntax racket/base
+         racket/provide-syntax
+         racket/require-syntax
+         (for-syntax racket/base 
                      racket/match
                      racket/list
                      racket/syntax
                      "../tools/tags.rkt"
-                     "../formal/hold.rkt")
+                     "hold.rkt")
+         (prefix-in part: "../../partial-app.rkt")
          "../tools/tags.rkt"
-         "../formal/hold.rkt")
+         "hold.rkt")
 
 (provide 
- (all-from-out "../formal/hold.rkt")
  (contract-out
   (formals (parameter/c (listof predicate/c)))
   (formal? predicate/c)
@@ -36,6 +38,15 @@
 ;; The parameter which keeps track of functions declared to be formal
 ;;--------------------------------------------------------------------------------
 (define formals (make-parameter '()))
+(define (add-to-formals p)
+  (define (include x s)
+    (match s
+      ['() (list x)]
+      [(and s (cons h t)) (if (equal? (object-name x)
+                             (object-name h))
+                             s
+                             (cons h (include x t)))]))
+  (formals (include p (formals))))
 
 ;;--------------------------------------------------------------------------------
 ;; Helper function which creates a list of rules for match expander f:
@@ -101,7 +112,7 @@
                 [(id x (... ...)) (list (quote id) x (... ...))])
               ; formal function outside the match form
               (syntax-id-rules ()
-                [(id x (... ...)) ((hold 'id n) x (... ...))]
+                [(id x (... ...)) (part:#%app (hold 'id n) x (... ...))]
                 [id (hold 'id n)]))
             (define-syntax id:
               ; the contracts for formal applications
@@ -114,7 +125,7 @@
             (define id?
               (match-lambda predicate-rules ... (_ #f)))
             ; new predicate in the list of functions declared to be formal
-            (formals (cons id? (formals))))))]
+            (add-to-formals id?))))]
     [(_ id) 
      ; compile-time syntax check
      (unless (symbol? (syntax-e #'id)) 
@@ -133,7 +144,7 @@
                  [(id x (... ...)) (list (quote id) x (... ...))])
                ; formal function outside the match form
               (syntax-id-rules ()
-                [(id x (... ...)) ((hold 'id) x (... ...))]
+                [(id x (... ...)) (part:#%app (hold 'id) x (... ...))]
                 [id (hold 'id)]))
              (define-syntax id:
              ; the contracts for formal applications
@@ -146,7 +157,7 @@
                  [(cons 'id _) #t]
                  [_ #f]))
              ; new predicate in the list of functions declared to be formal
-             (formals (cons id? (formals))))))]
+             (add-to-formals id?))))]
     [(_ ids ...) #'(begin (define-formal ids) ...)]))
 
 ;;--------------------------------------------------------------------------------
@@ -192,14 +203,15 @@
                   [id: (datum->syntax #'id str: #'id)])
       #'(combine-out id id? id:))))
 
-(define-syntax formal-out
-  (make-provide-pre-transformer 
-   (λ (stx modes)
-     (syntax-case stx ()
-       [(_ id) (make-out-combination #'id)]
-       [(_ ids ...) (with-syntax ([(o ...) (map make-out-combination (syntax->list #'(ids ...)))])
-                        #'(combine-out o ...))]))))
 
+(define-provide-syntax (formal-out stx)
+  (syntax-case stx ()
+    [(_ id) (with-syntax ([o (make-out-combination #'id)]
+                          [frm #'formals])
+              #'(combine-out o frm))]
+    [(_ ids ...) (with-syntax ([(o ...) (map make-out-combination (syntax->list #'(ids ...)))]
+                               [frm #'formals])
+                   #'(combine-out o ... frm))]))
 
 ;;--------------------------------------------------------------------------------
 ;; The formal-in form
@@ -212,15 +224,12 @@
     (with-syntax ([mod m] [id stx]
                   [id? (datum->syntax #'id str? #'id)]
                   [id: (datum->syntax #'id str: #'id)])
-      (expand-import #'(only-in mod id id? id:)))))
+      #'(only-in mod id id? id:))))
 
-#;(define-syntax formal-in
-  (make-require-transformer 
-   (λ (stx)
-     (syntax-case stx ()
-       [(_ m id) ((make-in-combination #'m) #'id)]
-       [(_ m ids ...) (with-syntax ([(i ...) 
-                                     (map (make-in-combination #'m) 
-                                          (syntax->list #'(ids ...)))])
-                        (values #'(combine-in i ...) #'m))]))))
-
+#;(define-require-syntax (formal-in stx)
+  (syntax-case stx ()
+    [(_ m id) ((make-in-combination #'m) #'id)]
+    [(_ m ids ...) (with-syntax ([(i ...) 
+                                  (map (make-in-combination #'m) 
+                                       (syntax->list #'(ids ...)))])
+                     #'(combine-in i ...))]))

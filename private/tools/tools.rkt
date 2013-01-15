@@ -10,7 +10,7 @@
 (require racket/contract
          racket/dict
          racket/match
-         "../../tags.rkt"
+         "tags.rkt"
          "functionals.rkt")
 
 (provide

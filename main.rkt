@@ -15,8 +15,21 @@
 (require racket/list
          racket/math
          racket/promise
-         racket/string
-         "tools.rkt"
+         racket/string)
+
+(provide
+ (except-out (all-from-out
+              racket/base
+              racket/list
+              racket/math
+              racket/promise
+              racket/string)
+             procedure? lazy delay eval)
+ (rename-out [procedure? function?]
+             [lazy delay]
+             [eval* eval]))
+
+(require "tools.rkt"
          "partial-app.rkt"
          "formal.rkt"
          "rewrite.rkt"
@@ -25,22 +38,11 @@
          "types.rkt"
          "monad.rkt")
 (provide
- (except-out (all-from-out
-              racket/base
-              racket/list
-              racket/math
-              racket/promise
-              racket/string
-              "tools.rkt"
-              "partial-app.rkt"
-              "formal.rkt"
-              "rewrite.rkt"
-              "tacit.rkt"
-              "memoize.rkt"
-              "types.rkt"
-              "monad.rkt")
-             procedure? lazy delay eval)
- (rename-out [procedure? function?]
-             [lazy delay]
-             [eval* eval]))
-
+ (all-from-out "tools.rkt"
+               "partial-app.rkt"
+               "formal.rkt"
+               "rewrite.rkt"
+               "tacit.rkt"
+               "memoize.rkt"
+               "types.rkt"
+               "monad.rkt"))

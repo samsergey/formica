@@ -138,7 +138,6 @@
  (check-exn exn:fail:contract? (λ () (seq/m (list (return 'x) 'y))))
  (check-exn exn:fail:contract? (λ () (sum/m (list (return 'x) 'y)))))
 
-(require "../examples/List-comprehension.rkt")
 (require "../examples/nondeterministic.rkt")
 
 

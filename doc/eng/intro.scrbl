@@ -13,9 +13,9 @@
 
 @title{Introduction}
 
-The @emph{Formica} language was created for educational purpose while teaching the "Functional and logical programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for following reasons. @emph{Racket} is elegant as a @emph{Scheme} and goes with educationally oriented IDE, which make newcomers feel comfortable. It has active community, reach libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finaly, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it was natural come to a new language, created specially for the coursework.
+The @emph{Formica} language was created for educational purpose while teaching the "Functional and logical programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for following reasons. @emph{Racket} is elegant as @emph{Scheme} and goes with educationally oriented IDE, which make newcomers feel comfortable. It has active community, reach libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finaly, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it is natural to come to a new language, created specially for the coursework.
 
-The main goal of designing @emph{Formica} is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as Mark Tarver's @emph{Qi} or @emph{Haskell}. Being a dialect of @emph{Racket} it sould complement the parent language and make it possible to use any of @emph{Racket}'s tools.
+The main goal of designing @emph{Formica} is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as Mark Tarver's @emph{Qi} or @emph{Haskell}. Being a dialect of @emph{Racket} it sould complement the parent language and make it possible to use any of @emph{Racket}'s native libraries.
 
 Even though it is mainly educational language, some of it's features (such as @tech{formal functions}, @tech{rewriting}, etc.) could be used in various practical applications.
 
@@ -64,7 +64,7 @@ This function rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @
       4 --> 1))
 (r '(1 2 (3 4)))]
 
-This rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] repeatedly, untill result stops changing.
+Following rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] repeatedly, untill result stops changing.
 @def+int[#:eval formica-eval
 (define r 
   (//. 1 --> 2
@@ -74,7 +74,7 @@ This rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4]
 (r '(1 2 (3 4)))]
 This rewriting system has a normal form: @racket[2].
 
-This is a rewriting-based definition of the `map` function:
+A rewriting-based definition of the @racket[map] function:
 @def+int[#:eval formica-eval
   (define/. map
     _ '()        --> '()
@@ -118,7 +118,7 @@ it is difficult not to try it in @emph{Formica}:
 
 @subsection{Contract-based dynamical typing system:}
 
-Not so strict as in @emph{Typed Racket} or @emph{Haskell}, the contract typing system gives a flavor of rich type systems used in functional programming, including abstract, algebraic and polymorphic types.
+Being not so strict as in @emph{Typed Racket} or @emph{Haskell}, the contract typing system gives a flavor of rich type systems used in functional programming, including abstract, algebraic and polymorphic types.
 
 @def+int[#:eval formica-eval
  (define-type Int-or-X
@@ -214,9 +214,27 @@ As in @racket[Haskell], it is possible to use pattern-matching in list-comprehen
    (using Stream 
      (collect t 
        [(and t (list a b _)) <- (find-triples (in-naturals))] 
-       (= 1 (gcd a b)))))
+       [1 <-: (gcd a b)])))
  (stream-take primitive-triples 5)]
 
+Consider a classical problem: @emph{A farmer buys 100 animals for $100.00. The animals include at least one cow, one pig, and one chicken, but no other kind. If a cow costs $10.00, a pig costs $3.00, and a chicken costs $0.50, how many of each did he buy?}
+
+Here is a declarative program solving this problem:
+@#reader scribble/comment-reader
+   (def+int #:eval formica-eval
+     (define (solve-farmer-problem #:cow (c 10) 
+                                   #:pig (p 3) 
+                                   #:chicken (ch 1/2))
+       (do [cows     <-  (in-range 1 (/ 100 c))] 
+           [pigs     <-  (in-range 1 (/ 100 p))] 
+           [chickens <-: (- 100 cows pigs)]
+           [100 <-: (+ (* c cows) (* p pigs) (* ch chickens))]
+           (return `((,cows cows) (,pigs pigs) (,chickens chickens)))))
+     (solve-farmer-problem))
+
+If cow costs $8 there would be 6 possible solutions:
+@interaction[#:eval formica-eval
+ (solve-farmer-problem #:cow 8)]
 
 It is easy to create new monads. Here is an example of defining the parameterized monad @tt{(Maybe a)}.
 

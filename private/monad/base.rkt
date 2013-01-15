@@ -7,7 +7,7 @@
 ;;..............................................................
 ;; Provides basic tools to work with monads.
 ;;==============================================================
-(require "../../tags.rkt"
+(require "../tools/tags.rkt"
          (only-in "../../types.rkt" 
                   check-result 
                   check-argument
@@ -79,18 +79,22 @@
        [() (return)]
        [(x) (cond
              [(undefined? x) x]
-             [type (check-result 'return type (return x))]
+             [type (check-result 'return type (return x) 
+                                 "using" (using-monad))]
              [else (return x)])]
        [(x y . z) (if type 
-                      (check-result 'return type (apply return x y z))
+                      (check-result 'return type (apply return x y z) 
+                                    "using" (using-monad))
                       (apply return x y z))])
      (procedure-arity return)))
   
   (define (bind* m f)
     (cond
       [(undefined? m) (f m)]
-      [type (check-argument 'bind type m)
-                    (check-result 'bind type (bind m f))]
+      [type (check-argument 'bind type m 
+                            "using" (using-monad))
+            (check-result 'bind type (bind m f) 
+                          "using" (using-monad))]
       [else (bind m f)]))
   
   (name 
@@ -121,6 +125,8 @@
 
 (define-syntax (define-monad stx)
   (syntax-case stx ()
+    [(define-monad (id v ...) m-expr ...) 
+     (raise-syntax-error 'define-monad "Can't use parameters" #'(define-monad (id v ...) (... ...)))]
     [(define-monad id m-expr) 
      (with-syntax ([mn (format-id #'id "monad:~a" (syntax-e #'id))])
        #'(begin
@@ -310,6 +316,13 @@
 
 (define-syntax (lift/m stx)
   (syntax-case stx ()
+    [(_ f) ; curried case
+     #'(case-lambda
+         [(a) (lift/m f a)]
+         [(a b) (lift/m f a b)]
+         [(a b c) (lift/m f a b c)]
+         [(a b c d) (lift/m f a b c d)]
+         [(a b c d e) (lift/m f a b c d e)])] ; In Haskell it seems enough to have five args
     [(_ f x xs ...) 
      (with-syntax ([(x-id x-ids ...) (generate-temporaries #'(x xs ...))])
        #'(do (x-id <- x)

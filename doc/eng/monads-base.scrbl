@@ -58,10 +58,10 @@ The secod form defines named monad in the same way as @racket[monad] constructor
 A simple container monad:
 @defs+int[#:eval formica-eval
   ((define-formal (m 1) f g)
+   
    (define-monad M
      #:return m
      #:bind (/. (m x) f --> (f x))))
-  M
   (using-monad M)]
 
 Basic binding:
@@ -80,26 +80,25 @@ Monadic functions:
 
 A simple additive monad (equivalent to @tt{Maybe}). In this example the type of monadic values is specified.
 @defs+int[#:eval formica-eval
-  ((define-formal (m 1))
-   (define-type A/M? (m: Any) 'z)
+  ((define-formal (m 1) (z 0))
+   
    (define-monad A/M
-     #:type A/M?
-     #:return (/. 'z --> 'z
-                   x --> (m x))
-     #:bind (/. 'z    f --> 'z
+     #:type (or/c m? z?)
+     #:return (/. (z) --> (z)
+                   x  --> (m x))
+     #:bind (/. (z)   f --> (z)
                 (m x) f --> (f x))
-     #:mzero 'z
-     #:mplus (/. 'z x --> x
-                  x _ --> x)))
-  A/M
+     #:mzero (z)
+     #:mplus (/. (z) x --> x
+                  x  _ --> x)))
   (using-monad A/M)]
 
 Basic binding:
 @interaction[#:eval formica-eval
   (return 'a)
-  (return 'z)
+  (return (z))
   (bind (m 'a) >>= (lift f))
-  (bind 'z >>= (lift f) >>= (lift g))
+  (bind (z) >>= (lift f) >>= (lift g))
   (do [x <-: 'a]
       [y <-: (f x 'b)]
       (return (g y)))]
@@ -120,8 +119,8 @@ Monadic functions:
 @interaction[#:eval formica-eval
   ((compose/m (lift f) (lift g)) 'a)
   (lift/m f (m 'a) (m 'b))
-  (lift/m f (m 'a) 'z)
-  (sum/m '(z z z a b))]
+  (lift/m f (m 'a) (z))
+  (sum/m '((z) (z) (z) a b))]
 
 The definition of the @racket[A/M] monad declares the type of monadic values. It makes the error reports more clear.
 @interaction[#:eval formica-eval
@@ -135,8 +134,10 @@ Example:
 
 A monad with parameterized type (@tt{Maybe a}):
 @defs+int[#:eval formica-eval
-  ((define-formal Maybe Just)
+  ((define-formal Just)
+   
    (define-type (Maybe? a) (Just: a) 'Nothing)
+   
    (define (Maybe a)
      (monad
       #:type (Maybe? a)
@@ -260,8 +261,8 @@ Operators @racket[_ops] could have any of following forms:
 
 @bold{Examples:}
 
-@defs+int[#:eval formica-eval
- ((define-formal f))]
+@def+int[#:eval formica-eval
+ (define-formal f)]
 
 Simple monadic binding:
 @interaction[#:eval formica-eval
@@ -416,6 +417,7 @@ Monadic composition of functions @racket[_fs].
 Example: monadic composition in the @racket[List] monad allows to compose functions returning several values:
 @defs+int[#:eval formica-eval
  ((using-monad List)
+  
   (define (Sqrt x) 
     (do (guard (positive? x))
         [r <-: (sqrt x)]
@@ -467,7 +469,7 @@ Examples:
 @defproc[(seq/m [lst list?]) Any]
 Monadic sequencing.
 
-@racketblock[(seq/m _lst) = (foldr (λ (_x _y) (lift/m cons _x _y)) (return '()) _lst)]
+@racketblock[(seq/m _lst) = (foldr (lift/m cons) (return '()) _lst)]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -495,8 +497,6 @@ Monadic fold.
 @interaction[#:eval formica-eval
  (using List
    (fold/m (lift (hold +)) 0 '(1 2 3)))
- (using List
-   (fold/m (lift/m + x (± y)) 0 '(1 2 3)))
  (using List
    (fold/m (λ(x y) (list (($ +) x y) 
                          (($ -) x y))) 
