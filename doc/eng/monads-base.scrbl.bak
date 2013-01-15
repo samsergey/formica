@@ -50,7 +50,7 @@ If the @racket[_failure] function is given, it will be called in case of failure
                       [type contract?]
                       [failure (Any → Any)])]
 First form defines named monad as a result of @racket[m-expr].
-The second form defines named monad in the same way as @racket[monad] constructor.
+The secod form defines named monad in the same way as @racket[monad] constructor.
 
 
 @bold{Examples:}
@@ -216,7 +216,7 @@ Binding in the @tech{currently used monad}.
 @itemize{
   @item{@racket[_m] @defidform/inline[>>=] @racket[_f] binding of function @racket[_f] and value @racket[_m].}
   @item{@racket[_expr1] @defidform/inline[>>] @racket[_expr2] sequential computation of @racket[_expr1] and @racket[_expr2].
-         Makes sense only if @racket[_expr1] has side effects.}}
+         Makes sence only if @racket[_expr1] has side effects.}}
 
 The form mimics the @emph{Haskell} syntax for monadic binding:
 
@@ -426,7 +426,7 @@ Example: monadic composition in the @racket[List] monad allows to compose functi
  (Sqrt 4)
  ((compose/m Sqrt Sqrt) 16)]
 
-For more examples see @filepath{List-monad.rkt} file in the @filepath{examples/} folder.
+For more examples see @filepath{List-monad.rkt} file in the @filepath{examples/} forder.
 
 @defproc[(guard [test Bool]) Any]
 Guarding operator. Defined for monads with zero.
@@ -454,7 +454,7 @@ Using @racket[guard] it is possible to perform a backtracking search:
      (tell "x: ~a\ty: ~a\n" x y)
      (< x y)))]
 
-For more examples see @filepath{nondeterministic.rkt} file in the @filepath{examples/} folder.
+For more examples see @filepath{nondeterministic.rkt} file in the @filepath{examples/} forder.
 
 @defproc[(guardf [pred (Any --> Bool)]) any]
 Guarding function. Defined for monads with zero.
@@ -504,7 +504,7 @@ Examples::
            '(1 2 3)))]
 
 @defproc[(filter/m [f (Any Any → Any)] [x0 Any] [lst list?]) Any]
-Monadic filter.
+Monadic fiter.
 
 @racketblock[(filter/m _pred '()) = (return '())
 (filter/m _pred (cons _h _t)) = (do [_b <- (_pred _h)]

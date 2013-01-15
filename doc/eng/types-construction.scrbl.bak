@@ -221,7 +221,7 @@ List of leaves
    (leaves B)
    (leaves '(1 2 3))]
 
-Sum of elements (for numeric entries):
+Sum of elements (for numebric entries):
 @def+int[#:eval formica-eval
    (define (total t)
      (cond

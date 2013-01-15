@@ -119,7 +119,7 @@ The same with @racket[for/list] iterator.
 @subsection{The List monad}
 
 @defthing[List monad-plus?] 
-The @racket[List] monad is used for list comprehension and in order to perform calculations with functions, returning more then one value. The main difference between the @racket[List] and monad @tt{[]} in @emph{Haskell}, is the ability of @racket[List] to operate with any sequences as @racket[for] iterators do.
+The @racket[List] monad is used for list comprehension and in order to perform calculations with functions, returning more then one value. The main differenece between the @racket[List] and monad @tt{[]} in @emph{Haskell}, is the ability of @racket[List] to operate with any sequences as @racket[for] iterators do.
 
 Definition:
 @codeblock{List = (Sequence #:return list

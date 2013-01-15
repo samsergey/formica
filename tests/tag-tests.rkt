@@ -1,5 +1,5 @@
 #lang racket/base
-(require "../tags.rkt"
+(require "../private/tools/tags.rkt"
          "test-utils.rkt")
 
 (define tagged-cons ((set-tag 'tag) cons))

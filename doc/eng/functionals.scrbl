@@ -148,7 +148,7 @@ Examples:
 
 
 @defproc[(fif [p Fun] [f Fun] [g Fun]) Fun]
-Returns function @centered[@tt{x y ... ⟼ (if (p x y ...) (f x y ...) (g x y ...)).}]
+Returns function @centered[@tt{x y ...  = (if (p x y ...) (f x y ...) (g x y ...)).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -156,7 +156,7 @@ Examples:
 
 
 @defproc[(andf [f Fun] [g Fun] ...) Fun]
-Returns function @centered[@tt{x y ... ⟼ (and (f x y ...) (g x y ...) ...).}]
+Returns function @centered[@tt{x y ...  = (and (f x y ...) (g x y ...) ...).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -164,7 +164,7 @@ Examples:
 
 
 @defproc[(orf [f Fun] [g Fun] ...) Fun]
-Returns function @centered[@tt{x y ... ⟼ (or (f x y ...) (g x y ...) ...).}]
+Returns function @centered[@tt{x y ...  = (or (f x y ...) (g x y ...) ...).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -173,7 +173,7 @@ Examples:
 
 @defproc*[([(fork [f Fun] [g unary?]) Fun]
            [(-< [f Fun] [g unary?]) Fun])]
-Returns function @centered[@tt{x y ... ⟼ (f (g x) (g y) ...).}]
+Returns function @centered[@tt{x y ...  = (f (g x) (g y) ...).}]
 This function has an alias @racket[-<].
 
 Examples:
@@ -238,7 +238,7 @@ Examples:
   (curried? +)]
 
 @defproc[(fixed-point [f Fun] [#:same-test same? (any/c any/c -> boolean?) equal?]) Fun]
-Returns a function @centered[@tt{x ⟼ (f (f (f ... (f x))))}]
+Returns a function @centered[@tt{x  = (f (f (f ... (f x))))}]
 which finds a least fixed point of @racket[_f] by iterative application,
 while result keeps changing in the sense of the @racket[_same?] function.
 

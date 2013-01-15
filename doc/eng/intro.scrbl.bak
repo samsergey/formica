@@ -13,9 +13,9 @@
 
 @title{Introduction}
 
-The @emph{Formica} language was created for educational purpose while teaching the "Functional and logical programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for following reasons. @emph{Racket} is elegant as @emph{Scheme} and goes with educationally oriented IDE, which make newcomers feel comfortable. It has active community, reach libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finally, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it is natural to come to a new language, created specially for the coursework.
+The @emph{Formica} language was created for educational purpose while teaching the "Functional and logical programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for following reasons. @emph{Racket} is elegant as @emph{Scheme} and goes with educationally oriented IDE, which make newcomers feel comfortable. It has active community, reach libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finaly, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it is natural to come to a new language, created specially for the coursework.
 
-The main goal of designing @emph{Formica} is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as Mark Tarver's @emph{Qi} or @emph{Haskell}. Being a dialect of @emph{Racket} it should complement the parent language and make it possible to use any of @emph{Racket}'s native libraries.
+The main goal of designing @emph{Formica} is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as Mark Tarver's @emph{Qi} or @emph{Haskell}. Being a dialect of @emph{Racket} it sould complement the parent language and make it possible to use any of @emph{Racket}'s native libraries.
 
 Even though it is mainly educational language, some of it's features (such as @tech{formal functions}, @tech{rewriting}, etc.) could be used in various practical applications.
 
@@ -42,7 +42,7 @@ In the following example the `+` function is made formal:
 @interaction[#:eval formica-eval
 (foldr (hold +) 0 '(1 2 3))]
 
-Together with pattern-matching and @tech{rewriting} technique, formal functions give a framework for designing complex abstract data types.
+Together with pattern-matching and @tech{rewriting} thechnique, formal functions give a framework for designing complex abstract data types.
 
 @subsection{Rewriting:}
   
@@ -64,7 +64,7 @@ This function rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @
       4 --> 1))
 (r '(1 2 (3 4)))]
 
-Following rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] repeatedly, until result stops changing.
+Following rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] repeatedly, untill result stops changing.
 @def+int[#:eval formica-eval
 (define r 
   (//. 1 --> 2
@@ -176,7 +176,7 @@ some functions to operate with klists
 
 @subsection{Monads}
 
-Monads give a very useful and elegant abstraction for sequential computations, allowing one to go deep into semantics, keeping syntax simple. Even though @emph{Racket} doesn't need monads to perform sequential computations, side effects or set comprehension, it is useful to have monads as a powerful tool for designing new semantic constructions.
+Monads give a very usefull and elegant abstraction for sequential computations, allowing one to go deep into semantics, keeping syntax simple. Even though @emph{Racket} doesn't need monads to perform sequential computations, side effects or set comprehension, it is useful to have monads as a powerful tool for designing new semantic constructions.
 
 An example of sequential computations in the @racket[List] monad:
 @interaction[#:eval formica-eval
@@ -283,7 +283,7 @@ This monad could be used to perform guarded computations:
 
 @subsection{Miscellaneous functional tools}
 
-Formica is informally called to be "functionally-oriented", meaning that it provides a lot of tools to operate with functions.
+Formica is informally called to be "functially-oriented", meaning that it provides a lot of tools to operate with functions.
 
 
 This defines binary and unary @tech{formal functions}:
@@ -320,4 +320,4 @@ Some purely functional definitions
 (complex<? 2 1-i)
 (complex<? 2 'x 1-i)]
 
-See @filepath{examples/} folder in the @emph{Formica} distribution for more examples. 
+See @filepath{examples/} folder in the @emph{Formica} distributuion for more examples. 

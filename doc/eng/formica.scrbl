@@ -12,7 +12,7 @@
      sandbox))
 
 
-@title[#:style '(toc) #:date "2012" #:version "0.0.1"]{Formica: The "functional-oriented" language.}
+@title[#:style '(toc) #:date "2012" #:version "0.0.1"]{Formica: The "functionally-oriented" language.}
 
 @author{Sergey B. Samoylenko}
 
