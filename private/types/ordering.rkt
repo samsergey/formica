@@ -54,6 +54,10 @@
    (let ([new-type (cons type ord-fun)])
      (cond
        [(eq? prec-type 'last) (append (type-ordering) (list new-type))]
+       [(eq? prec-type 'first) (append (list new-type) (type-ordering))]
+       [(dict-has-key? (type-ordering) type) (type-ordering (dict-remove (type-ordering) type))
+                                             (add-to-type-ordering type prec-type ord-fun)
+                                             (type-ordering)]
        [else (let next ([lst (type-ordering)])
                (cond
                  [(null? lst) (list new-type)]

@@ -35,4 +35,16 @@
  
  (parameterize ([type-ordering (type-ordering)])
    (add-to-type-ordering odd? #f >)
-   (check-true (ordered? '(9 7 5 3 1 0 2 4 6 8)))))
+   (check-true (ordered? '(9 7 5 3 1 0 2 4 6 8))))
+ 
+ (parameterize ([type-ordering (type-ordering)])
+   (add-to-type-ordering odd? 'first >)
+   (check-true (ordered? '(9 7 5 3 1 #t #f 0 2 4 6 8))))
+ 
+ (parameterize ([type-ordering (type-ordering)])
+   (add-to-type-ordering #f 'first)
+   (check-true (ordered? '(#f #t 0 "a"))))
+ 
+ (parameterize ([type-ordering (type-ordering)])
+   (add-to-type-ordering #t #f)
+   (check-true (ordered? '(#f #t 0 "a")))))

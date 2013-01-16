@@ -109,14 +109,31 @@ In following example even numbers follow odd numbers, moreover, within odd numbe
                                      (cons even? <))])
    (sort '(0 1 2 3 'x 4 5 6 'a 7 8 9) ordered?))]
 
-@defproc[(add-to-type-ordering (type contract?) (prec-type contract? 'last) (ord-fun (Any Any -> Bool) (cons #f))) void?]
-Adds @racket[_type] to the current @racket[(type-ordering)] table. If the @racket[_prec-type] is given, the new type will have the order next to it. If the comparing function @racket[_ord-fun] is given, it will be used to compare values within the type. 
+@defproc[(add-to-type-ordering (type contract?) (prec-type (or/c contract? 'last 'first) 'last) (ord-fun (Any Any -> Bool) (cons #f))) void?]
+Adds @racket[_type] to the current @racket[(type-ordering)] table. If the @racket[_prec-type] is given, the new type will have the order next to it. If the comparing function @racket[_ord-fun] is given, it will be used to compare values within the type. If @racket[_prec-type] is equal to @racket['last] or @racket['first] the new type will be appended or, correspondingly prepended to the current @racket[(type-ordering)] table.
+
+If @racket[_type] already exists in the current @racket[(type-ordering)] table, it's ordering will be changed according to new @racket[_prec-type] and @racket[_ord-fun].
 
 In this example complex numbers follow reals and precede strings. Moreover, within complex numbers ordering according to magnitude is set up. Symbols are ordered in default way.
 @interaction[#:eval formica-eval
  (parameterize ([type-ordering (type-ordering)])
    (add-to-type-ordering complex? real? (fork < magnitude))
-   (sort '(0-i 2 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9) ordered?))]
+   (sort '(0-i 2 #t 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9 #f) ordered?))]
+
+In theese examples complex numbers are added at the beginning or at the end of the ordering table.
+@interaction[#:eval formica-eval
+ (parameterize ([type-ordering (type-ordering)])
+   (add-to-type-ordering complex? 'first (fork < magnitude))
+   (sort '(0-i 2 #t 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9 #f) ordered?))
+ (parameterize ([type-ordering (type-ordering)])
+   (add-to-type-ordering complex? 'last (fork < magnitude))
+   (sort '(0-i 2 #t 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9 #f) ordered?))]
+
+This changes the ordering of booleans:
+@interaction[#:eval formica-eval
+(parameterize ([type-ordering (type-ordering)])
+   (add-to-type-ordering #t #f)
+   (sort '(0-i 2 #t 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9 #f) ordered?))]
 
 @defproc[(symbol<? [s1 Sym] [s2 Sym]) boolean?]
 Returns @racket[#t] if @racket[_s1] precedes @racket[_s2] in lexicographic order, and @racket[#f] otherwise.
