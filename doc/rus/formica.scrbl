@@ -33,27 +33,27 @@ Formica является диалектом языка Racket и использ�
 
 @include-section["computation.scrbl"]
 
-@;@include-section["types.scrbl"]
+@include-section["control.scrbl"]
 
-@;@include-section["contracts.scrbl"]
+@include-section["bindings.scrbl"]
 
-@;@include-section["bindings.scrbl"]
+@include-section["types.scrbl"]
 
-@;@include-section["formal.scrbl"]
+@include-section["contracts.scrbl"]
 
-@;@include-section["memoize.scrbl"]
+@include-section["formal.scrbl"]
 
-@;@include-section["rewrite.scrbl"]
+@include-section["equivalence.scrbl"]
 
-@;@include-section["control.scrbl"]
+@include-section["numeric.scrbl"]
 
-@;@include-section["equivalence.scrbl"]
+@include-section["pairs.scrbl"]
 
-@;@include-section["numeric.scrbl"]
+@include-section["memoize.scrbl"]
 
-@;@include-section["pairs.scrbl"]
+@include-section["rewrite.scrbl"]
 
-@;@include-section["functional.scrbl"]
+@include-section["functionals.scrbl"]
 
 @;@include-section["io.scrbl"]
 

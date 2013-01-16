@@ -1,6 +1,6 @@
 #lang setup/infotab
 
-(define scribblings '(("doc/eng/formica.scrbl" (multi-page) (language 50))))
+(define scribblings '(("doc/rus/formica.scrbl" (multi-page) (language 50))))
 
 (require string-constants)
 (define name "Formica1.0") 

@@ -34,7 +34,7 @@ Examples:
   (id '(a b c))]
 
 
-@defproc[(arg (n Ind)) Fun]
+@defproc[(arg (n Index)) Fun]
 Creates a trivial function which returns the @racket[_n]-th argument.
 
 Examples:
@@ -121,8 +121,9 @@ Examples:
   ((∘ remove-duplicates (greedy append)) '(1 2 3) '(2 3 2 4))]
 
 
-@defproc*[([(negated (p Fun)) Fun]
-           [(¬ (p Fun)) Fun])]
+@deftogether[[
+ @defproc[(negated (p Fun)) Fun]
+  @defthing[#:kind "alias" ¬ negated]]]
 Returns the negation of a predicate @racket[_p].
 
 For function @racket[negated] there is an alias: @racket[¬]
@@ -132,7 +133,8 @@ Examples:
 @interaction[#:eval formica-eval
   (negated odd?)
   ((negated odd?) 2)
-  ((¬ <) 1 2)]
+  (define ≥ (¬ <))
+  (map ≥ '(1 2 3) '(3 2 1))]
 
 
 @defproc[(flipped [f Fun]) Fun]
@@ -170,9 +172,9 @@ Examples:
 @interaction[#:eval formica-eval
   (map (orf integer? positive?) '(-3/5 -1 2 4.2))]
 
-
-@defproc*[([(fork [f Fun] [g unary?]) Fun]
-           [(-< [f Fun] [g unary?]) Fun])]
+@deftogether[[
+ @defproc[(fork [f Fun] [g unary?]) Fun]
+  @defthing[#:kind "alias" -< fork]]]
 Returns function @centered[@tt{x y ...  = (f (g x) (g y) ...).}]
 This function has an alias @racket[-<].
 
