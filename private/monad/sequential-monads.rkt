@@ -21,14 +21,12 @@
 
 (provide 
  amb
- scons
  (contract-out 
   ; Sequence monad
   (Sequence (->* (#:return (->* () #:rest list? listable?)
                   #:mplus (-> listable? listable? listable?)) 
                  (#:map (-> (-> any/c listable?) listable? listable?)) monad-plus?))
   (mplus-map (-> (-> any/c listable?) listable? any/c))
-  (listable? contract?)
   (zip (->* (listable?) #:rest (listof listable?) (sequence/c list?)))
   ; List monad
   (List monad-plus?)  
@@ -47,12 +45,6 @@
 ;;;===============================================================================
 ;;; general helper functions
 ;;;===============================================================================
-(define listable?
-  (flat-named-contract 
-   'listable?
-   (and/c sequence? (not/c formal?))))
-
-
 ;; the tool for parallel sequencing in the Accumulating monads.
 (define zip (compose in-values-sequence in-parallel))
 
@@ -135,13 +127,7 @@
   (for/list ([i (in-range n)]
              [x (in-stream s)]) x))
 
-(define-match-expander scons
-  (syntax-rules ()
-    [(scons x y) (and (? stream?) 
-                      (not (? stream-empty?))
-                      (app stream-first x)
-                      (app stream-rest y))]))
-                      
+                     
 
 ;;;===============================================================================
 ;;; Amb monad

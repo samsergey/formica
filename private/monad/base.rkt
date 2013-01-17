@@ -13,7 +13,9 @@
                   check-argument
                   check-type)
          racket/match
+         racket/stream
          racket/contract
+         (only-in "../../formal.rkt" formal?)
          (for-syntax racket/base racket/syntax ))
 
 (provide (rename-out (make-monad monad))
@@ -24,6 +26,7 @@
          collect
          using
          check-result
+          scons
          ; functional forms
          return
          bind
@@ -42,8 +45,9 @@
           (lift (-> procedure? procedure?))
           (fold/m (-> (-> any/c any/c any/c) any/c list? any/c))
           (filter/m (-> (-> any/c any/c) list? any/c))
-          (map/m (-> (-> any/c any/c) list? any/c))
-          (seq/m (-> list? any/c))
+          (listable? contract?)
+          (sequence/m (-> listable? any/c))
+          (map/m (-> (-> any/c any/c) listable? any/c))
           (sum/m (-> list? any/c))
           (guard (-> any/c any/c))
           (guardf (-> (-> any/c any/c) (-> any/c any/c)))
@@ -362,12 +366,31 @@
                          (return (if b (cons x ys) ys)))])
    'filter/m))
 
+;; match-expander for streams
+(define-match-expander scons
+  (syntax-rules ()
+    [(scons x y) (and (? stream?) 
+                      (not (? stream-empty?))
+                      (app stream-first x)
+                      (app stream-rest y))]))
+
+;; a predicate for listable objects
+(define listable?
+  (flat-named-contract 
+   'listable?
+   (and/c sequence? (not/c formal?))))
+
 ;; monadic sequencing
-(define (seq/m lst) 
-  (foldr (λ (x y) (lift/m cons x y)) (return '()) lst))
+(define sequence/m
+  (match-lambda
+    [(? stream-empty?) (return '())]
+    [(scons a as) (lift/m cons a (sequence/m as))]))
 
 ;; monadic map
-(define (map/m f lst) (seq/m (map f lst)))
+(define (map/m f lst)
+  (match lst
+    [(? stream-empty?) (return '())]
+    [(scons a as) (lift/m cons (f a) (map/m f as))]))
 
 ;; monadic sum
 (define (sum/m lst) 

@@ -18,6 +18,7 @@
  collect
  using
  check-result
+   scons
  ; functional forms
  return
  bind
@@ -36,8 +37,9 @@
   (lift (-> Fun Fun))
   (fold/m (-> binary? Any list? Any))
   (filter/m (-> unary? list? Any))
-  (map/m (-> unary? list? Any))
-  (seq/m (-> list? Any))
+  (listable? contract?)
+  (sequence/m (-> listable? Any))
+  (map/m (-> unary? listable? Any))
   (sum/m (-> list? Any))
   (guard (-> Any Any))
   (guardf (-> unary? unary?))
@@ -49,10 +51,9 @@
          racket/stream)
 (provide 
  amb
- scons
+
  zip
  (contract-out 
-  (listable? contract?)
   ; Sequence monad
   (Sequence (->* (#:return (-> Any .. listable?)
                   #:mplus (-> listable? listable? listable?)) 

@@ -466,27 +466,33 @@ Examples:
  (using List
    (bind '(1 2 3) >>= (guardf odd?) >>= (lift sqr)))]
 
-@defproc[(seq/m [lst list?]) Any]
-Monadic sequencing.
+@defproc[(sequence/m [s listable?]) Any]
+Sequential evaluation of elements of @racket[_s] stream (list).
 
-@racketblock[(seq/m _lst) = (foldr (lift/m cons) (return '()) _lst)]
+@racketblock[sequence/m empty-stream = (return '())
+             sequence/m (scons a as) = (lift/m cons a (sequence/m as))]
 
 Examples:
 @interaction[#:eval formica-eval
  (using List
-   (seq/m '((1 2) (3 4 5))))]
+   (sequence/m '((a) 3 "bc")))]
 
-@defproc[(map/m [f (Any Any → Any)] [lst list?]) Any]
+@interaction[#:eval formica-eval
+ (using Stream
+   (stream-first 
+    (sequence/m (list '(a) 3 (stream 'x (/ 0))))))]
+
+@defproc[(map/m [f unary?] [s listable?]) Any]
 Monadic mapping.
 
-@racketblock[map/m _f = seq/m ∘ (map _f)]
+@racketblock[map/m _f = sequence/m ∘ (map _f)]
 
 Example (definition of @racketidfont{Sqrt} function see in the example to the @racket[compose/m] operator):
 @interaction[#:eval formica-eval                  
  (using List
    (map/m Sqrt '(1 4 9)))]
 
-@defproc[(fold/m [f (Any Any → Any)] [x0 Any] [lst list?]) Any]
+@defproc[(fold/m [f binary?] [x0 Any] [lst list?]) Any]
 Monadic fold.
 
 @racketblock[(fold/m _f _x0 '()) = (return _x0)
@@ -503,7 +509,7 @@ Examples::
            0 
            '(1 2 3)))]
 
-@defproc[(filter/m [f (Any Any → Any)] [x0 Any] [lst list?]) Any]
+@defproc[(filter/m [f unary?] [x0 Any] [lst list?]) Any]
 Monadic filter.
 
 @racketblock[(filter/m _pred '()) = (return '())
