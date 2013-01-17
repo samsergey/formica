@@ -13,7 +13,7 @@
 
 @title{Introduction}
 
-The @emph{Formica} language was created for educational purpose while teaching the "Functional and logic programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for following reasons. @emph{Racket} is elegant as @emph{Scheme} and goes with educationally oriented IDE, which make newcomers feel comfortable. It has active community, reach libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finally, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it is natural to come to a new language, created specially for the coursework.
+The @emph{Formica} language was created for educational purpose while teaching the "Functional and logic programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for the following reasons. @emph{Racket} is elegant as @emph{Scheme} and goes with educationally oriented IDE, which makes newcomers feel comfortable. It has active community, rich libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finally, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it is natural to come to a new language, created specially for the coursework.
 
 The main goal of designing @emph{Formica} is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as Mark Tarver's @emph{Qi} or @emph{Haskell}. Being a dialect of @emph{Racket} it should complement the parent language and make it possible to use any of @emph{Racket}'s native libraries.
 
@@ -64,7 +64,7 @@ This function rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @
       4 --> 1))
 (r '(1 2 (3 4)))]
 
-Following rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] repeatedly, until result stops changing.
+Following rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] repeatedly, until result stops changing. This rewriting system has a normal form: @racket[2].
 @def+int[#:eval formica-eval
 (define r 
   (//. 1 --> 2
@@ -72,14 +72,13 @@ Following rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @rack
        4 --> 1))
 
 (r '(1 2 (3 4)))]
-This rewriting system has a normal form: @racket[2].
 
 A rewriting-based definition of the @racket[map] function:
 @def+int[#:eval formica-eval
   (define/. map
     _ '()        --> '()
     f (cons h t) --> (cons (f h) (map f t)))
- (map f '(a b c))]
+ (map ($ f) '(a b c))]
 
 Here is a simple implementation of symbolic η- and β-reduction rules for λ-calculus:
 @#reader scribble/comment-reader
@@ -96,7 +95,7 @@ Here is a simple implementation of symbolic η- and β-reduction rules for λ-ca
   
 @subsection{Simplified syntax for partial application and point-free definitions:}
   
-Once you have written in @emph{Haskell} on or the blackboard:
+Once you have written in @emph{Haskell} or on the blackboard:
 @codeblock{
  fold _f _x0 = F where F []     = _x0
                      F (_x:xs) = _f _x (fold _f _x0 _xs)

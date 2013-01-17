@@ -73,4 +73,17 @@
    @bib-entry[#:key "Wolfram"
              #:title  "Wolfram Mathematica"
              #:is-book? #f
-             #:url "http://www.wolfram.com/mathematica/"]]
+             #:url "http://www.wolfram.com/mathematica/"]
+
+   @bib-entry[#:key "Findler"
+                    #:author "Findler, R. and M. Felleisen" 
+                    #:title "Contracts for higher-order functions"
+                    #:location "ACM SIGPLAN International Conference on Functional Programming"
+                    #:year "2002"]
+   
+   @bib-entry[#:key "Krishnamurthi"
+                    #:title "Relationally-Parametric Polymorphic Contracts"
+                    #:author "Krishnamurthi, S., Guha, A. et.al."
+                    #:date "2007"
+                    #:is-book? #f
+                    #:url "http://cs.brown.edu/~sk/Publications/Papers/Published/gmfk-rel-par-poly-cont/"]]

@@ -14,7 +14,7 @@ Formica is based on the [Racket programming language](http://planet.racket-lang.
 Why Racket?
 -----------
 
-  a) Racket is elegant, transparent and flexible: it is possible to build from scratch and show any of programming concepts and paradigms: abstract data types and type systems, objects, continuations, monads, concurrency; logic, concatenative, reactive, combinatorial programming and so on.
+  a) Racket is elegant, transparent and flexible: it is possible to build from scratch and show any of programming concepts and paradigms, such as abstract data types and type systems, objects, continuations, monads, concurrency; logic, concatenative, reactive, combinatorial programming and so on.
   
   b) The symbols are first-class objects, so one may see how the program works.
 
@@ -42,7 +42,7 @@ Formica provides
   
  4) handy tools to operate with **monads**,
  
- 5) easy to use contract-based type system.
+ 5) easy to use contract-based type system,
  
  6) a lot of functional programming tools: memoization, generalized composition, combinators and functionals. 
 

@@ -1,11 +1,11 @@
-Дважды встречается : в одном предложении (why racket? a)) The second : can be replaced with "such as"
-Почему используется сокращение AI без объяснений?
-What is inside 5) comma
-Introduction for (the?) following reasons
-Introduction which make(s)?
-Introduction reach (rich?) libraries ... smae in why racket
-Intro  make(s?) it possible
-1.1.2 Rewriting: Непонятен смысл прежложения "This rewriting system has a normal form: 2."
-(map f '(a b c))
-'(..f.. a b c)
-1.1.3 on <--> or the blackboard:
+Ok Дважды встречается : в одном предложении (why racket? a)) The second : can be replaced with "such as"
+Ok Почему используется сокращение AI без объяснений?
+Ok What is inside 5) comma
+Ok Introduction for (the?) following reasons
+Ok Introduction which make(s)?
+Ok Introduction reach (rich?) libraries ... smae in why racket
+Ok Intro  make(s?) it possible
+Ok 1.1.2 Rewriting: Непонятен смысл прежложения "This rewriting system has a normal form: 2."
+Ok (map f '(a b c))
+Ok '(..f.. a b c)
+Ok 1.1.3 on <--> or the blackboard:

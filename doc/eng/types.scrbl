@@ -17,9 +17,9 @@
 
 The bindings documented in this section are provided by the @racket[formica/types] library and @racket[formica] language.
 
-Formica has @emph{strict dynamic type system}, with type checking being done at run-time.
+Formica has @emph{strict dynamic type system}, based on cononcept of contracts @cite["Findler" "Krishnamurthi"]. 
 
-Types are used for identification and guarding only. There is no optimisation based on types as in Typed Racket. It is not necessary to declare types of functions and arguments, they are used in the same way as Racket contracts.
+Types are used for identification and guarding only. There is no optimisation based on types as in Typed Racket. Type declarations are optional, they are used in the same way as Racket contracts, type checking is done at run-time.
 
 Contract-based type system is implemented in Formica for educational purpose: in order to give students a gentle but quite deep introduction to type systems used in functional programming languages. In Formica it is possible to declare and use abstract algebraic, inductive, parametrized and functional types, still being able to utilize @tech{rewriting}, simplified syntax for @tech{partial application} and definitions in @tech{point-free notation}. Moreover the Formica types have close relation to a concept of @tech{formal functions} widely used in the language.
 
