@@ -55,7 +55,7 @@ Formica является диалектом языка Racket и использ�
 
 @include-section["functionals.scrbl"]
 
-@;@include-section["io.scrbl"]
+@include-section["io.scrbl"]
 
 @;@include-section["testing.scrbl"]
 
