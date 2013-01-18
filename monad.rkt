@@ -54,8 +54,8 @@
 
  zip
  (contract-out 
-  ; Sequence monad
-  (Sequence (->* (#:return (-> Any .. listable?)
+  ; Monoid
+  (Monoid (->* (#:return (-> Any .. listable?)
                   #:mplus (-> listable? listable? listable?)) 
                  (#:map (-> (-> Any listable?) listable? listable?)) monad-plus?))
   (mplus-map (-> (-> Any listable?) listable? Any))

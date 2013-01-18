@@ -22,8 +22,8 @@
 (provide 
  amb
  (contract-out 
-  ; Sequence monad
-  (Sequence (->* (#:return (->* () #:rest list? listable?)
+  ; Monoid
+  (Monoid (->* (#:return (->* () #:rest list? listable?)
                   #:mplus (-> listable? listable? listable?)) 
                  (#:map (-> (-> any/c listable?) listable? listable?)) monad-plus?))
   (mplus-map (-> (-> any/c listable?) listable? any/c))
@@ -49,14 +49,14 @@
 (define zip (compose in-values-sequence in-parallel))
 
 ;;;===============================================================================
-;;; Sequence monad
+;;; Monoid
 ;;;===============================================================================
 (define (mplus-map f m)
   (for/fold ([r mzero]) ([x m])
      (let ([fx (f x)])
        (mplus (f x) r))))
 
-(define (Sequence #:return ret #:map (app-map mplus-map)  #:mplus app)
+(define (Monoid #:return ret #:map (app-map mplus-map)  #:mplus app)
   (monad
    #:type listable?
    #:return ret
@@ -74,7 +74,7 @@
 (define concatenate (fork append sequence->list))
 
 (define-monad List 
-  (Sequence
+  (Monoid
    #:return list
    #:map concat-map
    #:mplus concatenate))
@@ -118,7 +118,7 @@
   (sequence->stream (in-producer g 'end-of-stream)))
 
 (define-monad Stream 
-  (Sequence
+  (Monoid
    #:return make-stream
    #:map stream-concat-map
    #:mplus stream-concatenate))
@@ -185,7 +185,7 @@
   (sequence->stream (in-producer g 'end-of-stream)))
 
 (define-monad Amb 
-  (Sequence
+  (Monoid
    #:return amb
    #:map amb-union-map
    #:mplus amb-union))

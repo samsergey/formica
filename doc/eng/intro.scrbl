@@ -279,6 +279,26 @@ This monad could be used to perform guarded computations:
  (define powerset (filter/m (const '(#t #f))))
  (powerset '(1 2 3))]
 
+Monads could be created through higher order abstractions:
+@def+int[#:eval formica-eval
+ (define-monad Set
+   (Monoid
+    #:return set
+    #:mplus set-union))
+ (using Set
+   (lift/m + '(1 2 3) '(2 3 4)))]
+
+@defs+int[#:eval formica-eval
+ ((define-monad String
+   (Monoid
+    #:return string
+    #:mplus (flipped string-append))))
+ (using String
+  (collect (char-upcase x)
+    [x <- "abc12xy"] 
+    (char-alphabetic? x)
+    [x <- (format "~a(~a)" x (char->integer x))]))]
+
 
 @subsection{Miscellaneous functional tools}
 

@@ -103,7 +103,7 @@
 @section[#:tag-prefix "control"]{Управление вычислением}
 
 @defform[(quote expr)]
-Оставляет выражение @racket[_expr] невычисленным.
+Оставляет выражение @racket[_expr] не вычисленным.
 Может быть введена с помощью кавычки @litchar{'}.
 
 Примеры:
@@ -116,7 +116,7 @@
 [@defform[(quasiquote expr)]
   @defform[(unquote expr)]
   @defform[(unquote-splicing expr)]]]
-Оставляет выражение @racket[_expr] невычисленным, но позволяет вычислить части выражения, 
+Оставляет выражение @racket[_expr] не вычисленным, но позволяет вычислить части выражения, 
 отмеченные формами @racket[unquote] (@litchar{,}) и @racket[unquote-splicing] (@litchar{,@"@"}).
 Может быть введена с помощью обратной кавычки @litchar{`}.
 

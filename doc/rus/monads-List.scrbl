@@ -11,27 +11,26 @@
      (sandbox '(require formica))
      sandbox))
 
-@title{Monads, defined in Formica}
+@title[#:tag "monad:defined"]{Монады, определённые в Formica}
 
 @declare-exporting[formica]
 
-@section{The Identity monad}
+@section[#:tag "monad:Id"]{Тождественная монада}
 
 @defthing[Id monad?] 
-The identity monad.
+Тождественная монада.
 
-Definition:
+Определение:
 @codeblock{return = id
            bind _m _f = (_f _m)}
 
-Examples:
+Примеры:
 @defs+int[#:eval formica-eval
  ((using-monad Id)
  (define-formal f))
  (return 'x)
  (bind 'x >>= f)]
 
-In the @racket[Id] monad @racket[do] form works like @racket[match-let*] form with ability to produce side effects within calculations:
 @interaction[#:eval formica-eval
  (do [x <- 5]
      [y <- 8]
@@ -44,16 +43,17 @@ In the @racket[Id] monad @racket[do] form works like @racket[match-let*] form wi
      [(z t) <<- (reverse y)]
      (return (list x y z t)))]
 
-@section{Ambiguous computations.}
+@section[#:tag "monad:seq"]{Неоднозначные вычисления.}
 
-@subsection{The Sequence monad}
+Описанные в этом разделе монады, предназначены для работы с многозначными или частично-определёнными функциями (функциями, неопределёнными для некоторых значений).
+Под последовательностью в этом разделе понимаются любые индуктивные множества: натуральные числа, списки, строки, потоки и т.п.
 
-@defproc[(Sequence [#:return ret (Any ... → listable?)]
+@defproc[(Monoid [#:return ret (Any ... → listable?)]
                    [#:mplus seq-append (listable? listable? → listable?)]
                    [#:map seq-append-map ((Any → listable?) listable? → listable?) mplus-map]) monad-plus?]
-Returns a monad which performs computations which may return zero or more then one possible results as a sequence (list, stream, set etc.). This is a generalized monad, monads @racket[List], @racket[Stream] and @racket[Amb] are instances of the @racket[Sequence] monad.
+Возвращает монаду, предназначеннную для работы с вычислениями, которые могут возвращать последовательность значений. Это обобщение монад @racket[List], @racket[Stream] и @racket[Amb].
 
-Definition:
+Определение:
 @codeblock{return = _ret
            bind _s _f = (_seq-append-map _f _s)
            mplus = _seq-append
@@ -61,14 +61,16 @@ Definition:
            type = listable?
            failure = (const mzero)}
 
-The sequence of arguments is constructed by the @racket[_ret] function. The bound function @racket[_f] is applied to all possible values in the input sequence @racket[_s] and the resulting sequences are concatenated by the @racket[_seq-append] to produce a sequence of all possible results. The details of binding implementation are specified by the mapping function @racket[_seq-append-map].
+Последовательность возможных аргументов конструируется с помощью функции  @racket[_ret]. При связывании, функция @racket[_f] применяется ко всем возможным значениям аргументов из последовательности @racket[_s] и все возможные результаты объединяются с помощью операции @racket[_seq-append], производя последовательность всех возможных результатов. Особенности процесса связывания могут быть заданы функцией  @racket[_seq-append-map].
 
-@bold{Examples:}
+Функция @racket[Monoid] создаёт монады, оперирующие с моноидами: множествами с определёнными на них нейтральным элементом (нулём) @racket[(_ret)] и бинарной операцией соединения двух значений в одно (сложением) @racket[_seq-append].
 
-Using @racket[Sequence] it is easy to define monads working with different types of sequences: sets, vectors, strings etc.
+@bold{Примеры:}
+
+Используя @racket[Monoid] легко определить монады для различных типов последовательностей: множеств, векторов, строк и т.п.
 @def+int[#:eval formica-eval
  (define-monad Set
-   (Sequence
+   (Monoid
     #:return set
     #:mplus set-union))
  (using Set
@@ -76,7 +78,7 @@ Using @racket[Sequence] it is easy to define monads working with different types
 
 @defs+int[#:eval formica-eval
  ((define-monad String
-   (Sequence
+   (Monoid
     #:return string
     #:mplus (flipped string-append))))
  (using String
@@ -86,9 +88,9 @@ Using @racket[Sequence] it is easy to define monads working with different types
     [x <- (format "~a(~a)" x (char->integer x))]))]
 
 @defproc[(listable? (v Any)) Bool]
-Returns @racket[#t] if @racket[v] is a sequence but not the @tech{formal application}.
+Возвращает @racket[#t] если @racket[v] является последовательностью, но не является формальной аппликацией.
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (listable? '(1 2 3))
   (listable? 4)
@@ -98,38 +100,33 @@ Examples:
   (listable? (g 'x 'y))]
 
 @defproc[(mplus-map [f (Any → listable?)] [s listable?]) listable?]
-Generalized mapping function for the @tech{currently used monad}. Formally equal to 
+Обобщённая функция отображения в аддитивной монаде. Формально определена, как 
 @codeblock{(mplus-map f s) = (foldl (∘ mplus f) mzero s)}
 
 @defproc[(zip [s listable?] ...) sequence?]
-Returns a sequence where each element is a list with as many values as the number of supplied sequences; the values, in order, are the values of each sequence. Used to process sequences in parallel, as in @racket[for/list] iterator.
+Возвращает последовательность, в которой каждый элемент является списком из последовательно выбираемых элементов последовательностей @racket[_s ...]. Используется для параллельной обработки последовательностей.
 
-Example of using @racket[zip]:
+Пример:
 @interaction[#:eval formica-eval
   (using List
     (do [(list x y) <- (zip '(a b c) 
                             '(1 2 3 4))]
       (return (f x y))))]
-The same with @racket[for/list] iterator.
-@interaction[#:eval formica-eval
- (for/list ([x '(a b c)]
-            [y '(1 2 3 4)])
-   (f x y))]
 
-@subsection{The List monad}
+@subsection[#:tag "monad:List"]{Монада List}
 
 @defthing[List monad-plus?] 
-The @racket[List] monad is used for list comprehension and in order to perform calculations with functions, returning more then one value. The main difference between the @racket[List] and monad @tt{[]} in @emph{Haskell}, is the ability of @racket[List] to operate with any sequences as @racket[for] iterators do.
+Монада @racket[List] используется для генерации списков и производства жадных вычислений с многозначными или частично-определёнными функциями.
 
-Definition:
-@codeblock{List = (Sequence #:return list
+Определение:
+@codeblock{List = (Monoid #:return list
                             #:mplus concatenate
                             #:map concat-map)}
 
 @defproc[(concatenate (s listable?) ...) list?]
-Returns a result of @racket[_s ...] concatenation in a form of a list.
+Объединяет последовательности @racket[_s ...] в список.
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (concatenate '(1 2 3) '(a b c))
   (concatenate 4 (stream 'a 'b 'c))
@@ -137,19 +134,19 @@ Examples:
   (concatenate 1 2 3)]
 
 @defproc[(concat-map (f (any/c → n/f-list?)) (s listable?)) list?]
-Applies @racket[_f] to elements of @racket[_s] and returns the concatenation of results.
+Применяет функцию @racket[_f] к элементам последовательности @racket[_s] и возвращает объединение результатов в виде списка.
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (concat-map (λ (x) (list x (- x))) '(1 2 3))
   (concat-map (λ (x) (list x (- x))) 4)]
 
-@bold{Examples}
+@bold{Примеры использования монады List}
 
 @def+int[#:eval formica-eval
  (using-monad List)]
 
-Examples of list comprehension
+Примеры генерации списков
 @interaction[#:eval formica-eval
  (collect (sqr x) [x <- '(1 2 5 13 4 24)] (odd? x))]
 
@@ -166,33 +163,13 @@ Examples of list comprehension
    (odd? x)
    (< x y))]
 
-In place of a list any sequence could be used, but only a list is produced.
 @interaction[#:eval formica-eval
  (collect (cons x y) [(x y) <<- 10] (< 4 (+ (sqr x) (sqr y)) 9))]
 
 @interaction[#:eval formica-eval
  (lift/m cons 2 "abc")]
 
-Forms @racket[do] and @racket[collect] in the @racket[List] monad work like @racket[for*/list] form:
-@interaction[#:eval formica-eval
- (do [x <- 2] 
-     [y <- "abc"] 
-     (return (cons x y)))
- (for*/list ([x 2] 
-             [y "abc"]) 
-   (cons x y))]
-
-@interaction[#:eval formica-eval
- (collect (cons x y) 
-   [x <- 3] 
-   (odd? x) 
-   [y <- "abc"])
- (for*/list ([x 3] 
-             #:when (odd? x)
-             [y "abc"]) 
-   (cons x y))]
-
-It is easy to combine parallel and usual monadic processing:
+Использование параллельной обработки последовательностей:
 @interaction[#:eval formica-eval
   (using List
     (do [a <- '(x y z)]
@@ -200,22 +177,20 @@ It is easy to combine parallel and usual monadic processing:
                             (in-naturals))]
       (return (f a x y))))]
 
-The use of monad @racket[List] goes beyond the simple list generation. The main purpose of monadic computations is to provide computation with functions which may return more then one value (or fail to produce any). The examples of various applications of this monad could be found in the @filepath{nondeterministic.rkt} file in the @filepath{examples/} folder.
-
-@subsection{The Stream monad}
+@subsection[#:tag "monad:Stream"]{Монада Stream}
 
 @defthing[Stream monad-plus?] 
-Like @racket[List] monad, but provides lazy list processing. This monad is equivalent to monad @tt{[]} in @emph{Haskell} and could be used for operating with potentially infinite sequences.
+Подобна монаде @racket[List], но производит вычисления лениво и результат возвращается в виде потока.
 
-Definition:
-@codeblock{Stream = (Sequence #:return list
+Определение:
+@codeblock{Stream = (Monoid #:return list
                               #:mplus stream-concatenate
                               #:map stream-concat-map)}
 
 @defproc[(stream-concatenate (s listable?) ...) stream?]
-Returns a result of @racket[_s ...] lazy concatenation in a form of a stream.
+Возвращает результат ленивого объединения последовательностей @racket[_s ...] в виде потока.
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (stream->list 
    (stream-concatenate '(1 2 3) '(a b c)))
@@ -229,9 +204,9 @@ Examples:
    1)]
 
 @defproc[(stream-concat-map (f (any/c → stream?)) (s listable?)) stream?]
-Applies @racket[_f] to elements of @racket[_s] and lazily returns the concatenation of results.
+Лениво применяет функцию @racket[_f] к элементам последовательности @racket[_s] и возвращает объединение результатов.
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (stream->list 
    (stream-concat-map (λ (x) (stream x (- x))) '(1 2 3)))
@@ -251,18 +226,18 @@ Examples:
    3)]
 
 @defproc[(stream-take (s stream?) (n Nat)) list?]
-Returns list of @racket[_n] first elements of stream (or sequence) @racket[s].
+Возвращает список первых @racket[_n] элементов потока (или последовательности) @racket[s].
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (stream-take (stream 'a 'b 'c) 2) 
   (stream-take (stream 'a 'b (/ 0)) 2)
   (stream-take (in-naturals) 3)]
 
 @defform[(scons h t)]
-A match expander which matches non-empty streams and binds the first element to @racket[_h], and the rest of stream to @racket[_t]. Only the first element is evaluated eagerly.
+Шаблон для непустого потока с первым элементом @racket[_h], и хвостом @racket[_t]. При сопоставлении вычисляется только первый элемент.
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
  (require racket/match)
  (match (in-naturals)
@@ -270,14 +245,14 @@ Examples:
  (match (stream 1 (/ 0))
    [(scons h t) (list h t)])]
 
-@bold{Examples}
+@bold{Примеры применения монады Stream}
 
 @def+int[#:eval formica-eval
  (using-monad Stream)]
 
-Two classical examples with infinite sequences.
+Два классических примера генерации бесконечных последовательностей
 
-The infinite sequence of Pythagorean triples:
+Последовательность пифагоровых треугольников:
 @def+int[#:eval formica-eval
  (define triples 
   (collect (list a b c) 
@@ -289,7 +264,7 @@ The infinite sequence of Pythagorean triples:
 (stream-take triples 3)
 (stream-ref triples 100)]
 
-The first triangle with area exceeding 100: 
+Первый треугольник с площадью, превышающей 100: 
 @interaction[#:eval formica-eval
   (stream-first 
    (collect t 
@@ -297,7 +272,7 @@ The first triangle with area exceeding 100:
      (> (* 1/2 b c) 100)))]
 
 
-The infinite sequence of primes:
+Последовательность простых чисел:
 @def+int[#:eval formica-eval
 (define (primes r)
   (do [(scons x xs) <-: r]
@@ -309,7 +284,7 @@ The infinite sequence of primes:
 (stream-take (primes (in-naturals 2)) 10)
 (stream-ref (primes (in-naturals 2)) 100)]
 
-Using monad @racket[Stream] all monadic functions work lazily however they still operate on eager lists:
+В монаде @racket[Stream] все монадические функции работают лениво:
 @interaction[#:eval formica-eval
  (stream-first ((compose/m (lift /) (lift (curry * 2))) 1/2 0))
  (stream-first (lift/m / (return 1) (return 1 0)))
@@ -318,28 +293,28 @@ Using monad @racket[Stream] all monadic functions work lazily however they still
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 1)
  (stream-ref (map/m (λ (x) (stream x (/ x))) '(1 0 3)) 2)]
 
-@subsection{The Amb monad}
+@subsection[#:tag "monad:Amb"]{Монада Amb}
 
 @defthing[Amb monad-plus?] 
-Like @racket[Stream] monad, but tries to return a list of unique elements.
+Подобна монаде @racket[Stream], но возвращает поток уникальных элементов.
 
-Definition:
-@codeblock{Amb = (Sequence #:return amb
+Определение:
+@codeblock{Amb = (Monoid #:return amb
                            #:mplus amb-union
                            #:map amb-union-map)}
 
 @defproc[(amb (v any/c) ...) stream?]
-Returns a stream of arguments @racket[_v] removing duplicates (in terms of @racket[equal?]).
+Возвращает поток уникальных агрументов @racket[_v ...].
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
  (stream->list (amb 1 3 2 2 3 2 1 2 4 3))
  (stream-take (amb 1 2 (/ 0)) 2)]
 
 @defproc[(amb-union (s1 listable?) (s2 listable?)) stream?]
-Returns a stream of elements from @racket[_s1] and @racket[_s2], removing duplicates.
+Возвращает поток уникальных элементов последовательностей @racket[_s1] и @racket[_s2].
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (stream->list 
    (amb-union '(1 2 3) '(2 3 4)))
@@ -353,9 +328,9 @@ Examples:
    1)]
 
 @defproc[(amb-union-map (f (any/c → stream?)) (s listable?)) stream?]
-Applies @racket[_f] to elements of @racket[_s] and lazily returns the union of results.
+Применяет функцию @racket[_f] к элементам последовательности @racket[_s] и возвращает поток уникальных результатов.
 
-Examples:
+Примеры:
 @interaction[#:eval formica-eval
   (stream->list 
    (amb-union-map (lift sqr) '(-3 -2 -1 0 -1 2 3)))
@@ -371,12 +346,12 @@ Examples:
    (amb-union-map (λ (x) (amb x (/ x))) '(1 0 3)) 
    2)]
 
-@bold{Examples}
+@bold{Примеры использования монады Amb}
 
 @def+int[#:eval formica-eval
  (using-monad Amb)]
 
-Proving logical statements by brute force
+Доказательство логических утверждений методом полного перебора (построения таблицы истинности):
 @interaction[#:eval formica-eval
  (stream->list 
   (collect (eq? (==> A B) (or B (not A))) 

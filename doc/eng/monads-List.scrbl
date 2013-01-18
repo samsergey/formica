@@ -46,12 +46,10 @@ In the @racket[Id] monad @racket[do] form works like @racket[match-let*] form wi
 
 @section{Ambiguous computations.}
 
-@subsection{The Sequence monad}
-
-@defproc[(Sequence [#:return ret (Any ... → listable?)]
+@defproc[(Monoid [#:return ret (Any ... → listable?)]
                    [#:mplus seq-append (listable? listable? → listable?)]
                    [#:map seq-append-map ((Any → listable?) listable? → listable?) mplus-map]) monad-plus?]
-Returns a monad which performs computations which may return zero or more then one possible results as a sequence (list, stream, set etc.). This is a generalized monad, monads @racket[List], @racket[Stream] and @racket[Amb] are instances of the @racket[Sequence] monad.
+Returns a monad which performs computations which may return zero or more then one possible results as a sequence (list, stream, set etc.). This is an abstraction of, monads operating with monoids. Monads @racket[List], @racket[Stream] and @racket[Amb] are defined through the @racket[Monoid] function.
 
 Definition:
 @codeblock{return = _ret
@@ -63,12 +61,14 @@ Definition:
 
 The sequence of arguments is constructed by the @racket[_ret] function. The bound function @racket[_f] is applied to all possible values in the input sequence @racket[_s] and the resulting sequences are concatenated by the @racket[_seq-append] to produce a sequence of all possible results. The details of binding implementation are specified by the mapping function @racket[_seq-append-map].
 
+The @racket[Monoid] function creates monads, operating with @emph{monoids}: sets having a single identity element @racket[(_ret)], and an associative binary operator over the set of objects @racket[_seq-append].
+
 @bold{Examples:}
 
-Using @racket[Sequence] it is easy to define monads working with different types of sequences: sets, vectors, strings etc.
+Using @racket[Monoid] it is easy to define monads working with different types of sequences: sets, vectors, strings etc.
 @def+int[#:eval formica-eval
  (define-monad Set
-   (Sequence
+   (Monoid
     #:return set
     #:mplus set-union))
  (using Set
@@ -76,7 +76,7 @@ Using @racket[Sequence] it is easy to define monads working with different types
 
 @defs+int[#:eval formica-eval
  ((define-monad String
-   (Sequence
+   (Monoid
     #:return string
     #:mplus (flipped string-append))))
  (using String
@@ -122,9 +122,9 @@ The same with @racket[for/list] iterator.
 The @racket[List] monad is used for list comprehension and in order to perform calculations with functions, returning more then one value. The main difference between the @racket[List] and monad @tt{[]} in @emph{Haskell}, is the ability of @racket[List] to operate with any sequences as @racket[for] iterators do.
 
 Definition:
-@codeblock{List = (Sequence #:return list
-                            #:mplus concatenate
-                            #:map concat-map)}
+@codeblock{List = (Monoid #:return list
+                          #:mplus concatenate
+                          #:map concat-map)}
 
 @defproc[(concatenate (s listable?) ...) list?]
 Returns a result of @racket[_s ...] concatenation in a form of a list.
@@ -208,9 +208,9 @@ The use of monad @racket[List] goes beyond the simple list generation. The main 
 Like @racket[List] monad, but provides lazy list processing. This monad is equivalent to monad @tt{[]} in @emph{Haskell} and could be used for operating with potentially infinite sequences.
 
 Definition:
-@codeblock{Stream = (Sequence #:return list
-                              #:mplus stream-concatenate
-                              #:map stream-concat-map)}
+@codeblock{Stream = (Monoid #:return list
+                            #:mplus stream-concatenate
+                            #:map stream-concat-map)}
 
 @defproc[(stream-concatenate (s listable?) ...) stream?]
 Returns a result of @racket[_s ...] lazy concatenation in a form of a stream.
@@ -324,9 +324,9 @@ Using monad @racket[Stream] all monadic functions work lazily however they still
 Like @racket[Stream] monad, but tries to return a list of unique elements.
 
 Definition:
-@codeblock{Amb = (Sequence #:return amb
-                           #:mplus amb-union
-                           #:map amb-union-map)}
+@codeblock{Amb = (Monoid #:return amb
+                         #:mplus amb-union
+                         #:map amb-union-map)}
 
 @defproc[(amb (v any/c) ...) stream?]
 Returns a stream of arguments @racket[_v] removing duplicates (in terms of @racket[equal?]).
