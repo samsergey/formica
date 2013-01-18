@@ -1,0 +1,18 @@
+#! /bin/bash
+
+cd ..
+
+echo "Packing english version"
+cat formica/plt/info-eng.rkt > formica/info.rkt
+raco setup -p formica
+raco pack --plt-name 'Formica 1.0' --replace --at-plt  ++setup formica -v formica.plt formica formica/doc
+
+echo "Packing russian version"
+cat formica/plt/info-rus.rkt > formica/info.rkt
+raco setup -p formica
+raco pack --plt-name 'Formica 1.0' --replace --at-plt  ++setup formica -v formica-rus.plt formica formica/doc
+
+mv -f formica.plt formica/plt/
+mv -f formica-rus.plt formica/plt/
+
+cd $formica
