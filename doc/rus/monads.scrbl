@@ -32,6 +32,6 @@
 нейтральным элементом:
 @racketblock[mplus mzero _x  =  _x
              mplus _x mzero  =  _x] 
-ы
+
 @include-section["monads-base.scrbl"]
 @include-section["monads-List.scrbl"]

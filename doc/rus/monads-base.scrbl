@@ -11,7 +11,7 @@
      (sandbox '(require formica))
      sandbox))
 
-@title[#:tag "types"]{Базовые операции с монадами}
+@title[#:tag "monad:base"]{Базовые операции с монадами}
 
 @declare-exporting[formica]
 
