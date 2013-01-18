@@ -79,7 +79,7 @@
                     #:author "Findler, R. and M. Felleisen" 
                     #:title "Contracts for higher-order functions"
                     #:location "ACM SIGPLAN International Conference on Functional Programming"
-                    #:year "2002"]
+                    #:date "2002"]
    
    @bib-entry[#:key "Krishnamurthi"
                     #:title "Relationally-Parametric Polymorphic Contracts"

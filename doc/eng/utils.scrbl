@@ -24,3 +24,5 @@
 @include-section["tags.scrbl"]
 
 @include-section["arity.scrbl"]
+
+@include-section["testing.scrbl"]

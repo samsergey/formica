@@ -36,7 +36,8 @@
          "tacit.rkt"
          "memoize.rkt"
          "types.rkt"
-         "monad.rkt")
+         "monad.rkt"
+         "testing.rkt")
 (provide
  (all-from-out "tools.rkt"
                "partial-app.rkt"
@@ -45,4 +46,5 @@
                "tacit.rkt"
                "memoize.rkt"
                "types.rkt"
-               "monad.rkt"))
+               "monad.rkt"
+               "testing.rkt"))

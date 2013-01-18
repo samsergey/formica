@@ -17,3 +17,4 @@
 (require "nest-tests.rkt")
 (require "types-tests.rkt")
 (require "ordering-tests.rkt")
+(require "testing-tests.rkt")
