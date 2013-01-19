@@ -27,3 +27,9 @@ rus:
 	# Making russian version
 	cat plt/info-rus.rkt > info.rkt
 	raco setup -p formica && raco setup -U
+
+install:
+	# liniking formica
+	cd ..; raco link -l formica; cd formica
+	# installing package
+	raco setup -p formica && raco setup -U

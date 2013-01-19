@@ -65,7 +65,17 @@ To build and install Formica in the DrRacket environment follow one of possible 
  ```
  git clone https://github.com/samsergey/formica.git
  ``` 
- and then link this directory using `raco link` program. Finally run `raco setup` to build documentation and include formica modules in Racket module resolving system.
+ and then install package using
+ ```
+ make install
+ ``` 
+ or manually by running 
+ ```
+ raco link formica
+ raco setup formica
+ [sudo] raco setup -U
+ ```
+ from the parent folder of the working one.
 
 ---------------------------------------------------------------
 

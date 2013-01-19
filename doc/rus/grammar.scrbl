@@ -22,28 +22,62 @@ S-выражение может быть либо @emph{атомом}, либо 
 Ниже приводится формальная грамматика языка Formica.
 
 @(racketgrammar* #:literals (quote quasiquote unquote unquote-splicing ? or and _ ___ --> -->. do collect using 
-                                   define define/c define/. define//. define/memo define-formal define-monad
-                                   <- <-: <<- <<-: /. //. delay) 
-                 [program definition 
-                          expr...]
-                 [definition (define spec expr ...)
-                   (define/c spec expr ...)
-                   (define/. spec expr ...)
-                   (define//. spec expr ...)
-                   (define/memo spec expr ...)
-                   (define-formal frm ...)
-                   (define-monad id expr)
+                                   define define/c define/. define//. define/memo define-formal define-monad define-syntax-rule require test libname
+                                   ==> =error=> <- <-: <<- <<-: /. //. delay exn-pred name if cond boolean number symbol string formal) 
+                 [program def-or-expr...]
+                 [def-or-expr 
+                   definition 
+                   lib-require
+                   expr]
+                 [definition 
+                   (define spec expr ...+)
+                   (define/c spec fun-abstr)
+                   (define/. spec [patt ...+ --> expr] ...+)
+                   (define//. spec [patt ...+ <arr> expr] ...+)
+                   (define/memo spec expr ...+)
+                   (define-formal frm ...+)
+                   (define-monad name [#:kwd expr] ...+)
                    (define-syntax-rule spec expr)]
-                 [spec id (id id ...)]
-                 [frm id (id number)]
-                 [expr datum
-                       fun-expr
-                       monadic-expr
-                       literal
-                       delayed-expr]
-                 [fun-expr function 
-                           (f expr ...) 
-                           rewriting]
+                 [spec name (spec arg ...)]
+                 [arg name (name expr) (#:kwd name) (#:kwd name expr)]
+                 [frm name (name number)]
+                 [lib-require (require lib ...+)]
+                 [lib "filepath" libname]
+                 [expr datum 
+                       fexpr]
+                 [datum boolean number symbol string literal]
+                 [f-expr name
+                         fun-abstr
+                         fun-app
+                         local-binding
+                         control
+                         monadic-expr
+                         tests]
+                 [literal '(expr ...) 
+                          `(q-expr ...)]
+                 [q-expr expr ,expr ,@expr]
+                 [fun-abstr (λ spec expr ...+)
+                            (/. [patt ...+ --> expr] ...+)
+                            (//. [patt ...+ <arr> expr] ...+)]
+                 [patt datum 
+                       name 
+                       (name patt ...)
+                       (formal patt)
+                       (? f [name]) 
+                       (or patt ...+) 
+                       (and patt ...+) 
+                       _ 
+                       __k 
+                       ____]
+                 [<arr> --> -->.]
+                 [fun-app (f-expr expr ...)]
+                 [local-binding (let ([name expr] ...) expr)
+                                (let name ([name expr] ...) expr)
+                                (let* ([name expr] ...) expr)]
+                 [control (if expr expr expr)
+                          (cond [expr expr] ...)
+                          (cond [expr expr] ... [else expr])
+                          (delay expr)]
                  [monadic-expr (using spec expr ...)
                                (do op ...) 
                                (collect expr op ...)]
@@ -52,36 +86,16 @@ S-выражение может быть либо @emph{атомом}, либо 
                      (patt <<- expr)
                      (patt <<-: expr)
                      expr]
-                 [datum boolean number symbol string]
-                 [f form fun-expr]
-                 [literal '(expr ...) 
-                          `(q-expr ...)]
-                 [delayed-expr (delay expr)]
-                 [rewriting  
-                       (/. [patt ... --> expr] ...)
-                       (//. [patt ... <arr> expr] ...)]
-                 [q-expr expr ,expr ,@expr]
-                 [patt datum id (id patt ...) (? f [id]) (or patt ...) (and patt ...) _ __k ____]
-                 [<arr> --> -->.])
+                 [tests (test test-case ...)]
+                 [test-case (expr ==> expr)
+                            (expr =error=> exn-pred)
+                            expr])
 
 @itemize{
-@item{@emph{Программа} является последовательностью @emph{определений} @racket[_definition] и @emph{выражений} @racket[_expr].}
-
-@item{@emph{Определением} @racket[_definition] могут быть @emph{определения функций} @racket[define], @racket[define/c], @racket[define/.], @racket[define//.], @racket[define/memo],  @emph{определения формальных функций} @racket[define-formal], @emph{определения монад} @racket[define-monad] и @emph{определение синтаксических форм} @racket[define-syntax-rule].} 
+@item{@emph{Программа} является последовательностью @emph{определений} @racket[_definition], @emph{выражений} @racket[_expr] или @emph{зависимостей} @racket[_lib-require].}
  
-@item{@emph{Выражением} @racket[_expr] могут быть @emph{элементарные данные} @racket[_datum], 
-@emph{функциональное выражение} @racket[_fun-expr], @emph{монадическое вычисление} @racket[_monad-expr], 
-@emph{квотированное выражение} @racket[_literal], 
-@emph{отложенное вычисление} @racket[_delayed-expr].}
-
-@item{@emph{Функциональным выражением} @racket[_fun-expr] могут быть @emph{имя функции} @racket[_function], 
-@emph{аппликация} @racket[(_f _expr ...)], или
-@emph{подстановка} @racket[_rewrite].}
-
-@item{@emph{Монадическое вычисление} @racket[_monadic-expr] может быть 
-       @emph{указание на монаду} @racket[(using ...)],
-       @emph{последовательностью вычислений} @racket[(do ...)], 
-       или генератором последовательности @racket[(collect ...)].}
+@item{@emph{Выражением} @racket[_expr] могут быть @emph{элементарные данные} @racket[_datum] или @emph{функциональное выражение} @racket[_fun-expr].}
+@item{@emph{Функциональным выражением} @racket[_fun-expr] могут быть @emph{имя функции} @racket[_name], @emph{абстракция} @racket[_fun-abstr], @emph{аппликация} @racket[_fun-app], @emph{локальное связывание} @racket[_local-binding], @emph{управляющая конструкция} @racket[_control], @emph{монадическое вычисление} @racket[_monad-expr] или набор тестов @racket[_tests].}
 
 @item{Элементарные данные могут быть
  @itemize{
@@ -96,21 +110,4 @@ S-выражение может быть либо @emph{атомом}, либо 
    @item{@emph{символом} --- последовательностью знаков, не включающих пробел и
    @litchar{" , ' ` ( ) [ ] { } | ; #}.}
    @item{@emph{строкой} --- последовательностью знаков, ограниченной символами @litchar{"}, 
-     например, @racket["abc"], @racket["a sentence\n"].}}}
-
-@item{Аппликация --- это применение к последовательности аргументов @racket[_expr ...]
-  @emph{специальной формы} @racket[_form] или любого выражения,
- которое, будучи вычисленным, возвращает функцию @racket[_fun-expr].}
-
-@item{@emph{Квотированное выражение} @racket[_literal] --- это невычисляемое S-выражение, 
-       образованное с помощью кавычек @litchar{' `} или 
-       форм @racket[quote] и @racket[quasiquote].
-       
-       В форме  @racket[quasiquote] возможно вычисление частей выражения,
-       отмеченных с помощью символов @litchar{,} и @litchar{@"@",}.}
-
-
-@item{@emph{Подстановка} @racket[_replace] определяет систему правил переписывания, использующих
-       @elemref["t:patt"]{@emph{шаблоны}} @racket[_patt] и @emph{стрелки} @racket[_<arr>].}
-
-}
+     например, @racket["abc"], @racket["a sentence\n"].}}}}
