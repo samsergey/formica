@@ -189,8 +189,8 @@ Returns @centered[@tt{(argmap and p).}]
 
 Examples:
 @interaction[#:eval formica-eval
-  ((all-args real?) 2 -3 4.5)
-  ((all-args real?) 2 'x 4.5)]
+  ((all-args Real) 2 -3 4.5)
+  ((all-args Real) 2 'x 4.5)]
 
 
 @defproc[(any-args [f unary?]) Fun]
@@ -198,8 +198,8 @@ Returns function @centered[@tt{(argmap or p).}]
 
 Examples:
 @interaction[#:eval formica-eval
-  ((any-args real?) '(1 2) 'a "abc" 1-2i)
-  ((any-args real?) 'x 2 "abc" 0+8i)]
+  ((any-args Real) '(1 2) 'a "abc" 1-2i)
+  ((any-args Real) 'x 2 "abc" 0+8i)]
 
 
 @defproc*[([(curry [f Fun] [arg Any] ...) (or/c curried? Any)]
@@ -229,7 +229,7 @@ The @racket[curry] (@racket[curried]) and @racket[curryr] (@racket[r-curried]) f
   (procedure-arity (curryr cons 1))
   (procedure-arity (curry + 1 2 3))]
 
-@defproc[(curried? [x Any]) boolean?]
+@defproc[(curried? [x Any]) Bool]
 Returns @racket[#t] if @racket[x] is partially applied or curried function, and @racket[#f] otherwise.
 
 Examples:
@@ -239,7 +239,7 @@ Examples:
   (curried (curryr +))
   (curried? +)]
 
-@defproc[(fixed-point [f Fun] [#:same-test same? (any/c any/c -> boolean?) equal?]) Fun]
+@defproc[(fixed-point [f Fun] [#:same-test same? (Any Any → Bool) equal?]) Fun]
 Returns a function @centered[@tt{x  = (f (f (f ... (f x))))}]
 which finds a least fixed point of @racket[_f] by iterative application,
 while result keeps changing in the sense of the @racket[_same?] function.

@@ -54,5 +54,5 @@ Any checkers provided by @racket[rackunit] library could be used in the @racket[
  (test
   "tests from rack-unit"
   (car (cons 2 3)) ==> 2
-  (check-pred symbol? 'a)
+  (check-pred Sym 'a)
   (check < 2 3))]

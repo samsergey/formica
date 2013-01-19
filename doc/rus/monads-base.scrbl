@@ -19,8 +19,8 @@
 
 Монады являются объектами первого класса. Следующая функция возвращает анонимную монаду, которую можно использовать в замыканиях для создания параметризованных монад.
 
-@defproc[(monad [#:return return (Any → Any)]
-                [#:bind bind (Any (Any → Any) → Any)]
+@defproc[(monad [#:return return Fun]
+                [#:bind bind (Any unary? → Any)]
                 [#:mzero mzero Any 'undefined]
                 [#:mplus mplus (Any Any → Any) 'undefined]
                 [#:type type contract? #f]
@@ -43,8 +43,8 @@
              [#:type type]
              [#:failure failure])]
          #:contracts ([m-expr monad?]
-                      [return (Any → Any)]
-                      [bind (Any (Any → Any) → Any)]
+                      [return Fun]
+                      [bind (Any unary? → Any)]
                       [mzero Any]
                       [mplus (Any Any → Any)]
                       [type contract?]
@@ -340,8 +340,8 @@
 
 @section[#:tag "monad:fun"]{Монадические функции и операторы}
 
-@defproc[(return [x Any]) any]
-Функция «возвращения» (втягивания) величины в монаду.
+@defproc[(return [x Any] ...) any]
+Функция «возвращения» (втягивания) величин в монаду.
 
 Примеры:
 @interaction[#:eval formica-eval
@@ -442,7 +442,7 @@
      (tell "x: ~a\ty: ~a\n" x y)
      (< x y)))]
 
-@defproc[(guardf [pred (Any --> Bool)]) any]
+@defproc[(guardf [pred unary?]) any]
 Охраняющая функция.  Определена для функций, имеющих нейтральный элемент.
 
 @centered{@racket[(guardf _pred) = (bind (guard (_pred _x)) >> (return _x))]}
@@ -468,7 +468,7 @@
    (stream-first 
     (sequence/m (list '(a) 3 (stream 'x (/ 0))))))]
 
-@defproc[(map/m [f (Any Any → Any)] [lst list?]) Any]
+@defproc[(map/m [f unary?] [lst list?]) Any]
 Монадическое отображение.
 
 @racketblock[map/m _f = sequence/m ∘ (map _f)]
@@ -478,7 +478,7 @@
  (using List
    (map/m Sqrt '(1 4 9)))]
 
-@defproc[(fold/m [f (Any Any → Any)] [x0 Any] [lst list?]) Any]
+@defproc[(fold/m [f binary?] [x0 Any] [lst list?]) Any]
 Монадическая свёртка.
 
 @racketblock[(fold/m _f _x0 '()) = (return _x0)
@@ -495,7 +495,7 @@
            0 
            '(1 2 3)))]
 
-@defproc[(filter/m [f (Any Any → Any)] [x0 Any] [lst list?]) Any]
+@defproc[(filter/m [f unary?] [x0 Any] [lst list?]) Any]
 Монадический фильтр.
 
 @racketblock[(filter/m _pred '()) = (return '())

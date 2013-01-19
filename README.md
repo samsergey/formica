@@ -8,7 +8,7 @@ Introduction
 
 The Formica dialect was created for educational purpose while teaching the "Functional and logic programming" undergraduate course in the Kamchatka State Technical University (Russia).
 
-Formica is based on the [Racket programming language](http://planet.racket-lang.org/), famous by it's educational and practical use.
+Formica is based on the [Racket programming language](http://planet.racket-lang.org/), famous by it's educational and practical use, and could be considered as a Racket teachpack.
 
 
 Why Racket?

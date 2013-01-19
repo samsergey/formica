@@ -21,9 +21,9 @@ cd formica
 eng:
 	# Making english version
 	cat plt/info-eng.rkt > info.rkt
-	raco setup
+	raco setup -p formica && raco setup -U
 
 rus: 
 	# Making russian version
 	cat plt/info-rus.rkt > info.rkt
-	raco setup
+	raco setup -p formica && raco setup -U

@@ -31,7 +31,7 @@
 
 @section[#:tag "contracts:functions"]{Определение сигнатур}
 
-@margin-note{Переопределена в модуле @racket[formica/contract]}
+
 @defform*[#:literals (? ..)
    [(-> dom ... range)
     (-> dom ... rest .. range)
@@ -58,7 +58,7 @@
 Сигнатура функции может быть указана либо при её определении, с помощью формы @racket[::],
 либо при экспортировании функции, с помощью формы @racket[contract-out].
 
-@margin-note{Определена в модуле @racket[formica/contract]}
+
 @defform[(:: f sig definitions ...)]
 Связывает сигнатуру @racket[_sig] с функцией @racket[_f], определяемой в одном из выражений
 @racket[_definitions ...]. Сигнатура может включать в себя свободные символы,

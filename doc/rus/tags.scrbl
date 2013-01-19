@@ -32,12 +32,12 @@
 и имеет метку @racket[_t], в противном случае -- @racket[#f].
 
 @defproc*[[[(set-tag [t Sym]) (-> Fun tagged?)]
-           [(set-tag [t Sym] [n (or/c symbol? #f)]) (Fun -> tagged?)]]]
+           [(set-tag [t Sym] [n (or/c Sym #f)]) (Fun → tagged?)]]]
 Возвращает оператор, помечающий функцию меткой @racket[_t].
 Если указано имя @racket[_n], то функция будет переименована.
 
 @defproc*[[[(set-tag* [t Sym]) (-> Fun Fun)]
-           [(set-tag* [t Sym] [n (or/c symbol? #f)]) (Fun -> Fun)]]]
+           [(set-tag* [t Sym] [n (or/c Sym #f)]) (Fun → Fun)]]]
 Возвращает оператор, добавляющий к имени функции метку @racket[_t]. 
 При этом переименованная функция не является помеченной.
 Если указано имя @racket[_n], то функция будет переименована.

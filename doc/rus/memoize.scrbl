@@ -20,7 +20,7 @@
 этих аргументов.}
 
 
-@margin-note{Определена в библиотеке @racket[formica/memoize]}
+
 @defform*[((define/memo (f var ...) body ...)
           (define/memo f (λ (var ...) body ...)))]
 Определяет мемоизированную функцию @racket[_f].
@@ -34,7 +34,7 @@
   (f 2)
   (f 3)]
 
-@margin-note{Определена в библиотеке @racket[formica/memoize]}
+
 @defproc[(memoized [f Fun]) memoized?]
 Возвращает мемоизированный вариант функции @racket[f].
 
@@ -45,7 +45,7 @@
   (current-inexact-milliseconds)
   (g)]
 
-@margin-note{Определена в библиотеке @racket[formica/memoize]}
+
 @defproc[(memoized? [f Fun]) Bool]
 Возвращает @racket[#t], если @racket[_f] является мемоизированной функцией
 и @racket[#f] --- в любом другом случае.

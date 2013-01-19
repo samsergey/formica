@@ -20,7 +20,7 @@
 @elemtag["t:rewrite"]{@emph{Подстановкой}} будем называть набор правил переписывания, которые применяются к S-выражению 
 или его частям.
 
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform/subs[#:literals (--> => ?)(rewrite rule-spec ...) 
 ([rule-spec (pat ... --> expr) 
             (pat ... --> (=> id) expr) 
@@ -59,12 +59,12 @@
 продолжается процесс сопоставления, как если бы аргументы не 
 сопоставились с образцом. В противном случае, применяется соответствующее образцу правило. 
 
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform[(rewrite-all rule-spec ...)]{
 Преобразуется в функцию, которая, будучи применённой к списочной структуре, 
 применяет подстановки, заданные @racket[rule-spec], ко всем частям списка. 
 Если ни одно из правил не может быть применено, выражение возвращается без изменений.}
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform[(/. rule-spec ...)]{Сокращённая запись формы @racket[rewrite-all].}
 
 Примеры:
@@ -78,13 +78,13 @@
 Примеры:
 @interaction[#:eval formica-eval
                 (define g 
-                  (/. (? number? x) --> (* x x) 
+                  (/. (? Num x) --> (* x x) 
                       x y --> (* x y)))
                 (g 4)
                 (g '(4 5))
                 (g 4 5)]
 
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform[(define/. id rule-spec ...)]{Трансформируется в выражение @racket[(define id (/. rule-spec ...))].}
 
 @section[#:tag-prefix "rewrite"]{Итеративные подстановки}
@@ -102,7 +102,7 @@
  @item{после применения терминального правила,}
   @item{если в результате подстановки данные не изменяются.}}
 
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform/subs[#:id rewrite-repeated #:literals (--> -->. => ?) (rewrite-repeated rule-spec ...) 
 ([rule-spec (pat ... ar expr) 
 (pat ... ar (=> id) expr) 
@@ -113,12 +113,12 @@
 
 Стрелки  @racket[-->] и  @racket[-->.] соответствуют регулярным и терминальным переписывающим правилам соответственно.
 
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform[(rewrite-all-repeated rule-spec ...)]
 Трансформируется в функцию, итерационно применяющую правила
 @racket[rule-spec] ко всем частям переданного ей аргумента.
 
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform[(//. rule-spec ...)]
 Сокращённая форма для @racket[rewrite-all-repeated].   
 
@@ -133,7 +133,7 @@
                           'b --> 'c
                           'c --> 'a) '(a b c))]
 
-@margin-note{Определена в библиотеке @racket[formica/rewrite]}
+
 @defform[(define//. id rule-spec ...)]{Трансформируется в выражение @racket[(define id (//. rule-spec ...))].}
 
 @section[#:tag "patt"]{Образцы и шаблоны}

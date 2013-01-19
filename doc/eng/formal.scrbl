@@ -142,7 +142,7 @@ Besides, formal functions could be useful in general. For example in exploring f
 ([f-spec
    id
    (id arity-spec)])
- #:contracts ([id symbol?]
+ #:contracts ([id Sym]
               [arity-spec procedure-arity?])]
 
 Defines @tech{formal functions}, according to specifications @racket[_f-spec ...], where

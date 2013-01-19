@@ -25,7 +25,7 @@
 
 @section[#:tag "formal applications"]{Определение формальных функций}
 
-@margin-note{Определена в библиотеке @racket[formica/formal]}
+
 @defform/subs[(define-formal f-spec ...) 
 ([f-spec
    id
@@ -71,7 +71,7 @@
   ((/. (g a b) --> (list a b)) (g 1 2))
   ((/. (g a) --> a) (g 1 2))]
 
-@margin-note{Определена в библиотеке @racket[formica/formal]}
+
 @deftogether[(
               @defproc[(hold [f (or/c Fun Sym)] [arity procedure-arity? (arity-at-least 0)]) formal-function?]
               @defthing[#:kind "alias" $ hold])]
@@ -95,7 +95,7 @@
   (($ f 2) 1 2 3)]
 
 @defproc[(formal-function? [x Any]) Bool]
-Возвращает @racket[#t], если @racket[_x] является @tech{formal function}, и @racket[#f] -- в противном случае.
+Возвращает @racket[#t], если @racket[_x] является формальной функцией, и @racket[#f] -- в противном случае.
 
 Примеры:
 @interaction[#:eval formica-eval
@@ -106,7 +106,7 @@
 
 @section{Идентификация формальных аппликаций}
 
-@margin-note{Определена в библиотеке @racket[formica/formal]}
+
 @defproc[(formal? [v Any]) Bool]
 Возвращает @racket[#t], если @racket[_v] является формальной аппликацией.
 
@@ -127,3 +127,7 @@
      
   ((/. (formal (F args ...)) --> `(function: ,F arguments: ,args))
    '(F 1 2))]
+
+
+@defproc[(n/f-list? [v Any]) Bool]
+Возвращает @racket[#t], если @racket[_v] является списком, но не формальной аппликацией.

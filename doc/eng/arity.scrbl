@@ -24,7 +24,7 @@ In the reference guide to the Formica language following terminology concerned t
           
           
           
-@defproc[(fixed-arity? [v Any]) boolean?]
+@defproc[(fixed-arity? [v Any]) Bool]
 Returns @racket[#t] if @racket[_v] is a function having @tech{fixed arity}, and @racket[#f] otherwise.
 
 Examples:
@@ -36,7 +36,7 @@ Examples:
   (fixed-arity? +)]
 
 
-@defproc[(variadic? [v Any]) boolean?]
+@defproc[(variadic? [v Any]) Bool]
 Returns @racket[#t] if @racket[_v] is @tech{variadic} function, and @racket[#f] otherwise.
 
 Examples:
@@ -49,7 +49,7 @@ Examples:
   (variadic? cons)
   (variadic? +)]
 
-@defproc[(polyadic? [v Any]) boolean?]
+@defproc[(polyadic? [v Any]) Bool]
 Returns @racket[#t] if @racket[_v] is @tech{polyadic} function, and @racket[#f] otherwise.
 
 Examples:
@@ -62,7 +62,7 @@ Examples:
   (polyadic? cons)
   (polyadic? +)]
 
-@defproc[(nullary? [v Any]) boolean?]
+@defproc[(nullary? [v Any]) Bool]
 Returns @racket[#t] if @racket[_v] is a function and arity of @racket[_v] includes 0, and @racket[#f] otherwise.
 
 Examples:
@@ -76,7 +76,7 @@ Examples:
   (nullary? cons)
   (nullary? +)]
 
-@defproc[(unary? [v Any]) boolean?]
+@defproc[(unary? [v Any]) Bool]
 Returns @racket[#t] if @racket[_v] is a function and arity of @racket[_v] includes 1, and @racket[#f] otherwise.
 
 Examples:
@@ -91,7 +91,7 @@ Examples:
   (unary? cons)
   (unary? +)]
 
-@defproc[(binary? [f Any]) boolean?]
+@defproc[(binary? [f Any]) Bool]
 Returns @racket[#t] if @racket[_v] is a function and arity of @racket[_v] includes 2, and @racket[#f] otherwise.
 
 Examples:
@@ -106,7 +106,7 @@ Examples:
   (binary? cons)
   (binary? +)]
 
-@defproc[(min-arity [f Fun]) (or/c 0 positive?)]
+@defproc[(min-arity [f Fun]) Nat]
 Returns the minimal arity of a function @racket[#t].
 
 Examples:
@@ -120,7 +120,7 @@ Examples:
   (min-arity cons)
   (min-arity +)]
 
-@defproc[(max-arity [f Fun]) (or/c 0 positive? +inf.0)]
+@defproc[(max-arity [f Fun]) (or/c Nat +inf.0)]
 Returns the maximal arity of a function @racket[#t].
 
 Examples:

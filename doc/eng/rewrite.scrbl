@@ -55,7 +55,7 @@ Rewriting rules used as lambda-functions:
 Rewriting is done at any level of a list structure:
 @interaction[
              #:eval formica-eval
-                    ((/. (? number? x) --> (* x x)) '(1 (2 3) 4))]
+                    ((/. (? Num x) --> (* x x)) '(1 (2 3) 4))]
 
 Rewriting rules accept any pattern recognized by @racket[match] form:
 @interaction[
@@ -155,7 +155,7 @@ Only unary rules could be applied to subexpressions.
 At the same time multiary rules could be applied to a sequence of input arguments.
 @examples[#:eval formica-eval
                 (define g 
-                  (/. (? number? x) --> (* x x) 
+                  (/. (? Num x) --> (* x x) 
                       x y --> (* x y)))
                 (g 4)
                 (g '(4 5))

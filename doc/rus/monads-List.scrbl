@@ -133,7 +133,7 @@
   (concatenate (in-set (set 'x 'y 'z)) (in-value 8))
   (concatenate 1 2 3)]
 
-@defproc[(concat-map (f (any/c → n/f-list?)) (s listable?)) list?]
+@defproc[(concat-map (f (Any → n/f-list?)) (s listable?)) list?]
 Применяет функцию @racket[_f] к элементам последовательности @racket[_s] и возвращает объединение результатов в виде списка.
 
 Примеры:
@@ -203,7 +203,7 @@
    (stream-concatenate (stream 1 (/ 0)) (in-naturals)) 
    1)]
 
-@defproc[(stream-concat-map (f (any/c → stream?)) (s listable?)) stream?]
+@defproc[(stream-concat-map (f (Any → stream?)) (s listable?)) stream?]
 Лениво применяет функцию @racket[_f] к элементам последовательности @racket[_s] и возвращает объединение результатов.
 
 Примеры:
@@ -303,7 +303,7 @@
                            #:mplus amb-union
                            #:map amb-union-map)}
 
-@defproc[(amb (v any/c) ...) stream?]
+@defproc[(amb (v Any) ...) stream?]
 Возвращает поток уникальных агрументов @racket[_v ...].
 
 Примеры:
@@ -327,7 +327,7 @@
    (amb-union (amb 1 (/ 0)) (in-naturals)) 
    1)]
 
-@defproc[(amb-union-map (f (any/c → stream?)) (s listable?)) stream?]
+@defproc[(amb-union-map (f (Any → stream?)) (s listable?)) stream?]
 Применяет функцию @racket[_f] к элементам последовательности @racket[_s] и возвращает поток уникальных результатов.
 
 Примеры:

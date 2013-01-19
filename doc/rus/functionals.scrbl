@@ -293,7 +293,7 @@
 
 
  
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @deftogether[[
  @defproc[(negated (p Fun)) Fun]
   @defthing[#:kind "alias" ¬ negated]]]
@@ -308,7 +308,7 @@
   (define ≥ (¬ <))
   (map ≥ '(1 2 3) '(3 2 1))]
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @defproc[(flipped [f Fun]) Fun]
 Возвращает функцию, функционально-эквивалентную @racket[_f], но принимающую 
 аргументы в обратном порядке.
@@ -320,35 +320,35 @@
   (snoc 1 2)
   ((flipped list) 1 2 3)]
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @defproc[(fif [p Fun] [f Fun] [g Fun]) Fun]
-Возвращает функцию @tt{x y ... -> (if (p x y ...) (f x y ...) (g x y ...))}.
+Возвращает функцию @tt{x y ... → (if (p x y ...) (f x y ...) (g x y ...))}.
 
 Примеры:
 @interaction[#:eval formica-eval
   (map (fif odd? sub1 id) '(1 2 3 4))]
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @defproc[(andf [f Fun] [g Fun] ...) Fun]
-Возвращает функцию @tt{x y ... -> (and (f x y ...) (g x y ...) ...)}.
+Возвращает функцию @tt{x y ... → (and (f x y ...) (g x y ...) ...)}.
 
 Примеры:
 @interaction[#:eval formica-eval
   (map (andf integer? positive?) '(-3/5 -1 0 2 4.2))]
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @defproc[(orf [f Fun] [g Fun] ...) Fun]
-Возвращает функцию @tt{x y ... -> (or (f x y ...) (g x y ...) ...)}.
+Возвращает функцию @tt{x y ... → (or (f x y ...) (g x y ...) ...)}.
 
 Примеры:
 @interaction[#:eval formica-eval
   (map (orf integer? positive?) '(-3/5 -1 2 4.2))]
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @deftogether[[
  @defproc[(argmap [f Fun] [g unary?]) Fun]
   @defthing[#:kind "alias" /@ argmap]]]
-Возвращает функцию @tt{x y ... -> (f (g x) (g y) ...)}.
+Возвращает функцию @tt{x y ... → (f (g x) (g y) ...)}.
 
 Функция @racket[argmap] иеет псевдоним: @racket[/@]
 
@@ -357,7 +357,7 @@
   ((argmap cons sqr) 2 3)
   ((/@ + magnitude) -2 3 4-7i)]
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @defproc[(fixed-point [f Fun]) Fun]
 Возвращает функцию, отыскивающую неподвижную точку функции @racket[_f] с помощью 
 итеративной аппликации. Для любого аргумента @racket[x], она

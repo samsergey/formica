@@ -136,7 +136,7 @@ Examples:
   (concatenate (in-set (set 'x 'y 'z)) (in-value 8))
   (concatenate 1 2 3)]
 
-@defproc[(concat-map (f (any/c → n/f-list?)) (s listable?)) list?]
+@defproc[(concat-map (f (Any → n/f-list?)) (s listable?)) list?]
 Applies @racket[_f] to elements of @racket[_s] and returns the concatenation of results.
 
 Examples:
@@ -228,7 +228,7 @@ Examples:
    (stream-concatenate (stream 1 (/ 0)) (in-naturals)) 
    1)]
 
-@defproc[(stream-concat-map (f (any/c → stream?)) (s listable?)) stream?]
+@defproc[(stream-concat-map (f (Any → stream?)) (s listable?)) stream?]
 Applies @racket[_f] to elements of @racket[_s] and lazily returns the concatenation of results.
 
 Examples:
@@ -328,7 +328,7 @@ Definition:
                          #:mplus amb-union
                          #:map amb-union-map)}
 
-@defproc[(amb (v any/c) ...) stream?]
+@defproc[(amb (v Any) ...) stream?]
 Returns a stream of arguments @racket[_v] removing duplicates (in terms of @racket[equal?]).
 
 Examples:
@@ -352,7 +352,7 @@ Examples:
    (amb-union (amb 1 (/ 0)) (in-naturals)) 
    1)]
 
-@defproc[(amb-union-map (f (any/c → stream?)) (s listable?)) stream?]
+@defproc[(amb-union-map (f (Any → stream?)) (s listable?)) stream?]
 Applies @racket[_f] to elements of @racket[_s] and lazily returns the union of results.
 
 Examples:

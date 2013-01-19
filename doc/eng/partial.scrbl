@@ -17,7 +17,7 @@
 
 The bindings documented in this section are provided by the @racket[formica/partial-app] library and @racket[formica] language.
 
-In order to get Formica language without syntax for partial application, use @racket{#lang formica/regular-app} at the header of the file or @racket[(require formica/regular-app)]. It will load all bindings from  @racket[formica] language except for those provided in @racket[formica/partial-app] library.
+In order to get Formica language without syntax for partial application, use @para[@tt{#lang formica/regular-app}] at the header of the file or @racket[(require formica/regular-app)]. It will load all bindings from  @racket[formica] language except for those provided in @racket[formica/partial-app] library.
 
 One feature which makes @emph{Formica} different from @emph{Racket}, is simplified syntax for @deftech{partial application}, which is close to @emph{Haskell}'s sections.
 

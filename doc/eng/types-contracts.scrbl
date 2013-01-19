@@ -29,14 +29,14 @@ Any constant which belongs to a @tech{primitive type} could be used as a contrac
 
 Any predicate could be used as a contract:
 @interaction[#:eval formica-eval
- (contract? number?)
+ (contract? Num)
  (contract? procedure-arity?)
  (contract? cons)]
 
 Contracts could be constructed using @tech{contract combinators}:
 @interaction[#:eval formica-eval 
  (contract? (and/c integer? positive?))
- (contract? (or/c number? (cons: number? number?)))]
+ (contract? (or/c Num (cons: Num Num)))]
 
 @defform[(is v type-pred) #:contracts ([v Any] [type-pred contract?])]
 Provides safe type check. Returns @racket[#t] if @racket[_v] belongs to a type, defined by the contract @racket[_type-pred], and @racket[#f] otherwise.
@@ -46,7 +46,7 @@ This form differs from direct contract application in following:
          @item{if application of @racket[_type-pred] leads to exception, the @racket[is] form does not stop running the program and returns @racket[#f].}}
 
 @interaction[#:eval formica-eval
- (is 'abc symbol?)
+ (is 'abc Sym)
  (is 'abc 'abc)
  (is 1.2 odd?)]
 
@@ -59,7 +59,7 @@ For example number @racket[5] belongs to:
 @itemize{@item{the unit type @racket[5]:
            @interaction[#:eval formica-eval (is 5 5)]}          
          @item{the numeric type:
-           @interaction[#:eval formica-eval (is 5 number?)]}
+           @interaction[#:eval formica-eval (is 5 Num)]}
          @item{the integer number type:
            @interaction[#:eval formica-eval (is 5 integer?)]}
          @item{the numeric type "odd number":

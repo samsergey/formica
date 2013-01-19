@@ -61,7 +61,7 @@
     [(odd? 3) 3]
     [else (/ 0)])]
 
-@margin-note{Переопределена в библиотеке @racket[formica/tools]}
+
 @defform[(or expr ...)]
 Оператор дизъюнкции. 
 По очереди вычисляет выражения @racket[_expr ...], и, как только одно из них возвращает @racket[#t] или 
@@ -80,7 +80,7 @@
  (map or '(#t #f #t #f) '(#t #t #f #f))
  (foldr (∘ or odd?) #f '(2 4 5 6 8))]
 
-@margin-note{Переопределена в библиотеке @racket[formica/tools]}
+
 @defform[(and expr ...)]
 Оператор конъюнкции. 
 По очереди вычисляет выражения @racket[_expr ...], и, как только одно из них возвращает @racket[#f],

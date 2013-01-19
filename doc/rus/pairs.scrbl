@@ -140,7 +140,7 @@
 
 Приведём некоторые часто используемые функции для создания и обработки списков:
 
-@margin-note{Определена в модуле @racket[formica/tools].}
+
 @defproc*[[[(range [n Real]) (listof Real)]
            [(range [n Real] [m Real]) (list: Real ..)]
            [(range [n Real] [m Real] [step Real]) (list: Real ..)]]]
@@ -179,7 +179,7 @@
  (foldr f 'x0 '(a b c) '(x y z))
  (foldl f 'x0 '(a b c) '(x y z))]
 
-@defproc[(filter [f (Any -> Bool)] [lst list?]) list?]
+@defproc[(filter [f (Any → Bool)] [lst list?]) list?]
 Функция фильтрации списка @racket[_lst] с помощью
 функции @racket[_f].
 

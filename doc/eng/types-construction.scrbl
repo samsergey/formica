@@ -226,6 +226,6 @@ Sum of elements (for numeric entries):
    (define (total t)
      (cond
        [(is t (Tree Num)) (tfold + 0 id t)]
-       [else (error "total: The argument must be a (Tree number?). Given" t)]))
+       [else (error "total: The argument must be a (Tree Num). Given" t)]))
    (total A)
    (total B)]

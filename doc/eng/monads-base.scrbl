@@ -20,7 +20,7 @@
 Monads are first-class objects in Formica. Following function returns anonymous monad which could be used to create parameterized monads as mixins.
 
 @defproc[(monad [#:return return (Any → Any)]
-                [#:bind bind (Any (Any → Any) → Any)]
+                [#:bind bind (Any unary? → Any)]
                 [#:mzero mzero Any 'undefined]
                 [#:mplus mplus (Any Any → Any) 'undefined]
                 [#:type type contract? #f]
@@ -44,7 +44,7 @@ If the @racket[_failure] function is given, it will be called in case of failure
              [#:failure failure])]
          #:contracts ([m-expr monad?]
                       [return (Any → Any)]
-                      [bind (Any (Any → Any) → Any)]
+                      [bind (Any unary? → Any)]
                       [mzero Any]
                       [mplus (Any Any → Any)]
                       [type contract?]
@@ -348,7 +348,7 @@ The @racket[(undefined)] object could be used as the @emph{unit type} @tt{()} in
 
 @section{Monadic functions and operators}
 
-@defproc[(return [x Any]) any]
+@defproc[(return [x Any] ...) any]
 The unit function of @tech{currently used monad}.
 
 Examples:
@@ -456,7 +456,7 @@ Using @racket[guard] it is possible to perform a backtracking search:
 
 For more examples see @filepath{nondeterministic.rkt} file in the @filepath{examples/} folder.
 
-@defproc[(guardf [pred (Any --> Bool)]) any]
+@defproc[(guardf [pred unary?]) any]
 Guarding function. Defined for monads with zero.
 
 @centered{@racket[(guardf _pred) = (bind (guard (_pred _x)) >> (return _x))]}

@@ -28,11 +28,11 @@ Returns a tag of a tagged function @racket[_f].
 @defproc[(check-tag [f tagged?] [t Any]) Bool]
 Returns @racket[#t] if @racket[_f] is a tagged function and has tag @racket[_t], otherwise returns @racket[#f].
 
-@defproc[(set-tag [t Sym] [n (or/c symbol? #f) #f]) (Fun -> tagged?)]
+@defproc[(set-tag [t Sym] [n (or/c Sym #f) #f]) (Fun → tagged?)]
 Returns an operator, which sets a tag  @racket[_t] to given function.
 If name @racket[_n] is given, tagged function will be renamed.
 
-@defproc[(set-tag* [t Sym] [n (or/c symbol? #f) #f]) (Fun -> Fun)]
+@defproc[(set-tag* [t Sym] [n (or/c Sym #f) #f]) (Fun → Fun)]
 Returns an operator, which adds symbol @racket[_t] to function name. 
 The result is not a tagged function. If name @racket[_n] is given, the function will be renamed.
 

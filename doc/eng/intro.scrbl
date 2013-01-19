@@ -46,15 +46,15 @@ Together with pattern-matching and @tech{rewriting} technique, formal functions 
 
 @subsection{Rewriting:}
   
-Suppose we have to define a function f that, if it receives 1 returns 0 and if it returns 0 returns 1. If all rules fail the argument is left unchanged:
+Suppose we have to define a function that, if it receives 1 returns 0 and if it returns 0 returns 1. If all rules fail the argument is left unchanged:
 @def+int[#:eval formica-eval
-(define f 
+(define r 
   (rewrite 1 --> 0
            0 --> 1))
-(f 0)
-(f 1)
-(f 'x)
-(f '(0 1))]
+(r 0)
+(r 1)
+(r 'x)
+(r '(0 1))]
 
 This function rewrites @racket[1] to @racket[2], @racket[3] to @racket[4], and @racket[4] to @racket[1] anywhere in a list.
 @def+int[#:eval formica-eval
@@ -78,7 +78,7 @@ A rewriting-based definition of the @racket[map] function:
   (define/. map
     _ '()        --> '()
     f (cons h t) --> (cons (f h) (map f t)))
- (map ($ f) '(a b c))]
+ (map ($ 'f) '(a b c))]
 
 Here is a simple implementation of symbolic η- and β-reduction rules for λ-calculus:
 @#reader scribble/comment-reader

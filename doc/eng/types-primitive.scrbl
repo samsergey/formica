@@ -15,7 +15,7 @@
 
 A value belongs to a @deftech{primitive type} if it belongs either to
 @itemize{@item{a data type, defined by corresponding predicate (@racket[boolean?],
-         @racket[number?], @racket[real?], @racket[integer?],
+         @racket[Num], @racket[real?], @racket[integer?],
          @racket[positive?], @racket[string?], @racket[symbol?] etc.),}
          @item{or to a @emph{functional type}.}}
 
@@ -33,7 +33,7 @@ could be declared using @tech{function signatures}.
 Some frequently used primitive types have short names, which denote sets, defined by predicates. They could be used in type definitions, signatures and contracts.
 
 @defthing[Bool contract?] defines a set of boolean values. Equivalent to @racket[boolean?].
-@defthing[Num contract?] defines a set of numeric values. Equivalent to @racket[number?].
+@defthing[Num contract?] defines a set of numeric values. Equivalent to @racket[Num].
 @defthing[Real contract?]  defines a set of real numbers. Equivalent to @racket[real?].
 @defthing[Int contract?]  defines a set of integer numbers. Equivalent to @racket[integer?].
 @defthing[Nat contract?]  defines a set of natural numbers.

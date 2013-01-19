@@ -15,7 +15,7 @@
 
 @title[#:tag "testing"]{Тестирование}
 
-@margin-note{Определена в библиотеке @racket[formica/testing]}
+
 @defform/subs[#:literals (==> =error=>)
  (test tst-spec ...)
  ([tst-spec (expr ==> res)

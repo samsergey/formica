@@ -45,7 +45,7 @@ Formica --- язык со @emph{строгой динамической типи
 использовано, как контракт, и @racket[#f] --- во всех других случаях.
 
 @interaction[#:eval formica-eval
- (contract? number?)
+ (contract? Num)
  (contract? Num)
  (contract? (and/c integer? positive?))
  (contract? cons)]
@@ -57,7 +57,7 @@ Formica --- язык со @emph{строгой динамической типи
  (contract? 5)
  (contract? 'abc)]
 
-@margin-note{Определена в модуле @racket[formica/types]}
+
 @defform[(is v type-pred) #:contracts ([v Any] [type-pred contract?])]
 Возвращает @racket[#t], если @racket[_v] принадлежит типу,
 определяемому контрактом @racket[_type-pred], и @racket[#f] --- во всех других случаях.
@@ -67,7 +67,7 @@ Formica --- язык со @emph{строгой динамической типи
          @item{если аппликация предиката @racket[_type-pred] к величине @racket[_v] приводит к ошибке, возвращает @racket[#f] не останавливая выполнения программы.}}
 
 @interaction[#:eval formica-eval
- (is 'abc symbol?)
+ (is 'abc Sym)
  (is 'abc 'abc)
  (is 1.2 odd?)]
 
@@ -80,8 +80,8 @@ Formica --- язык со @emph{строгой динамической типи
 Так, например, число @racket[5] одновременно принадлежит следующим типам:
 @itemize{@item{единичному типу @racket[5]:
            @interaction[#:eval formica-eval (is 5 5)]}          
-         @item{числовому типу, определяемому предикатом @racket[number?]:
-           @interaction[#:eval formica-eval (is 5 number?)]}
+         @item{числовому типу, определяемому предикатом @racket[Num]:
+           @interaction[#:eval formica-eval (is 5 Num)]}
          @item{числовому типу "целое число", определяемому предикатом @racket[integer?]:
            @interaction[#:eval formica-eval (is 5 integer?)]}
          @item{числовому типу "нечётное число", определяемому предикатом @racket[odd?]:
@@ -113,9 +113,9 @@ Formica --- язык со @emph{строгой динамической типи
 
 Некоторые часто используемые простые типы имеют краткие обозначения. Они могут рассматриваться, как имена множеств, отражающие эти типы.
 
-@margin-note{Определены в модуле @racket[formica/types]}
+
 @defthing[Bool contract?] определяет множество величин логического типа. Эквивалентен предикату @racket[boolean?].
-@defthing[Num contract?] определяет множество чиел. Эквивалентен предикату @racket[number?].
+@defthing[Num contract?] определяет множество чиел. Эквивалентен предикату @racket[Num].
 @defthing[Real contract?]  определяет множество действительных чисел. Эквивалентен предикату @racket[real?].
 @defthing[Int contract?]  определяет множество целых чисел. Эквивалентен предикату @racket[integer?].
 @defthing[Nat contract?]  определяет множество натуральных чисел.
@@ -130,7 +130,7 @@ Formica --- язык со @emph{строгой динамической типи
 Форма @racket[define-type] позволяет давать определения типам, используя синтаксис, подобный тому, что принято использовать для определения
 алгебраических типов данных.
 
-@margin-note{Определена в модуле @racket[formica/types]}
+
 @defform*[#:literals(? and or not)
  [(define-type name c ...)
   (define-type (name x ...) c ...)] #:contracts ([c contract?] [x contract?])]
@@ -153,7 +153,7 @@ Formica --- язык со @emph{строгой динамической типи
 
 Алгебраические типы данных создаются с помощью контейнерных типов: пар или формальных функций.
 
-@margin-note{Определена в модуле @racket[formica/types]}
+
 @defproc[(cons: [c1 contract?] [c2 contract?]) contract?]
 контракт для @elemref["t:pair"]{пары}, элементы которой имеют типы @racket[_c1] и @racket[_c2].
 
@@ -164,7 +164,7 @@ Formica --- язык со @emph{строгой динамической типи
   (is (cons 1 (cons 2 'x)) (cons: Num (cons: Num Sym)))]
 
 
-@margin-note{Определена в модуле @racket[formica/contract]}
+
 @defform*[
 [(list: c ...) 
  (list: c ..)] #:contracts [(c contract?)]]
@@ -239,7 +239,7 @@ Formica --- язык со @emph{строгой динамической типи
     (cons: A (listof A)))
   (is '(1 2 3) (listof integer?))
   (is '(1 2 x) (listof integer?))
-  (is '(a b c) (listof symbol?))]
+  (is '(a b c) (listof Sym))]
 
 @section[#:tag "types:ADT"]{Абстрактные типы}
 
@@ -342,8 +342,8 @@ Formica --- язык со @emph{строгой динамической типи
                                (Node (Leaf 'c)
                                      'Empty))))]
   ((Tree integer?) A)
-  ((Tree symbol?) A)
-  ((Tree symbol?) B)]
+  ((Tree Sym) A)
+  ((Tree Sym) B)]
 
 Определим для нашего типа функцию свёртки:
 
@@ -376,14 +376,14 @@ Formica --- язык со @emph{строгой динамической типи
 @def+int[#:eval formica-eval
    (define (total t)
      (cond
-       [(is t (Tree number?)) (tfold + 0 id t)]
-       [else (error "total: The argument must be a (Tree number?). Given" t)]))
+       [(is t (Tree Num)) (tfold + 0 id t)]
+       [else (error "total: The argument must be a (Tree Num). Given" t)]))
    (total A)
    (total B)]
 
 Для проверки типов можно определить @elemref["t:signature"]{сигнатуру} функции:
 @def+int[#:eval formica-eval
-   (:: total ((Tree Num) -> Num)
+   (:: total ((Tree Num) → Num)
      (define total (tfold + 0 id)))
    (total A)
    (total B)]

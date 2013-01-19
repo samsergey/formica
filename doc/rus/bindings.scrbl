@@ -81,7 +81,7 @@
   ((f 1 2) 3 4)]}}
 
 @section[#:tag-prefix "point-free"]{Cвязывание в бесточечной нотации}
-@margin-note{Определена в библиотеке @racket[formica/tacit]}
+
 
 @defform/subs[#:literals (λ /. //.) (define/c (f var ...) rhs) 
 ([rhs
