@@ -18,9 +18,7 @@
 
 @smaller{Справочное руководство по функциям и формам диалекта Formica.}
 
-@defmodulelang[formica]{Функции и синтаксические формы, описываемые в этом справочном руководстве, могут быть использованы как в контексте диалекта Formica, устанавливаемого директивой @tt{#lang}, так и в контексте других языков и диалектов в качестве библиотечных.}
-
-Formica является диалектом языка Racket и используется в рамках курса @emph{"Функциональное и логическое программирование"}, (КамчатГТУ).
+@defmodulelang[formica]{Функции и синтаксические формы, описываемые в этом справочном руководстве, могут быть использованы как в контексте диалекта Formica, устанавливаемого директивой @para[@tt{#lang formica}] так и в контексте других языков и диалектов в качестве библиотечных.}
 
 @include-section["intro.scrbl"]
 
@@ -28,31 +26,13 @@ Formica является диалектом языка Racket и использ�
 
 @include-section["computation.scrbl"]
 
-@include-section["control.scrbl"]
+@include-section["types.scrbl"]
 
 @include-section["bindings.scrbl"]
 
-@include-section["types.scrbl"]
-
-@include-section["contracts.scrbl"]
-
-@include-section["formal.scrbl"]
-
-@include-section["equivalence.scrbl"]
-
-@include-section["numeric.scrbl"]
-
-@include-section["pairs.scrbl"]
-
-@include-section["memoize.scrbl"]
-
-@include-section["rewrite.scrbl"]
-
-@include-section["functionals.scrbl"]
+@include-section["functions.scrbl"]
 
 @include-section["monads.scrbl"]
-
-@include-section["io.scrbl"]
 
 @include-section["testing.scrbl"]
 

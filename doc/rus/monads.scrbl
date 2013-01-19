@@ -15,8 +15,6 @@
 
 @declare-exporting[formica]
 
-@local-table-of-contents[]
-
 @elemtag["t:monad"]{@emph{Монада}} является абстракцией линейной цепочки связанных вычислений. Она определяется @emph{единичной функцией} @tt{return} и @emph{операцией связывания} @tt{>>=} (@tt{bind}), для которых выполняются следующие отношения:
 
 @racketblock[
@@ -32,6 +30,8 @@
 нейтральным элементом:
 @racketblock[mplus mzero _x  =  _x
              mplus _x mzero  =  _x] 
+                                   
+@local-table-of-contents[]
 
 @include-section["monads-base.scrbl"]
 @include-section["monads-List.scrbl"]

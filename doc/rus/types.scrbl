@@ -29,6 +29,8 @@ Formica --- язык со @emph{строгой динамической типи
          @item{@elemref["t:ADT"]{абстрактные} алгебраические и полиморфные типы;}
          @item{@elemref["t:funtype"]{функциональные типы} и @elemref["t:signature"]{сигнатуры функций}.}}
 
+@local-table-of-contents[]
+
 @section[#:tag "type:predicates"]{Контракты}
 
 @emph{Типы данных} определяются контрактами.
@@ -138,7 +140,7 @@ Formica --- язык со @emph{строгой динамической типи
 
 Типы, определяемые формой @racket[define-type] соответствуют понятию @emph{алгебраического типа}, где простые типы соответствуют @emph{единичным типам}, составные и абстрактные типы ---  @emph{произведению типов}, а последовательность @nonbreaking{@racket[_c ...]} --- @emph{сумме типов}.
 
-@elemtag["t:type:comb"]{@bold{Комбинаторы контрактов}}
+@subsection[#:tag "ss:type:comb"]{Комбинаторы контрактов}
 
 @defproc[(Any [v Any]) contract?]
 контракт для произвольного выражения.
@@ -149,7 +151,7 @@ Formica --- язык со @emph{строгой динамической типи
  @defproc[(not/c [c contract?]) contract?]]]
 Объединение, пересечение и отрицание контрактов.
 
-@section[#:tag "types:container"]{Контейнерные типы}
+@subsection[#:tag "types:container"]{Контейнерные типы}
 
 Алгебраические типы данных создаются с помощью контейнерных типов: пар или формальных функций.
 
@@ -162,8 +164,6 @@ Formica --- язык со @emph{строгой динамической типи
   (is (cons 1 2) (cons: Num Num))
   (is (cons 1 'x) (cons: Num Num))
   (is (cons 1 (cons 2 'x)) (cons: Num (cons: Num Sym)))]
-
-
 
 @defform*[
 [(list: c ...) 
@@ -241,7 +241,7 @@ Formica --- язык со @emph{строгой динамической типи
   (is '(1 2 x) (listof integer?))
   (is '(a b c) (listof Sym))]
 
-@section[#:tag "types:ADT"]{Абстрактные типы}
+@subsection[#:tag "types:ADT"]{Абстрактные типы}
 
 @elemtag["t:ADT"]{@emph{Абстрактным типом данных}} будем называть комбинацию данных других типов (абстрактных или простых), объединённую с помощью @emph{контенерного типа}. 
 
@@ -387,3 +387,5 @@ Formica --- язык со @emph{строгой динамической типи
      (define total (tfold + 0 id)))
    (total A)
    (total B)]
+
+@include-section["contracts.scrbl"]

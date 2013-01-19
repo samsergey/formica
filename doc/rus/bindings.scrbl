@@ -13,9 +13,13 @@
 
 @declare-exporting[formica]
 
-@title[#:tag "bindings"]{Определения и связывание}
+@title[#:tag "bindings"]{Создание функций}
 
-@section[#:tag-prefix "regular"]{Обычное связывание}
+В этом разделе описываются способы создания и определения функций и синтаксических форм в языке Formica.
+
+@local-table-of-contents[]
+
+@section[#:tag-prefix "regular"]{Определения и связывание}
 
 @defform*[[(define x body)
            (define (f var ...) body ...)
@@ -80,27 +84,31 @@
   (f 1 2)
   ((f 1 2) 3 4)]}}
 
-@section[#:tag-prefix "point-free"]{Cвязывание в бесточечной нотации}
-
-
-@defform/subs[#:literals (λ /. //.) (define/c (f var ...) rhs) 
-([rhs
-   fun-constructor
-   (g args ...)])]
-
-Оператор связывания в бесточечной нотации, определяет функцию @racket[_f]. Правая часть определения @racket[_rhs] может быть либо конструктором функции или подстановки @racket[_fun-constructor], либо частичным вызовом функции @racket[_g] с фиксированными аргументами @racket[_arg ...]. Формальными аргументами определяемой функции являются аргументы левой части определения  @racket[_var ...], дополненные свободными аргументами правой части определения.
+@defform[(define-syntax-rule (form stx ...) expr)]
+Определяет @elemref["t:form"]{синтаксическую форму} @racket[_form], которая преобразуется в 
+выражение @racket[_expr] до его вычисления.
 
 Примеры:
 @interaction[#:eval formica-eval
-  (define/c (map1 f) 
-    (/. (cons h t) --> (cons (f h) (map1 f t))))
-  (procedure-arity map1)
-  (map1 ($ 'f) '(a b c))]
+  (define-syntax-rule (when p expr) 
+    (if p expr (display "Fail!")))
+  (when (odd? 2) (display "test"))
+  (when (odd? 3) (display "test"))]
+
+Если бы мы определили @racket[when], как функцию, сначала были бы вычислены 
+все её фактические аргументы, а потом был бы сделан выбор:
+
 @interaction[#:eval formica-eval
-  (define/c (map2 f) (foldr (∘ cons f) '()))
-  (procedure-arity map2)
-  (map2 ($ 'f) '(a b c))
-  (map2 ($ 'g 2) '(a b c) '(x y z))]
+  (define (when p expr) 
+    (if p expr (display "Fail!")))
+  (when (odd? 2) (display "test"))
+  (when (odd? 3) (display "test"))]
+
+@defform[(require name ...)]
+Загружает определения, экспортируемые модулями @racket[_name ...].
+
+@defform[(provide id ...)]
+Экспортирует определения для символов и функций @racket[_id ...] из данного модуля.
 
 @section[#:tag-prefix "local-binding"]{Локальное связывание}
 
@@ -139,28 +147,30 @@
         (fact (- n 1) (* n res))))]}}
 
 
-@defform[(define-syntax-rule (form stx ...) expr)]
-Определяет @elemref["t:form"]{синтаксическую форму} @racket[_form], которая преобразуется в 
-выражение @racket[_expr] до его вычисления.
+@section[#:tag-prefix "point-free"]{Cвязывание в бесточечной нотации}
+
+
+@defform/subs[#:literals (λ /. //.) (define/c (f var ...) rhs) 
+([rhs
+   fun-constructor
+   (g args ...)])]
+
+Оператор связывания в бесточечной нотации, определяет функцию @racket[_f]. Правая часть определения @racket[_rhs] может быть либо конструктором функции или подстановки @racket[_fun-constructor], либо частичным вызовом функции @racket[_g] с фиксированными аргументами @racket[_arg ...]. Формальными аргументами определяемой функции являются аргументы левой части определения  @racket[_var ...], дополненные свободными аргументами правой части определения.
 
 Примеры:
 @interaction[#:eval formica-eval
-  (define-syntax-rule (when p expr) 
-    (if p expr (display "Fail!")))
-  (when (odd? 2) (display "test"))
-  (when (odd? 3) (display "test"))]
-
-Если бы мы определили @racket[when], как функцию, сначала были бы вычислены 
-все её фактические аргументы, а потом был бы сделан выбор:
-
+  (define/c (map1 f) 
+    (/. (cons h t) --> (cons (f h) (map1 f t))))
+  (procedure-arity map1)
+  (map1 ($ 'f) '(a b c))]
 @interaction[#:eval formica-eval
-  (define (when p expr) 
-    (if p expr (display "Fail!")))
-  (when (odd? 2) (display "test"))
-  (when (odd? 3) (display "test"))]
+  (define/c (map2 f) (foldr (∘ cons f) '()))
+  (procedure-arity map2)
+  (map2 ($ 'f) '(a b c))
+  (map2 ($ 'g 2) '(a b c) '(x y z))]
 
-@defform[(require name ...)]
-Загружает определения, экспортируемые модулями @racket[_name ...].
 
-@defform[(provide id ...)]
-Экспортирует определения для символов и функций @racket[_id ...] из данного модуля.
+
+@include-section["formal.scrbl"]
+
+@include-section["rewrite.scrbl"]

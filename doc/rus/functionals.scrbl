@@ -368,3 +368,5 @@
 @interaction[#:eval formica-eval
   ((fixed-point cos) 1)
   (cos ((fixed-point cos) 1))]
+
+@include-section["memoize.scrbl"]
