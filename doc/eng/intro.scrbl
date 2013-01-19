@@ -332,9 +332,9 @@ Some purely functional definitions
  (all-elements odd? '(2 4 5 3 7 8))
  (all-elements even? '(2 4 6 0 12 8))]
 @defs+int[#:eval formica-eval 
- ((define all-arguments (-< and))
+ ((define all-arguments (/@ and))
   (define complex<? (andf (all-arguments complex?)
-                          (-< < magnitude))))
+                          (/@ < magnitude))))
 (complex<? 0-i 2 4+i)
 (complex<? 2 1-i)
 (complex<? 2 'x 1-i)]

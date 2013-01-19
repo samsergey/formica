@@ -75,8 +75,8 @@
 ;;;-------------------------------------------------------------
 ;;; any-args and all-args functionals
 ;;;-------------------------------------------------------------
-(define (any-args p) (-< or* p))
-(define (all-args p) (-< and* p))
+(define (any-args p) (/@ or* p))
+(define (all-args p) (/@ and* p))
 
 ;;;-------------------------------------------------------------
 ;; almost-equal? and tolerance
@@ -98,8 +98,8 @@
             (any-args complex?)) x y) (almost-equal? 0 (magnitude (- x y)))]
     
     
-    [((all-args pair?) x y) ((andf (-< almost-equal? car)
-                                   (-< almost-equal? cdr)) x y)]
+    [((all-args pair?) x y) ((andf (/@ almost-equal? car)
+                                   (/@ almost-equal? cdr)) x y)]
     
     [else (equal? x y)]))
 

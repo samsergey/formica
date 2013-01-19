@@ -24,8 +24,8 @@
   (fif (-> procedure? procedure? procedure? procedure?))
   (andf (->* () #:rest (listof procedure?) procedure?))
   (orf (->* () #:rest (listof procedure?) procedure?))
-  (fork (-> procedure? unary? procedure?))
-  (-< (-> procedure? unary? procedure?))
+  (argmap (-> procedure? unary? procedure?))
+  (/@ (-> procedure? unary? procedure?))
   (fixed-point (->* (procedure?) (#:same-test (-> any/c any/c boolean?)) procedure?))))
 
 ;;;-------------------------------------------------------------
@@ -111,20 +111,15 @@
     [(f . g) (orf f (apply orf g))]))
 
 ;;;-------------------------------------------------------------
-;;; fork
+;;; argmap
 ;;;-------------------------------------------------------------
-(define (fork f g)
+(define (argmap f g)
   (define result (λ x (apply f (map g x))))
    (procedure-rename
    ((inherit-arity f) result)
-   'fork))
+   'argmap))
 
-(define -< fork)
-
-;;;-------------------------------------------------------------
-;;; >> the pipe function
-;;;-------------------------------------------------------------
-(define >> (flipped compose))
+(define /@ argmap)
 
 ;;;-------------------------------------------------------------
 ;;; fixed-point

@@ -11,7 +11,7 @@
          racket/contract
          "arity.rkt"
          "tags.rkt"
-         (only-in "functionals.rkt" andf -<))
+         (only-in "functionals.rkt" andf /@))
 
 
 (provide 

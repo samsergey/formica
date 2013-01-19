@@ -9,7 +9,7 @@
 ;;==============================================================
 (require racket/match
          "base.rkt"
-         (only-in "../../tools.rkt" fork)
+         (only-in "../../tools.rkt" argmap)
          (only-in "../../formal.rkt" formal? n/f-list?)
          (only-in "../../types.rkt" check-result check-argument)
          racket/set
@@ -71,7 +71,7 @@
 (define (concat-map f lst)
   (for*/list ([x lst] [fx (in-list (f x))]) fx))
 
-(define concatenate (fork append sequence->list))
+(define concatenate (argmap append sequence->list))
 
 (define-monad List 
   (Monoid

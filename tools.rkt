@@ -63,8 +63,8 @@
   (fif (-> Fun Fun Fun Fun))
   (andf (-> Fun .. Fun))
   (orf (-> Fun .. Fun))
-  (fork (-> Fun unary? Fun))
-  (-< (-> Fun unary? Fun))
+  (argmap (-> Fun unary? Fun))
+  (/@ (-> Fun unary? Fun))
   (fixed-point (->* (procedure?) (#:same-test (-> any/c any/c boolean?)) procedure?))))
 
 (require "private/tools/tags.rkt")

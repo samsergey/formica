@@ -69,15 +69,15 @@
  (check-equal? (map (orf < -) '(1 -3 1.2) '(2 4 -2)) '(#t #t 3.2)))
 
 (test-case
- "fork tests"
- (check-equal? ((-< u u) 'x) '(u (u x)))
- (check-equal? ((-< b u) 'x 'y) '(b (u x) (u y)))
- (check-equal? ((-< t u) 'x 'y 'z) '(t (u x) (u y) (u z)))
- (check-equal? ((-< t u*) 'x 'y 'z) '(t (u* x) (u* y) (u* z)))
- (check-equal? ((-< b v) 'x 'y) '(b (v x) (v y)))
- (check-equal? ((-< b o) 'a 'b) '(b (o a 88) (o b 88)))
- (check-equal? ((-< b n*) 'x 'y) '(b (n* x) (n* y)))
- (check-exn exn:fail:contract? (λ () (-< b b))))
+ "argmap tests"
+ (check-equal? ((/@ u u) 'x) '(u (u x)))
+ (check-equal? ((/@ b u) 'x 'y) '(b (u x) (u y)))
+ (check-equal? ((/@ t u) 'x 'y 'z) '(t (u x) (u y) (u z)))
+ (check-equal? ((/@ t u*) 'x 'y 'z) '(t (u* x) (u* y) (u* z)))
+ (check-equal? ((/@ b v) 'x 'y) '(b (v x) (v y)))
+ (check-equal? ((/@ b o) 'a 'b) '(b (o a 88) (o b 88)))
+ (check-equal? ((/@ b n*) 'x 'y) '(b (n* x) (n* y)))
+ (check-exn exn:fail:contract? (λ () (/@ b b))))
 
 (test-case
  "fixed-point tests"

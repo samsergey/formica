@@ -13,7 +13,111 @@
 
 @declare-exporting[formica]
 
-@title[#:tag "functional"]{Операторы и функционалы}
+@title[#:tag "functional"]{Инструменты функционального программирования}
+
+@section[#:tag "s:arity"]{Валентность функций}
+
+В контексте языка Formica используется следующая терминология, касающаяся валентности функций:
+@itemize{@item{Функция имеет @emph{фиксированную валентность}, если она принимает какое-то одно определённое число аргументов. Валентность такой функции выражается натуральным числом.}
+          @item{Функция называется @emph{вариадической}, если она может принимать различнное (возможно неограниченное) число аргументов. Валентность такой функции выражается структурой @racket[arity-at-least].}
+         @item{Функция называется @emph{полиадической}, если она может принимать различнное, но ограниченное число аргументов. Валентность такой функции выражается списком элементами которого могут быть натуральные числа или структура @racket[arity-at-least].}}
+         
+          
+@deftogether[(@defproc[(fixed-arity? [v Any]) Bool]
+               @defproc[(variadic? [v Any]) Bool]
+               @defproc[(polyadic? [v Any]) Bool])]
+Возвращают @racket[#t], если @racket[_v] является функцией с фиксированной валентностью, вариадической или полиадической, соответственно.
+
+Примеры:
+@interaction[#:eval formica-eval
+  (fixed-arity? (lambda (x) (+ 2 x)))
+  (define (f . x) (cons 'f x))
+  (fixed-arity? f)
+  (fixed-arity? cons)
+  (fixed-arity? +)]
+
+@interaction[#:eval formica-eval
+  (variadic? (case-lambda
+               [(x) x]
+               [(x . y) (apply + x y)]))
+  (define (f . x) (cons 'f x))
+  (variadic? f)
+  (variadic? cons)
+  (variadic? +)]
+
+@interaction[#:eval formica-eval
+  (polyadic? (case-lambda
+               [(x) x]
+               [(x y) (+ x y)]))
+  (define (f x (y 2)) '(f x y))
+  (polyadic? f)
+  (polyadic? cons)
+  (polyadic? +)]
+
+@deftogether[(@defproc[(nullary? [v Any]) Bool]
+               @defproc[(unary? [v Any]) Bool]
+               @defproc[(binary? [v Any]) Bool])]
+Возвращают @racket[#t], если @racket[_v] является функцией валентность которой включает в себя 0, 1 или 2, соответственно.
+
+Примеры:
+@interaction[#:eval formica-eval
+  (nullary? (case-lambda
+              [() 0]
+              [(x) x]
+              [(x . y) (apply + x y)]))
+  (define (f . x) (cons 'f x))
+  (nullary? f)
+  (nullary? cons)
+  (nullary? +)]
+
+@interaction[#:eval formica-eval
+  (unary? (case-lambda
+              [() 0]
+              [(x) x]
+              [(x . y) (apply + x y)]))
+  (define (f x . y) (list* 'f x y))
+  (unary? f)
+  (unary? not)
+  (unary? cons)
+  (unary? +)]
+
+@interaction[#:eval formica-eval
+  (binary? (case-lambda
+              [() 0]
+              [(x y) (+ x y)]
+              [(x . y) (apply + x y)]))
+  (define (f x . y) (list* 'f x y))
+  (binary? f)
+  (binary? not)
+  (binary? cons)
+  (binary? +)]
+
+@deftogether[(@defproc[(min-arity [f Fun]) Nat]
+               @defproc[(max-arity [f Fun]) (or/c Nat +inf.0)])]
+Возвращаеют минимальную и максимальную валентности функции  @racket[_f].
+
+Примеры:
+@interaction[#:eval formica-eval
+  (min-arity (case-lambda
+              [() 0]
+              [(x y) (+ x y)]))
+  (define (f x . y) (list* 'f x y))
+  (min-arity f)
+  (min-arity not)
+  (min-arity cons)
+  (min-arity +)]
+
+@interaction[#:eval formica-eval
+  (max-arity (case-lambda
+              [() 0]
+              [(x y) (+ x y)]))
+  (define (f x . y) (list* 'f x y))
+  (max-arity f)
+  (max-arity not)
+  (max-arity cons)
+  (max-arity +)]
+
+@section[#:tag "s:abstr"]{Абстракция и аппликация}
 
 @defform/subs[#:id λ (λ vars body)
 ([vars (x ...)
@@ -50,13 +154,55 @@
   (apply (λ (x) (* 2 x)) '(1))
   (apply map + '((1 2 3) (10 20 30)))]
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+
 @defproc[(function? [x Any]) Bool]
 Возвращает @racket[#t] только если @racket[_x] является функцией 
 и @racket[#f] --- во всех других случаях.
 
 
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
+@defproc[(curry [f Fun] [arg Any] ...) (or/c curried? Any)]
+Каррирует функцию @racket[_f], фиксируя аргументы @racket[_arg ...] слева.
+
+Если аргументы @racket[_arg ...] не заданы возвращается каррированная функция @racket[_f].
+
+Примеры:
+@interaction[#:eval formica-eval
+  (curry list 1 2)
+  ((curry list 1 2) 3 4)
+  (map (curry cons 1) '(1 2 3))
+  (curry +)
+  ((curry +) 1)
+  ((curry +) 1 2)
+  (curry cons 1 2)]
+
+
+@defproc[(curryr [f Fun] [arg Any] ...) (or/c curried? Any)]
+Каррирует функцию @racket[_f], фиксируя аргументы @racket[_arg ...] справа.
+
+Примеры:
+@interaction[#:eval formica-eval
+  (curryr list 1 2)
+  ((curryr list 1 2) 3 4)
+  (map (curryr cons 1) '(1 2 3))
+  (curryr list)
+  ((curryr list) 1)
+  ((curryr list) 1 2)
+  (curryr cons 1 2)]
+
+@defproc[(curried? [f Any]) Bool]
+Возвращает @racket[#t], если @racket[_f] является каррированной функцией 
+и @racket[#f] --- в любом другом случае.
+
+Примеры:
+@interaction[#:eval formica-eval
+  (curried? (curry + 1))
+  (curried? cons)
+  (curried? (curry cons))
+  (curried? (curry cons 1))
+  (curried? ((curry cons) 1 2))]
+
+@section[#:tag "s:operators"]{Операторы и функционалы}
+
 @defthing[id Fun]
 Тождественная функция.
 
@@ -69,9 +215,11 @@
   (id id)
   (id '(a b c))]
 
-
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
-@defproc[(arg (n Index)) Fun]
+@deftogether[(@defproc[(arg (n Index)) Fun]
+               @defthing*[#:kind "alias" 
+                                 ([I1 (arg 1)]
+                                  [I2 (arg 2)]
+                                  [I3 (arg 3)])])]
 Создаёт тривиальную функцию, возвращающую @racket[_n]-ый 
 переданный ей аргумент.
 
@@ -81,13 +229,8 @@
   ((arg 2) 'x 'y 'z)
   ((arg 3) 'x 'y 'z)]
 
-@defthing*[([I1 (arg 1)]
-            [I2 (arg 2)]
-            [I3 (arg 3)])]
+@racket[I1], @racket[I2] и @racket[I3] -- псевдонимы для часто встречающихся вызовов функции @racket[arg].
 
-Псевдонимы для часто встречающихся вызовов функции @racket[arg].
-
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
 @defproc[(const (x Any)) Fun]
 Создаёт тривиальную функцию, возвращающую @racket[_x] для 
 любых переданных ей аргументов.
@@ -203,16 +346,16 @@
 
 @margin-note{Определена в библиотеке @racket[formica/functionals]}
 @deftogether[[
- @defproc[(fork [f Fun] [g unary?]) Fun]
-  @defthing[#:kind "alias" -< fork]]]
+ @defproc[(argmap [f Fun] [g unary?]) Fun]
+  @defthing[#:kind "alias" /@ argmap]]]
 Возвращает функцию @tt{x y ... -> (f (g x) (g y) ...)}.
 
-Функция @racket[fork] иеет псевдоним: @racket[-<]
+Функция @racket[argmap] иеет псевдоним: @racket[/@]
 
 Примеры:
 @interaction[#:eval formica-eval
-  ((fork cons sqr) 2 3)
-  ((-< + magnitude) -2 3 4-7i)]
+  ((argmap cons sqr) 2 3)
+  ((/@ + magnitude) -2 3 4-7i)]
 
 @margin-note{Определена в библиотеке @racket[formica/functionals]}
 @defproc[(fixed-point [f Fun]) Fun]
@@ -225,46 +368,3 @@
 @interaction[#:eval formica-eval
   ((fixed-point cos) 1)
   (cos ((fixed-point cos) 1))]
-
-@margin-note{Определена в библиотеке @racket[formica/curry]}
-@defproc[(curry [f Fun] [arg Any] ...) (or/c curried? Any)]
-Каррирует функцию @racket[_f], фиксируя аргументы @racket[_arg ...] слева.
-
-Если аргументы @racket[_arg ...] не заданы возвращается каррированная функция @racket[_f].
-
-Примеры:
-@interaction[#:eval formica-eval
-  (curry list 1 2)
-  ((curry list 1 2) 3 4)
-  (map (curry cons 1) '(1 2 3))
-  (curry +)
-  ((curry +) 1)
-  ((curry +) 1 2)
-  (curry cons 1 2)]
-
-@margin-note{Переопределена в библиотеке @racket[formica/functionals]}
-@defproc[(curryr [f Fun] [arg Any] ...) (or/c curried? Any)]
-Каррирует функцию @racket[_f], фиксируя аргументы @racket[_arg ...] справа.
-
-Примеры:
-@interaction[#:eval formica-eval
-  (curryr list 1 2)
-  ((curryr list 1 2) 3 4)
-  (map (curryr cons 1) '(1 2 3))
-  (curryr list)
-  ((curryr list) 1)
-  ((curryr list) 1 2)
-  (curryr cons 1 2)]
-
-@margin-note{Определена в библиотеке @racket[formica/functionals]}
-@defproc[(curried? [f Any]) Bool]
-Возвращает @racket[#t], если @racket[_f] является каррированной функцией 
-и @racket[#f] --- в любом другом случае.
-
-Примеры:
-@interaction[#:eval formica-eval
-  (curried? (curry + 1))
-  (curried? cons)
-  (curried? (curry cons))
-  (curried? (curry cons 1))
-  (curried? ((curry cons) 1 2))]

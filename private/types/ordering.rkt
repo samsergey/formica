@@ -41,13 +41,13 @@
 
 ;; ordering for symbols
 (define symbol<? 
-  (-< string<? symbol->string))
+  (/@ string<? symbol->string))
 
 ;; ordering for pairs
 (define pair<?
-  (orf (-< ordered? car)
-       (andf (-< equal? car)
-             (-< ordered? cdr))))
+  (orf (/@ ordered? car)
+       (andf (/@ equal? car)
+             (/@ ordered? cdr))))
 
 (define (add-to-type-ordering type (prec-type 'last) (ord-fun (const #f)))
   (type-ordering 

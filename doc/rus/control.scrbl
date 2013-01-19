@@ -100,6 +100,15 @@
  (map and '(#t #f #t #f) '(#t #t #f #f))
  (foldr (∘ and even?) #t '(2 4 6 8))]
 
+@defform[(==> expr1 expr2)]
+Оператор импликации. Эквивалентен форме @centered{@tt{(if expr1 expr2 #t)}.}
+Может использоваться, как бинарная функция.
+
+@interaction[#:eval formica-eval
+  ==>
+  (==> 'A 'B)
+  (==> #f (/ 1 0))]
+
 @section[#:tag-prefix "control"]{Управление вычислением}
 
 @defform[(quote expr)]

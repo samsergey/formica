@@ -173,19 +173,19 @@ Examples:
   (map (orf integer? positive?) '(-3/5 -1 2 4.2))]
 
 @deftogether[[
- @defproc[(fork [f Fun] [g unary?]) Fun]
-  @defthing[#:kind "alias" -< fork]]]
+ @defproc[(argmap [f Fun] [g unary?]) Fun]
+  @defthing[#:kind "alias" /@ argmap]]]
 Returns function @centered[@tt{x y ...  = (f (g x) (g y) ...).}]
-This function has an alias @racket[-<].
+This function has an alias @racket[/@].
 
 Examples:
 @interaction[#:eval formica-eval
-  ((fork cons sqr) 2 3)
-  ((-< + sqr) 1 2 3)]
+  ((argmap cons sqr) 2 3)
+  ((/@ + sqr) 1 2 3)]
 
 
 @defproc[(all-args [p unary?]) Fun]
-Returns @centered[@tt{(fork and p).}]
+Returns @centered[@tt{(argmap and p).}]
 
 Examples:
 @interaction[#:eval formica-eval
@@ -194,7 +194,7 @@ Examples:
 
 
 @defproc[(any-args [f unary?]) Fun]
-Returns function @centered[@tt{(fork or p).}]
+Returns function @centered[@tt{(argmap or p).}]
 
 Examples:
 @interaction[#:eval formica-eval

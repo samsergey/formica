@@ -117,16 +117,16 @@ If @racket[_type] already exists in the current @racket[(type-ordering)] table, 
 In this example complex numbers follow reals and precede strings. Moreover, within complex numbers ordering according to magnitude is set up. Symbols are ordered in default way.
 @interaction[#:eval formica-eval
  (parameterize ([type-ordering (type-ordering)])
-   (add-to-type-ordering complex? real? (fork < magnitude))
+   (add-to-type-ordering complex? real? (argmap < magnitude))
    (sort '(0-i 2 #t 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9 #f) ordered?))]
 
 In theese examples complex numbers are added at the beginning or at the end of the ordering table.
 @interaction[#:eval formica-eval
  (parameterize ([type-ordering (type-ordering)])
-   (add-to-type-ordering complex? 'first (fork < magnitude))
+   (add-to-type-ordering complex? 'first (argmap < magnitude))
    (sort '(0-i 2 #t 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9 #f) ordered?))
  (parameterize ([type-ordering (type-ordering)])
-   (add-to-type-ordering complex? 'last (fork < magnitude))
+   (add-to-type-ordering complex? 'last (argmap < magnitude))
    (sort '(0-i 2 #t 3.5 1+2i "x" 4-i 5 6 "a" 7 -1+2.5i 9 #f) ordered?))]
 
 This changes the ordering of booleans:
