@@ -13,9 +13,10 @@
 
 @title{Introduction}
 
-The @emph{Formica} language was created for educational purpose while teaching the "Functional and logic programming" undergraduate course in the Kamchatka State Technical University (Russia). For student's practical work the @emph{Racket} language was chosen for the following reasons. @emph{Racket} is elegant as @emph{Scheme} and goes with educationally oriented IDE, which makes newcomers feel comfortable. It has active community, rich libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finally, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it is natural to come to a new language, created specially for the coursework.
-
+The @emph{Formica} language was created for educational purpose while teaching the "Functional and logic programming" undergraduate course in the Kamchatka State Technical University (Russia).
 The main goal of designing @emph{Formica} is to have a functional programming language as flexible as @emph{Racket} or @emph{Wolfram Mathematica}, and almost as syntactically clean as Mark Tarver's @emph{Qi} or @emph{Haskell}. Being a dialect of @emph{Racket} it should complement the parent language and make it possible to use any of @emph{Racket}'s native libraries.
+
+For student's practical work the @emph{Racket} language was chosen for the following reasons. @emph{Racket} is elegant as @emph{Scheme} and goes with educationally oriented IDE, which makes newcomers feel comfortable. It has active community, rich libraries and provides a lot of real-life instruments for GUI development, web tools etc. Finally, @emph{Racket} is extremely flexible: it encourages creating domain-oriented languages and dialects, so it is natural to come to a new language, created specially for the coursework.
 
 Even though it is mainly educational language, some of it's features (such as @tech{formal functions}, @tech{rewriting}, etc.) could be used in various practical applications.
 
@@ -97,9 +98,6 @@ Here is a simple implementation of symbolic η- and β-reduction rules for λ-ca
   
 Once you have written in @emph{Haskell} or on the blackboard:
 @codeblock{
- fold _f _x0 = F where F []     = _x0
-                     F (_x:xs) = _f _x (fold _f _x0 _xs)
- 
  map _f = fold (cons . _f) []
  
  map (* 2) [1 2 3]}
@@ -107,10 +105,7 @@ Once you have written in @emph{Haskell} or on the blackboard:
 it is difficult not to try it in @emph{Formica}:
 
 @defs+int[#:eval formica-eval
-  ((define/c (fold f x0) (/. '()        --> x0
-                             (cons h t) --> (f h (fold f x0 t))))
-   
-   (define/c (map f) (fold (∘ cons f) '())))
+  ((define/c (map f) (foldr (∘ cons f) '())))
   (map (* 2) '(1 2 3))
   (map (map (* 2)) '((1 2) (3 4) (5)))]
 
@@ -137,18 +132,18 @@ Being not so strict as in @emph{Typed Racket} or @emph{Haskell}, the contract ty
   
  Building abstract algebraic types with formal functions:
 
-A formal constructor of a pair
+A formal constructor of a pair:
 @def+int[#:eval formica-eval
 (define-formal kons)
 (kons 1 (kons 2 3))]
 
-A constructor of the klist
+A constructor of the klist:
 @def+int[#:eval formica-eval
  (define (klist . x)
    (foldr kons 'knull x))
  (klist 'a 'b 'c)]
 
-A recursive type declaration
+A recursive type declaration:
 @def+int[#:eval formica-eval
 (define-type klist?
   'knull
@@ -157,7 +152,7 @@ A recursive type declaration
  (is (list 1 2 3) klist?)
  (is (kons 1 (kons 2 3)) klist?)]
 
-some functions to operate with klists
+Some functions to operate with klists:
 @defs+int[#:eval formica-eval
  ((define/c (kfold f x0)
     (/. 'knull --> x0
@@ -192,7 +187,7 @@ Monads allow to define generic functions and then to use them with different sem
  (define (find-triples r)
    (collect (list a b c) 
      [a <- r]
-     [b <- (in-range (ceiling (/ a 2)) a)]
+     [b <- (in-range 1 a)]
      [c <-: (sqrt (- (sqr a) (sqr b)))]
      (integer? c)
      (> b c)))]
