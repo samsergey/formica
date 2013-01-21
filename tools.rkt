@@ -75,3 +75,6 @@
   (check-tag (-> Sym Any Bool))
   (set-tag ((symbol?) ((or/c #f symbol?)) . ->* . (procedure? . -> . tagged?)))
   (set-tag* ((symbol?) ((or/c #f symbol?)) . ->* . (procedure? . -> . procedure?)))))
+
+(require "private/tools/patterns.rkt")
+(provide +)

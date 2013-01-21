@@ -5,6 +5,7 @@
 (require "arity-tests.rkt")
 (require "functionals-tests.rkt")
 (require "tools-tests.rkt")
+(require "patterns-tests.rkt")
 (require "curry-tests.rkt")
 (require "partial-app-tests.rkt")
 (require "hold-tests.rkt")

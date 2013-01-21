@@ -103,16 +103,25 @@
     
     [else (equal? x y)]))
 
+;;;-------------------------------------------------------------
+;; variadic eq?
+;;;-------------------------------------------------------------
 (define eq?* 
   (case-lambda 
     [(x y) (eq? x y)]
     [(x y . z) (and (eq? x y) (apply eq?* y z))]))
 
+;;;-------------------------------------------------------------
+;; variadic equal?
+;;;-------------------------------------------------------------
 (define equal?* 
   (case-lambda 
     [(x y) (equal? x y)]
     [(x y . z) (and (equal? x y) (apply equal?* y z))]))
 
+;;;-------------------------------------------------------------
+;; variadic almost-equal?
+;;;-------------------------------------------------------------
 (define almost-equal?* 
   (case-lambda 
     [(x y) (almost-equal? x y)]
@@ -120,10 +129,12 @@
 
 (define ≈ almost-equal?*)
 
+;;;-------------------------------------------------------------
+;; different? predicate
+;;;-------------------------------------------------------------
 (define different?
   (case-lambda 
     [(x y) (not (equal? x y))]
     [(x y . z) (and (not (equal? x y)) 
                     (andmap (λ (t) (different? x t)) z)
                     (apply different? y z))]))
-

@@ -8,6 +8,7 @@
 ;; Provides basic tools to work with monads.
 ;;==============================================================
 (require "../tools/tags.rkt"
+         "../tools/patterns.rkt"
          (only-in "../../types.rkt" 
                   check-result 
                   check-argument
@@ -26,7 +27,6 @@
          collect
          using
          check-result
-          scons
          ; functional forms
          return
          bind
@@ -365,14 +365,6 @@
                          [ys <- (filter/m p xs) ]
                          (return (if b (cons x ys) ys)))])
    'filter/m))
-
-;; match-expander for streams
-(define-match-expander scons
-  (syntax-rules ()
-    [(scons x y) (and (? stream?) 
-                      (not (? stream-empty?))
-                      (app stream-first x)
-                      (app stream-rest y))]))
 
 ;; a predicate for listable objects
 (define listable?

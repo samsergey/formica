@@ -1,7 +1,7 @@
 #lang racket/base
 (require "test-utils.rkt"
          "../partial-app.rkt"
-         "../tools.rkt"
+         (except-in "../tools.rkt" +)
          "../formal.rkt"
          racket/list)
 

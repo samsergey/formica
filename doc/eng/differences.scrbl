@@ -11,7 +11,7 @@
      (sandbox '(require formica))
      sandbox))
 
-@title[#:tag "differences"]{Differences from Racket}
+@title[#:tag "differences"]{Differences and additions to core Racket}
 
 @declare-exporting[formica]
 
@@ -79,3 +79,30 @@ Same as @racket[eq?] and @racket[equal?] provided @racket[racket/base], but if m
 
 @defproc[(eval [expr Any] [ns namespace? formica-namespace]) any]
 Evaluates the expression @racket[_expr] like @racket[eval] provided @racket[racket/base], but uses predefined namespace containing bindings provided by the @emph{Formica} language.
+
+@section{Additional match expanders}
+
+@deftogether[(@defform/none[(+ n x)]
+               @defform/none[(+ x n)])]
+Matches a numeric value and binds a symbol @racket[_x] to a difference between matched value and @racket[_n]. 
+
+Examples:
+@interaction[#:eval formica-eval
+ ((/. (+ 1 x) --> x) 5)
+ ((/. (+ x 2) --> x) 5)]
+
+The definition of recursive function.
+@def+int[#:eval formica-eval
+ (define/c (sum f)
+   (/. 0 --> 0
+       (+ n 1) --> (+ (f (+ n 1)) (sum f n))))
+ (sum sqr 4)]
+
+@defform[(scons h t)]
+Matches non-empty streams and binds the first element to @racket[_h], and the rest of stream to @racket[_t]. Only the first element is evaluated eagerly.
+
+Examples:
+@interaction[#:eval formica-eval
+ (require racket/match)
+ ((/. (scons h t) --> (list h t)) (in-naturals))
+ ((/. (scons h t) --> (list h t)) (stream 1 (/ 0)))]

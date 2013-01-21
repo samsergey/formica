@@ -21,3 +21,6 @@
 (define-syntax -->.
   (syntax-id-rules ()
     (-->. (raise-syntax-error '-->. "could be used only in rewriting rules."))))
+
+(require "private/tools/patterns.rkt")
+(provide (all-from-out "private/tools/patterns.rkt"))
