@@ -2,7 +2,7 @@
 
 @(require (for-label formica))
 
-@(require
+@(require 
   scribble/manual
   scribble/eval)
 
