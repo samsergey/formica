@@ -151,11 +151,13 @@
 \newcommand{\MenuItem}[1] {{\normalfont\sffamily\small#1}}
 
 \RequirePackage{listings}
+\RequirePackage{textcomp}
 \lstloadlanguages{Lisp}
 
 \lstdefinelanguage{Scheme}
 {language=[]{Lisp},
 texcl,
+upquote=true
 mathescape=true,
 aboveskip=0pt,
 belowskip=0pt,
@@ -198,7 +200,6 @@ literate={expr}{{$expr$}}1
 {body1}{{$body_1$}}1
 {body2}{{$body_2$}}1
 {P1}{{$P_1$}}1 {P2}{{$P_2$}}1
-{'}{{\,'$\!$}}1
 {Ф}{{$\Phi$}}1
 {match-lambda}{{\syntaxform match-lambda}}1
 {``}{{"}}1
