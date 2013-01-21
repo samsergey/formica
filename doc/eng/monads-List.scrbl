@@ -259,17 +259,6 @@ Examples:
   (stream-take (stream 'a 'b (/ 0)) 2)
   (stream-take (in-naturals) 3)]
 
-@defform[(scons h t)]
-A match expander which matches non-empty streams and binds the first element to @racket[_h], and the rest of stream to @racket[_t]. Only the first element is evaluated eagerly.
-
-Examples:
-@interaction[#:eval formica-eval
- (require racket/match)
- (match (in-naturals)
-   [(scons h t) (list h t)])
- (match (stream 1 (/ 0))
-   [(scons h t) (list h t)])]
-
 @bold{Examples}
 
 @def+int[#:eval formica-eval

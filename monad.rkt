@@ -18,7 +18,6 @@
  collect
  using
  check-result
-   scons
  ; functional forms
  return
  bind

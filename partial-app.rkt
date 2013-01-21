@@ -7,8 +7,6 @@
 ;;..............................................................
 ;; Provides formica/partiall-app module.
 ;;==============================================================
-(require "types.rkt")
-
 (require "private/syntax/partial-app.rkt")
 (provide
  (all-from-out "private/syntax/partial-app.rkt"))

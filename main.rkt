@@ -29,10 +29,10 @@
              [lazy delay]
              [eval* eval]))
 
-(require "tools.rkt"
+(require (except-in "tools.rkt" +)
+         (except-in "rewrite.rkt" +)
          "partial-app.rkt"
          "formal.rkt"
-         "rewrite.rkt"
          "tacit.rkt"
          "memoize.rkt"
          "types.rkt"

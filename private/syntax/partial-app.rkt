@@ -9,6 +9,8 @@
 ;;;=============================================================
 (require (for-syntax racket/base racket/contract)
          racket/contract
+         racket/match
+         (prefix-in t: (only-in "../tools/patterns.rkt" +))
          (only-in "../tools/curry.rkt" curry)
          (only-in "../tools/arity.rkt" max-arity))
 
@@ -76,5 +78,11 @@
 (define p-map (procedure-reduce-arity map (arity-at-least 2)))
 (define p-andmap  (procedure-reduce-arity andmap (arity-at-least 2)))
 (define p-ormap  (procedure-reduce-arity ormap (arity-at-least 2)))
-(define p-+  (procedure-reduce-arity + (arity-at-least 2)))
 (define p-*  (procedure-reduce-arity * (arity-at-least 2)))
+
+(define-match-expander p-+
+  (syntax-rules ()
+    [(p-+ a x) (t:+ a x)])
+  (syntax-id-rules ()
+    [(p-+ args ...) (%p-app (procedure-reduce-arity t:+ (arity-at-least 2)) args ...)]
+    [p-+ (procedure-reduce-arity t:+ (arity-at-least 2))]))

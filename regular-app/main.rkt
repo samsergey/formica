@@ -33,7 +33,7 @@
 
 (require "../tools.rkt"
          "formal.rkt"
-         "../rewrite.rkt"
+         (except-in "../rewrite.rkt" +)
          "../tacit.rkt"
          "../memoize.rkt"
          "../types.rkt"
