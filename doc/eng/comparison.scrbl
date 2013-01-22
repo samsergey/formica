@@ -66,13 +66,13 @@ In the last case it is impossible to use the relative tolerance, so @racket[(tol
 
 @section{Generic ordering}
 
-Symbolic transformations often require ordering of objects of different kinds: numbers, booleans, strings or lists. For example, these two algebraic expressions, should be equivalent: @centered{@tt{'(+ a b) = '(+ b a).}} As another example consider following simplification chain:
+Symbolic transformations often require ordering of objects of different kinds: numbers, booleans, strings or lists. For example, these two algebraic expressions, should be equivalent: @centered{@tt{'(+ a b) = '(+ b a).}} As another example, consider following simplification chain:
 @centered{@tt{'(+ x 2 (* y x) 5)}   ==> 
           
           @tt{'(+ 2 5 x (* x y))}   ==> 
           
           @tt{'(+ 7 x (* x y)).}}
-So it is reasonable to sort the arguments of commutative  operations. One more example, is given in the @filepath{logics.rkt} file in the @filepath{formica/examples} folder.
+So it is reasonable to sort the arguments of commutative  operations. One more example is given in the @filepath{logics.rkt} file in the @filepath{formica/examples} folder.
 
 Formica provides a generic ordering procedure which allows to define the ordering on different sets which are represented by contract-based types.
 
@@ -87,7 +87,7 @@ By default following ordering of different types is used:
                (list "6"   @racket[null?]    @racket[(const #f)])
                (list "7"   @racket[pair?]    @racket[pair<?]))]
 It means that any string follows any real number, and for comparing values within the type the corresponding ordering function is used.
-This table is stored in the @racket[(type-ordering)] parameter, and could be extended or modified.
+This table is stored in the @racket[(type-ordering)] parameter and could be extended or modified.
 
 @defproc[(ordered? [v Any] ...) Bool]
 Returns @racket[#t] if arguments @racket[_v ...] are ordered according to ordering given by the @racket[(type-ordering)] parameter. Returns @racket[#f] otherwise.

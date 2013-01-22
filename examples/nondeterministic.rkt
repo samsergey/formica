@@ -133,14 +133,15 @@
 (test-case
  "non-deterministic parser"
  ; tokens
- (define-formal Hex Dec Word)
- ;; we can parse three different types of terms
- (define-type Parsed (Hex: Int) (Dec: Int) (Word: Str))
+ (define-formal Hex Dec Word Bin)
+ ;; we can get three different types of terms
+ (define-type Parsed (Hex: Int) (Dec: Int) (Word: Str) (Bin: Int))
  
  ; predicates for types of characters
  (define hex-char? (regexp-match? #rx"[0-9a-f]"))
  (define dec-char? (regexp-match? #rx"[0-9]"))
  (define alph-char? (regexp-match? #rx"[a-z]"))
+ (define bin-char? (regexp-match? #rx"[01]"))
  
  ;; attempts to add a character to the parsed representation of a hex digit
  (:: parse-hex (Str Parsed -> (list: Parsed ..))
@@ -160,17 +161,23 @@
      (? alph-char? c) (Word w) --> (return (Word (string-append w c)))
      _                _        --> mzero))
  
+ ;; attempts to add a character to the parsed representation of a hex digit
+ (:: parse-bin (Str Parsed -> (list: Parsed ..))
+   (define/. parse-bin
+     (? bin-char? c) (Bin d) --> (return (Bin (+ (* 2 d) (string->number c 2))))
+     _                _      --> mzero))
+ 
  ;; tries to parse the digit as a hex value, a decimal value and a word
  ;; the result is a list of possible parses
  (:: parse-char (Str Parsed -> (list: Parsed ..))
    (define (parse-char c p)
-     (mplus (parse-hex c p) (parse-dec c p) (parse-word c p))))
+     (mplus (parse-hex c p) (parse-dec c p) (parse-word c p) (parse-bin c p))))
  
  ;; parse an entire String and return a list of the possible parsed values
  (:: parse (Str -> (list: Parsed ..))
    (define (parse str)
      (do [s <-: (map string (string->list str))]
-         [init <- '((Hex 0) (Dec 0) (Word ""))]
+         [init <- '((Hex 0) (Dec 0) (Word "") (Bin 0))]
          (fold/m parse-char init s))))
  
  (check-equal? (parse "12") '((Hex 18) (Dec 12)))
