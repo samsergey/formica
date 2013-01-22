@@ -25,7 +25,8 @@
   ; Monoid
   (Monoid (->* (#:return (->* () #:rest list? listable?)
                   #:mplus (-> listable? listable? listable?)) 
-                 (#:map (-> (-> any/c listable?) listable? listable?)) monad-plus?))
+                 (#:map (-> (-> any/c listable?) listable? listable?)
+                  #:type contract?) monad-plus?))
   (mplus-map (-> (-> any/c listable?) listable? any/c))
   (zip (->* (listable?) #:rest (listof listable?) (sequence/c list?)))
   ; List monad
@@ -56,9 +57,9 @@
      (let ([fx (f x)])
        (mplus (f x) r))))
 
-(define (Monoid #:return ret #:map (app-map mplus-map)  #:mplus app)
+(define (Monoid #:return ret #:map (app-map mplus-map)  #:mplus app #:type (T listable?))
   (monad
-   #:type listable?
+   #:type T
    #:return ret
    #:bind (λ (m f) (app-map f m))
    #:mzero (ret)
@@ -69,15 +70,16 @@
 ;;; List monad
 ;;;===============================================================================
 (define (concat-map f lst)
-  (for*/list ([x lst] [fx (in-list (f x))]) fx))
+  (for*/list ([x (in-list lst)] [fx (in-list (f x))]) fx))
 
 (define concatenate (argmap append sequence->list))
 
 (define-monad List 
   (Monoid
+   #:type n/f-list?
    #:return list
    #:map concat-map
-   #:mplus concatenate))
+   #:mplus append))
 
 ;;;===============================================================================
 ;;; Stream monad
@@ -119,6 +121,12 @@
 
 (define-monad Stream 
   (Monoid
+   #:type (flat-named-contract 
+           'listable?
+           (and/c sequence? 
+                  (not/c integer?)
+                  (not/c n/f-list?)
+                  (not/c formal?)))
    #:return make-stream
    #:map stream-concat-map
    #:mplus stream-concatenate))

@@ -19,6 +19,7 @@
  using
  check-result
  ; functional forms
+ type
  return
  bind
  mzero
