@@ -25,7 +25,7 @@ This guide is addressed to a reader which is familiar both to a @emph{Racket} an
 @section{Brief tour}
 Here are the main features of the Formica dialect.
 
-@subsection{Formal functions:}
+@subsection{Formal functions}
 
 This declares @racketidfont{f} to be a @tech{formal function}: a function which doesn't perform any calculations, but just shows it's application.
 @def+int[#:eval formica-eval
@@ -45,7 +45,7 @@ In the following example the `+` function is made formal:
 
 Together with pattern-matching and @tech{rewriting} technique, formal functions give a framework for designing complex abstract data types.
 
-@subsection{Rewriting:}
+@subsection{Rewriting}
   
 Suppose we have to define a function that, if it receives 1 returns 0 and if it returns 0 returns 1. If all rules fail the argument is left unchanged:
 @def+int[#:eval formica-eval
@@ -94,7 +94,7 @@ Here is a simple implementation of symbolic η- and β-reduction rules for λ-ca
  (reduce '((λ. x (f x x)) a))                
  (reduce '((λ. f (λ. x (f (f x)))) (λ. f (λ. y (f (f y))))))]
   
-@subsection{Simplified syntax for partial application and point-free definitions:}
+@subsection{Simplified syntax for partial application and point-free definitions}
   
 Once you have written in @emph{Haskell} or on the blackboard:
 @codeblock{
@@ -110,7 +110,7 @@ it is difficult not to try it in @emph{Formica}:
   (map (map (* 2)) '((1 2) (3 4) (5)))]
 
 
-@subsection{Contract-based dynamical typing system:}
+@subsection{Contract-based dynamical typing system}
 
 Being not so strict as in @emph{Typed Racket} or @emph{Haskell}, the contract typing system gives a flavor of rich type systems used in functional programming, including abstract, algebraic and polymorphic types.
 
@@ -214,17 +214,16 @@ As in @racket[Haskell], it is possible to use pattern-matching in list-comprehen
 Consider a classical problem: @emph{A farmer buys 100 animals for $100.00. The animals include at least one cow, one pig, and one chicken, but no other kind. If a cow costs $10.00, a pig costs $3.00, and a chicken costs $0.50, how many of each did he buy?}
 
 Here is a declarative program solving this problem:
-@#reader scribble/comment-reader
-   (def+int #:eval formica-eval
-     (define (solve-farmer-problem #:cow (c 10) 
-                                   #:pig (p 3) 
-                                   #:chicken (ch 1/2))
-       (do [cows     <-  (in-range 1 (/ 100 c))] 
-           [pigs     <-  (in-range 1 (/ 100 p))] 
-           [chickens <-: (- 100 cows pigs)]
-           [100 <-: (+ (* c cows) (* p pigs) (* ch chickens))]
-           (return `((,cows cows) (,pigs pigs) (,chickens chickens)))))
-     (solve-farmer-problem))
+@def+int[#:eval formica-eval
+ (define (solve-farmer-problem #:cow (c 10) 
+                               #:pig (p 3) 
+                               #:chicken (ch 1/2))
+   (collect `((,cows cows) (,pigs pigs) (,chickens chickens))
+     [cows     <-  (in-range 1 (/ 100 c))] 
+     [pigs     <-  (in-range 1 (/ 100 p))] 
+     [chickens <-: (- 100 cows pigs)]
+     [= 100 (+ (* c cows) (* p pigs) (* ch chickens))]))
+ (solve-farmer-problem)]
 
 If cow costs $8 there would be 6 possible solutions:
 @interaction[#:eval formica-eval
@@ -233,7 +232,7 @@ If cow costs $8 there would be 6 possible solutions:
 It is easy to create new monads. Here is an example of defining the parameterized monad @tt{(Maybe a)}.
 
 @defs+int[#:eval formica-eval
-  ((define-formal Maybe Just)
+  ((define-formal Just)
    
    (define-type (Maybe? a) 
      (Just: a) 
