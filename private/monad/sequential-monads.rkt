@@ -13,6 +13,7 @@
          (only-in "../../formal.rkt" formal? n/f-list?)
          (only-in "../../types.rkt" check-result check-argument)
          racket/set
+         racket/list
          racket/contract
          racket/generator
          racket/stream
@@ -78,7 +79,7 @@
   (Monoid
    #:type n/f-list?
    #:return list
-   #:map concat-map
+   #:map append-map
    #:mplus append))
 
 ;;;===============================================================================
@@ -105,7 +106,7 @@
                ; the for-cycle is over
                (yield 'end-of-stream)))
   ; return a stream, produced by the generator
-  (sequence->stream (in-producer g 'end-of-stream)))
+ (in-producer g 'end-of-stream))
 
 (define (stream-concatenate s1 s2) 
   (define g 
@@ -125,8 +126,7 @@
            'listable?
            (and/c sequence? 
                   (not/c integer?)
-                  (not/c n/f-list?)
-                  (not/c formal?)))
+                  (not/c list?)))
    #:return make-stream
    #:map stream-concat-map
    #:mplus stream-concatenate))

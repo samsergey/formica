@@ -8,6 +8,7 @@
 ;;; monadic type inference
 ;;;===============================================================================
 (require racket/promise)
+ (require racket/sequence)
 
 (define monad-types (make-parameter (list (cons Any Id))))
 
@@ -21,14 +22,12 @@
   #:return (λ x (apply (inferred-return) x))
   #:bind (λ (m f)
            (define M (cdr (assoc m (monad-types) (λ (x T) (is x T)))))
-           (parameterize ([inferred-return (using M return)]
-                          [inferred-mzero (if (monad-zero? M) 
-                                              (using M mzero)
-                                              'undefined)]
-                          [inferred-mplus (if (monad-plus? M) 
-                                              (using M mplus)
-                                              'undefined)])
-             (apply (using M bind) m (list f))))
+           (display M)
+           (using M 
+             (parameterize ([inferred-return return]
+                            [inferred-mzero (if (monad-zero? M) mzero 'undefined)]
+                            [inferred-mplus (if (monad-plus? M) mplus 'undefined)])
+               (bind m >>= f))))
   #:mplus (λ (x y) ((inferred-mplus) x y))
   #:mzero (delay/name (inferred-mzero))
   #:failure (λ (x) ((inferred-failure) x)))
@@ -46,7 +45,7 @@
 (bind 7 >>= (lift (* 2)) >>= (lift sqr))
 (bind (Just 7) >>= (lift (* 2)) >>= (lift sqr))
 (bind (list 7) >>= (lift (* 2)) >>= (lift sqr))
-(stream-first (bind (in-value 7) >>= (lift (* 2)) >>= (lift sqr)))
+(sequence->list (bind (in-value 7) >>= (lift (* 2)) >>= (lift sqr)))
 
 (define (isqrt x)
   (let next ([s 0] [r 0])
@@ -59,5 +58,3 @@
 (bind (list 16) >>= isqrt)
 (bind (range 100) >>= isqrt)
 ;(stream->list (bind (in-range 10) >>= isqrt))
-
-(using Stream (is (return 6) type))
