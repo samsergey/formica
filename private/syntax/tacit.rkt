@@ -13,6 +13,8 @@
 
 (provide define/c)
 
+; FIXME (define/c (f x) 'sin) does not define f nor rases an error
+
 ;;; ==============================================================
 ;;;  helper functions
 ;;; ==============================================================
@@ -124,8 +126,8 @@
           [(x ... y ...) body ...] ...
           [(x ... . z) rest-body ...])))]
     
-    [(_ (f x ...) (quote y ...)) (define (f x ...) (quote y ...))]
-    [(_ (f x ...) (quasiquote y ...)) (define (f x ...) (quasiquote y ...))]
+    [(_ (f x ...) (quote y ...)) (error 'define/c (format "the right-hand side of point-free definition is not a function constructor, nor the function call\n given ~a" (quote y ...)))]
+    [(_ (f x ...) (quasiquote y ...)) (error 'define/c (format "the right-hand side of point-free definition is not a function constructor, nor the function call\n given ~a" (quasiquote y ...)))]
     
     [(_ (f x ...) (g y ...)) (begin
                                (unless (procedure? g) (raise-syntax-error 
@@ -140,9 +142,10 @@
                                    (arity-add (reduce-arity (procedure-arity g) (length '(y ...)))
                                               (length '(x ...)))))))]
     
-    [(_ f b) (raise-syntax-error #f 
-                                 "the right-hand side of point-free definition is not a function constructor, nor the function call"
-                                 #'(define/c f b))]
+    [(_ f b) (begin 
+               (unless (procedure? b)
+                 (error 'define/c (format "the right-hand side of point-free definition is not a function constructor, nor the function call\n given ~a" b)))
+               (define/c f (b)))]
     
     [(_ f a b ...) (raise-syntax-error #f 
                                        "multiple expressions in point-free definition"

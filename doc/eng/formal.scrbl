@@ -26,7 +26,7 @@ functions give powerful and flexible framework for development of abstract data 
 symbolic computations, debugging of functional programs and teaching different programming concepts.
 
 A @deftech{@emph{formal function}} if applied to any
-arguments does not provide any computations and returns a literal expression denoting
+arguments does not perform any computations and returns a literal expression denoting
 it's application (the @deftech{@emph{formal application}}).
 
 @centered[@tt{(f 'x 'y)  ==>  '(f x y)}]
@@ -34,7 +34,7 @@ it's application (the @deftech{@emph{formal application}}).
 The formal application is just a list, having the name of function at the first position and 
 the sequence of arguments as the rest of it.
 
-Formal functions are in many ways similar to Racket's structures: they provide tagged containers, 
+Formal functions are in many ways similar to Racket's structures: they both provide tagged containers, 
 which could be identified and analyzed by pattern-matching and contract systems.
 Here are some points which show the difference between formal functions and structures.
 @itemize{@item{Formal functions do not give names to their arguments as Racket structures do.}
@@ -48,7 +48,7 @@ Here are some points which show the difference between formal functions and stru
 @section[#:tag "formal motivation"]{Motivation}
 
 Pattern matching usually goes together with algebraic types. 
-Racket's structures and lists could be used as constructors for algebraic data types, but they use have some drawbacks.
+Racket's structures and lists could be used as constructors for algebraic data types, but their use have some drawbacks.
 
 Suppose we wish to define a rewriting system for Peano axioms. We start with definition of types for numerals, successor, sum and product:
 @defs+int[#:eval formica-eval
@@ -110,7 +110,7 @@ Another approach is to use lists and interpret their @racket[car]-s as tags.
 
 Looks much better, but a bit prickly because of quotes and commas. It may become even worse-looking if we use blanks _ and ___ a lot. Using explicit @racket[list] constructor does not help either, it makes patterns more difficult to read and write: @racket[(list 'Sum x (list '1+ y))].
 
-The package provides an abstraction named @emph{formal function} which work as a tagged list constructor in expression position and as a structure constructor in patterns. With use of formal functions we may write clear definition of rewriting system for Peano's numerals without a single redundant word or symbol:
+With use of formal functions we may write clear definition of rewriting system for Peano's numerals without a single redundant word or symbol:
 @defs+int[#:eval formica-eval
                  [(define-formal N 1+ Sum Prod)
                   (define calculate4

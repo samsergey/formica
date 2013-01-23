@@ -35,9 +35,9 @@ Here is partial application of binary function @racket[cons]:
 @interaction[#:eval formica-eval
   (cons 1)
   ((cons 1) 2)]
-In the expression @racket[(cons 1)] the first argument is fixed, resulting an unary function.
+In the expression @racket[(cons 1)] the first argument is fixed, resulting in an unary function.
 
-That's how it is possible to define the increment function:
+The partially apllied function becomes a regular function which could be applied, returned as a result or passed as a n argument to another function.
 @interaction[#:eval formica-eval
   ((+ 1) 3)
   (define inc (+ 1))

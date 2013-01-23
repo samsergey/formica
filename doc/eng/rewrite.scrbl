@@ -16,7 +16,7 @@
 
 The bindings documented in this section are provided by the @racket[formica/rewrite] library and @racket[formica] language.
 
-The Formica provides tools for programming via term rewriting technique. Provided forms could be considered as a syntactic sugar for Racket's @racket[match] form, however they offer different semantics. The language introduces repetitive rewriting in order to obtain the normal form of given expression, ability to transform any sub-part in nested list structure and definition of formal functions which abstract general algebraic types.
+The Formica provides tools for programming via term rewriting technique. Provided forms could be considered as a syntactic sugar for Racket's @racket[match-lambda] form, however they offer different semantics. The language introduces repetitive rewriting in order to obtain the normal form of given expression, ability to transform any sub-part in nested list structure.
 
 @local-table-of-contents[]
 
@@ -24,9 +24,9 @@ The Formica provides tools for programming via term rewriting technique. Provide
 
 The thoroughly developed rewriting theory has many applications in different fields of computer science @cite["Baader99"  "Bezem03"]. It could be a handy tool in everyday programming practice, making program units shorter and more expressive. The REFAL @cite["Turchin89" "Surhone10"] and Wolfram's Mathematica core language @cite["Wolfram"] give excellent examples of scalability, power and expressiveness provided by rewriting.
 
-The aim of developing this library is to mimic Mathematica's rewriting tools in Scheme. The library provides four forms: @racket[rewrite], @racket[rewrite-all], @racket[rewrite-repeated] and @racket[rewrite-all-repeated] named almost in the same way as rewriting functions in Mathematica. In spite of this naming convention, we use word ``rewriting'' for ``replacement'', ``substitution'' or ``transformation'' in this manual, since ``rewriting'' has precise mathematical meaning.
+The aim of developing this library is to mimic Mathematica's rewriting tools in Scheme. The library provides four forms: @racket[rewrite], @racket[rewrite-all], @racket[rewrite-repeated] and @racket[rewrite-all-repeated] named almost in the same way as rewriting functions in Mathematica. We use word ``rewriting'' for ``replacement'', ``substitution'' or ``transformation'' in this manual, since ``rewriting'' has precise mathematical meaning.
 
-@deftech{Rewriting} is a formal method of replacing subterms of an expression with other terms. In Formica the role of the expression play lists, structures and @tech{formal applications}.
+@deftech{Rewriting} is a formal method of replacing  an expression or subterms of an expression with other terms. Here the role of the expression play any datum, lists, structures and @tech{formal applications}.
 
 @subsection{Short examples}
 
@@ -44,7 +44,7 @@ This rewriting describes cyclic swapping of symbols:
              #:eval formica-eval
                     ((/. 'a --> 'b 'b --> 'c 'c --> 'a) '(1 a ((a b c) a)))]
 
-Rewriting rules used as lambda-functions:
+Rewriting rules can be used as lambda-functions:
 
 @interaction[
              #:eval formica-eval
@@ -52,7 +52,7 @@ Rewriting rules used as lambda-functions:
                     ((/. x y --> (* y x)) 4 5)
                     ((/. x (cons y z) --> (values (* x y) z)) 4 '(1 2 3))]
 
-Rewriting is done at any level of a list structure:
+Rewriting is performed at any level of a list structure:
 @interaction[
              #:eval formica-eval
                     ((/. (? Num x) --> (* x x)) '(1 (2 3) 4))]
