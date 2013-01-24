@@ -357,88 +357,45 @@ $false\ \text{и}\ x = false$}
 
 Тип данных связывается с величиной, а не с переменной, и представляет множество к которому принадлежит величина. При этом любая величина может принадлежать к неограниченному числу типов.
 
-Договоримся, что названия типов будут начинаться с~заглавной буквы. Вот некоторые простые типы данных, определённые в языке:
+\label{set-definition}Как известно, любое множество может быть задано \emph{перечислением} с помощью \emph{определяющего предиката}, через \emph{индуктивное определение}, или \emph{алгебраически} --- в виде комбинации других множеств (объединения, пересечения или отрицания). Все эти способы применимы и для определения типов. Об индуктивных определениях мы поговорим позже, а пока обсудим прочие способы.
 
+Любая константа принадлежит единичному типу (множеству из одного элемента).
+
+Любой предикат может определять тип. Например, предикат \s{odd?} определяет множество нечётных чисел, а предикат \s{positive?} --- множество положительных чисел. В частности, к типам данных, определённым через предикаты, относятся:
+
+\vspace{-\medskipamount}
 \begin{type}
-   \item Bool --- {\TextCommentлогическая константа}
-   \item Num --- {\TextCommentчисло (комплексное)}
-   \item Int --- {\TextCommentцелое число}
-   \item Real --- {\TextCommentвещественное число}
-   \item Sym --- {\TextCommentсимвол}
-   \item Str --- {\TextCommentстрока}
+  \item Bool --- {\TextCommentлогические константы: \s{#t} или \s{#f},}
+  \item Num --- {\TextCommentчисла (комплексные),}
+  \item Real --- {\TextCommentвещественные числа,}
+  \item Int --- {\TextCommentцелые числа,}
+  \item Sym --- {\TextCommentсимволы,}
+  \item Str --- {\TextCommentстроки,}
+  \item Fun --- {\TextCommentфункции.}
 \end{type}
 
-\begin{example}{%
-\bsfindex{if}%
-Проверка типов производится формой \s{is}.}
-\REPL
-  {(is 5 Num)}
-  {#t}
-\REPL
-  {(is 5 Str)}
-  {#f}
-\end{example}
+Объединение, пересечение и дополнение типов производится с помощью \emph{комбинаторов типов}: \s{$\cup$}, \s{$\cap$} и \s{\\}\footnote{Символы $\cap$ и $\cup$ вводятся, как \s{\\cup}, \MenuItem{Alt}+\s{\\} и \s{\\cap}, \MenuItem{Alt}+\s{\\}.}. Например, \s{($\cup$ 1 5 8)} определяет множество, состоящее из трёх элементов: 1, 5 и 8; \s{($\cap$ Int positive?)} --- множество натуральных чисел; \s{(\\ Real 0)} --- множество всех действительных чисел, кроме нуля.
 
-\label{set-definition}Множество может быть задано \emph{перечислением} с помощью \emph{предиката} или \emph{индуктивного определения} (о последнем способе, мы поговорим позже).
+Если тип определён предикатом, то проверить принадлежит ли величина тому или иному типу можно просто применив предикат к величине. Более универсальную проверку выполняет функция \sflpi{is}.
 
 \begin{example}{%
-Типы могут определяться любыми предикатами.}
-\REPL
-  {(is 5 positive?)}
-  {#t}
-\REPL
-  {(is 5 odd?)}
-  {#t}
-\end{example}
-
-\begin{example}{%
-Любая константа представляет собой единичный тип. Любая величина принадлежит типу \s{Any}}
-\REPL
-  {(is 5 5)}
-  {#t}
-\REPL
-  {(is 5 Any)}
-  {#t}
-\end{example}
-
-Кроме перечисленных выше, существует алгебраический способ определения множеств: путём их объединения, пересечения или отрицания. Комбинаторы типов \s{or/c}, \s{and/c} и \s{not/c} позволяют комбинировать их друг с другом алгебраически.
-
-\begin{example}{%
-Примеры объединения, пересечения и дополнения типов.}
-\REPL
-  {(is 5 (or/c 5 even?))}
-  {#t}
-\REPL
-  {(is 5 (and/c  odd?))}
-  {#t}
-\begin{ExampleCode}
-> (is 5 (and/c Int 
-               (not/c 7)))
-\end{ExampleCode}
-\REPLout
-  {#t}
+Функция \s{is} позволяет определять принадлежность к единичным типам и не прерывает выполнение программы в случае, если проверка типа приводит к ошибке. Например, функцию \s{odd?} нельзя применять к нецелым числам.}
+\REPL{(is 5 Int)}{#t}
+\REPL{(is 5 5)}{#t}
+\REPL{(is 5.4 odd?)}{#f}
 \end{example}
 
 Для конструирования новых именованных типов служит форма \s{define-type}.
 
 \begin{example}{%
-Так определяется тип величины, которая может быть равна 3, 5, или любому чётному числу, кроме 4.}
+Так определяется тип величины, которая может быть равна 3, 5, или любому чётному числу, pза исключением 4.}
 \begin{ExampleCode}
 > (define-type A
-    3 
-    5 
-    (and/c even? 
-           (not/c 4)))
+    3 5 (\\ even? 4))
 \end{ExampleCode}
-\REPL
-  {(is 3 A)}
-  {#t}
-\REPL
-  {(is 4 A)}
-  {#f}
-\REPL
-  {(is 2 A)}
-  {#t}
+\REPL{(is 3 A)}{#t}
+\REPL{(is 2 A)}{#t}
+\REPL{(is 4 A)}{#f}
 \end{example}
 
 \index{тип!функции}%
@@ -459,7 +416,7 @@ $false\ \text{и}\ x = false$}
 
 Приведём пример, указав тип для написанной нами ренее функции \s{sign}:
 \begin{SchemeCode}
-(:: sqr (Real -> (or/c -1 0 1))
+(:: sqr (Real -> ($\cup$ -1 0 1))
  (define (sign x)
   (cond
     [(negative? x) -1]
@@ -485,12 +442,13 @@ $false\ \text{и}\ x = false$}
   (not (divisible? 4 3))
   (divisible? 7 3.5)
   (divisible? 7.5 -2.5)
-  (divisible? 2 1)
   (not (divisible? 2.5 1))
   (divisible? 1 0))
 \end{Specification}
 
-б) Определите функцию 
+б) Определите числовой тип для множества $\{\pi k\ |\ k \in 1,2, ...\}$.
+
+в) Определите функцию 
 \begin{equation*}
 \mathrm{sinc}(x) = \left\{
 \begin{array}{lll}
@@ -522,17 +480,17 @@ $false\ \text{и}\ x = false$}
 
 \begin{example}{Напишем небольшую программу.
 
-В ней мы определяем две функции \s{area} и \s{perimeter}.}
+В ней мы определяем две функции \s{area} и \s{perimeter} вычисляющие площадь и периметр круга с заданным радиусом.}
 \begin{ExampleCode}[emph={r}]
 #lang formica
 
-; area :: Num \arrow Num
-(define (area r)
-  (* pi (sqr r)))
+(:: area (Real -> Real)
+ (define (area r)
+   (* pi (sqr r))))
 
-; perimeter :: Num \arrow Num
-(define (perimeter r)
-  (* 2 pi r))
+(:: perimeter (Real -> Real)
+ (define (perimeter r)
+   (* 2 pi r)))
 \end{ExampleCode}
 \end{example}
 
@@ -546,29 +504,23 @@ $false\ \text{и}\ x = false$}
 
 Приведём пример простейшей программы с~вводом-выводом:
 \begin{Definition}[emph={r}]
-#lang flp
-
+#lang formica
 ; определения
+(:: area (Real -> Real)
+ (define (area r)
+   (* pi (sqr r))))
 
-; area :: Num \arrow Num
-(define (area r)
-  (* pi (sqr r)))
-
-; perimeter :: Num \arrow Num
-(define (perimeter r)
-  (* 2 pi r))
-
+(:: perimeter (Real -> Real)
+ (define (perimeter r)
+   (* 2 pi r)))
 
 ; input
 (display "Enter the radius:")
 (define r (read))
-
 ; output
-(display "Area: ")
-(display (area r))
+(printf "Area: ~a" (area r))
 (newline)
-(display "Perimiter: ")
-(display (perimeter r))
+(printf "Perimiter: ~a" (perimeter r))
 \end{Definition}
 
 
