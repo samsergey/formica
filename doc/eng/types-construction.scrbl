@@ -26,10 +26,10 @@ Types defined by @racket[define-type] represent @deftech{algebraic types}, where
 The contract for any value.
 
 @deftogether[
-[@defproc[(or/c [c contract?] ...) contract?]
- @defproc[(and/c [c contract?] ...) contract?]
- @defproc[(not/c [c contract?]) contract?]]]
-Union, intersection and negation of contracts.
+[@defproc[(∪ [c contract?] ...) contract?]
+ @defproc[(∩ [c contract?] ...) contract?]
+ @defproc[(\\ [c contract?] ...+) contract?]]]
+Union, intersection and complement of contracts.
 
 @section[#:tag "types:ADT"]{Container types}
 

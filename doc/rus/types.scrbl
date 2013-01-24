@@ -49,7 +49,7 @@ Formica --- язык со @emph{строгой динамической типи
 @interaction[#:eval formica-eval
  (contract? Num)
  (contract? Num)
- (contract? (and/c integer? positive?))
+ (contract? (andf integer? positive?))
  (contract? cons)]
 
 Любая константа, принадлежащая @elemref["t:prim"]{простому типу}, представляет собой @emph{единичный тип}
@@ -148,10 +148,10 @@ Formica --- язык со @emph{строгой динамической типи
 контракт для произвольного выражения.
 
 @deftogether[
-[@defproc[(or/c [c contract?] ...) contract?]
- @defproc[(and/c [c contract?] ...) contract?]
- @defproc[(not/c [c contract?]) contract?]]]
-Объединение, пересечение и отрицание контрактов.
+[@defproc[(∪ [c contract?] ...) contract?]
+ @defproc[(∩ [c contract?] ...) contract?]
+ @defproc[(\\ [c contract?]) contract?]]]
+Объединение, пересечение и дополнение контрактов.
 
 @subsection[#:tag "types:container"]{Контейнерные типы}
 

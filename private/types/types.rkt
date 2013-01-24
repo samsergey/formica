@@ -19,7 +19,7 @@
  define-type
  (rename-out (.->. ->))
  Any Bool Num Real Int Nat Index Str Sym Fun Fun/c
- ∩ ∪
+ ∩ ∪ \\ complement/c
  is check-result check-argument check-type
  list: cons:
  (except-out (all-from-out racket/contract)
@@ -102,9 +102,9 @@
     ; parameterized type
     [(_ (name A ...) expr ...) 
      (define (name A ...)
-        (flat-named-contract 
-         (cons 'name (map object-name (list A ...)))
-         (λ (x) (or ((flat-contract expr) x) ...))))]
+       (flat-named-contract 
+        (cons 'name (map object-name (list A ...)))
+        (λ (x) (or ((flat-contract expr) x) ...))))]
     ; primitive type or type product
     [(_ name expr) 
      (define name 
@@ -124,15 +124,20 @@
 ;;;=================================================================
 ;;; Safe type checking
 ;;;=================================================================
-(define-syntax (is stx)
-  (syntax-case stx ()
-    [(_ x type) 
-     (with-syntax ([c (parse-infix-contract #'type)])
-       #'(cond
-           [(contract? c) 
-            (with-handlers ([exn:fail? (lambda (exn) #f)])
-              (contract-first-order-passes? c x))]
-           [else (raise-type-error 'is "predicate" 1 x type)]))]))
+(define-syntax is
+  (make-set!-transformer
+   (lambda (stx)
+     (syntax-case stx ()
+       [(is x type) 
+        (with-syntax ([c (parse-infix-contract #'type)])
+          (syntax-protect
+           #'(cond
+               [(contract? c) 
+                (with-handlers ([exn:fail? (lambda (exn) #f)])
+                  (contract-first-order-passes? c x))]
+               [else (raise-type-error 'is "predicate" 1 x type)])))]
+       [is (syntax-protect
+            #'(λ (x t) (is x t)))]))))
 
 (define check-type (make-parameter #t))
 
@@ -203,9 +208,19 @@
 ;;;=================================================================
 ;;; aliaces
 ;;;=================================================================
+(define complement/c
+  (procedure-rename
+   (case-lambda
+     [(A) (not/c A)]
+     [(A B) (and/c A (not/c B))]
+     [(A B . C) (apply complement/c (complement/c A B) C)])
+   'complement/c))
+
+
 
 (define ∩ and/c)
 (define ∪ or/c)
+(define \\ complement/c)
 (define-type Any any/c)
 (define-type Bool boolean?)
 (define-type Num number?)

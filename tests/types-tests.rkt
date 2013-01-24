@@ -175,3 +175,16 @@
 (test-case
  "mutual satisfaction"
  (check-equal? (h Sqr 5)  25))
+
+(test-case
+ "is tests"
+ (check-true (is 'x Sym))
+ (check-true (apply is (list 'x Sym))))
+
+(test-case
+ "complement/c tests"
+ (check-true (is 3 (\\ Int 0)))
+ (check-false (is 0 (\\ Int 0)))
+ (check-true (is 'x (\\ 0)))
+ (check-true (is 'x (\\ Sym 'y 'z 't)))
+ (check-false (is 'x (\\ Sym 'y 'z 'x))))

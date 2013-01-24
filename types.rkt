@@ -18,4 +18,3 @@
   (add-to-type-ordering (-> contract? (? contract? Fun) void?))
   (symbol<? (-> Sym Sym Sym .. Bool))
   (pair<? (-> pair? pair? pair? .. Bool))))
-
