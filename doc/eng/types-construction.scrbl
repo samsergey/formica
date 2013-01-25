@@ -14,7 +14,7 @@
 @title[#:tag "type:definition"]{Defining new types}
 
 @defform*[[(define-type name c ...)
-  (define-type (name x ...) c ...)] #:contracts ([c contract?] [x contract?])]
+  (define-type (name x ...) c ...)] #:contracts ([c Type] [x Type])]
 Defines named contract which returns @racket[#t], if the argument satisfies any contract within @racket[_c ...]. If parameters @racket[_x ...] are given, defines the contract for parametrized type.
 
 Types defined by @racket[define-type] represent @deftech{algebraic types}, where the sequence @nonbreaking{@racket[_c ...]} represents the @emph{type sum}, @tech{container types}  correspond to @emph{type products} and @tech{primitive types} correspond to @emph{unit types}.
@@ -22,20 +22,20 @@ Types defined by @racket[define-type] represent @deftech{algebraic types}, where
 @section[#:tag "types:type combinators"]{Contract combinators}
 @deftech{Contract combinators} allow to construct new types out of existing @tech{primitive types} or @tech{container types}.
 
-@defproc[(Any [v Any]) contract?]
+@defproc[(Any [v Any]) Type]
 The contract for any value.
 
 @deftogether[
-[@defproc[(∪ [c contract?] ...) contract?]
- @defproc[(∩ [c contract?] ...) contract?]
- @defproc[(\\ [c contract?] ...+) contract?]]]
+[@defproc[(∪ [c Type] ...) Type]
+ @defproc[(∩ [c Type] ...) Type]
+ @defproc[(\\ [c Type] ...+) Type]]]
 Union, intersection and complement of contracts.
 
 @section[#:tag "types:ADT"]{Container types}
 
 Algebraic data types could be created using @deftech{container types}: pairs, lists, @tech{formal functions} or structures.
 
-@defproc[(cons: [c1 contract?] [c2 contract?]) contract?]
+@defproc[(cons: [c1 Type] [c2 Type]) Type]
 The contract for a pair of values, which belong to types @racket[_c1] and @racket[_c2].
 
 @interaction[#:eval formica-eval
@@ -46,7 +46,7 @@ The contract for a pair of values, which belong to types @racket[_c1] and @racke
 
 @defform*[
 [(list: c ...) 
- (list: c ..)] #:contracts [(c contract?)]]
+ (list: c ..)] #:contracts [(c Type)]]
 The contract for lists.
 
 @itemize{ @item{@racket[(list: c ...)] contract for a list with fixed number of elements.
@@ -64,7 +64,7 @@ The contract for lists.
                    (is '(1 2 x 4 5) (list: Num ..))
                    (is '(1 2 30 1) (list: positive? ..))]}}
 
-@defform/none[(f: c ...) #:contracts [(c contract?)]]
+@defform/none[(f: c ...) #:contracts [(c Type)]]
 contract for the @tech{formal application} of function @racket[_f]. Similar to @racket[list:] combinator.
 
 All contracts defined in the @racket[racket/contract] module also could be used. 

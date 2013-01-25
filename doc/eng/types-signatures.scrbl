@@ -19,10 +19,10 @@ The @deftech{function signature} defines the domain and range of a function. On 
    [(-> dom ... range)
     (-> dom ... rest .. range)
     (-> dom ... (? opt ...) range)
-    (-> dom ... (? opt ...) rest .. range)] #:contracts [(dom contract?)
-                                                         (range contract?)
-                                                         (opt contract?)
-                                                         (rest contract?)]]
+    (-> dom ... (? opt ...) rest .. range)] #:contracts [(dom Type)
+                                                         (range Type)
+                                                         (opt Type)
+                                                         (rest Type)]]
 Defines a function signature, having domain @racket[_dom ...] and range  @racket[_range]. Function may have optional arguments @racket[_opt ...]. For @tech{variadic} functions the type of arguments is given by the contract @racket[_rest] followed by symbol @litchar{..} .
 
 Could be used in the infix notation:

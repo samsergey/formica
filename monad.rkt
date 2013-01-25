@@ -36,7 +36,7 @@
   (lift (-> Fun Fun))
   (fold/m (-> binary? Any list? Any))
   (filter/m (-> unary? list? Any))
-  (listable? contract?)
+  (listable? Type)
   (sequence/m (-> listable? Any))
   (map/m (-> unary? listable? Any))
   (sum/m (-> list? Any))

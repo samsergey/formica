@@ -18,7 +18,7 @@
  ::
  define-type
  (rename-out (.->. ->))
- Any Bool Num Real Int Nat Index Str Sym Fun Fun/c
+ Any Bool Num Real Int Nat Index Str Sym Fun Fun/c Type
  ∩ ∪ \\ complement/c
  is check-result check-argument check-type
  list: cons:
@@ -103,7 +103,7 @@
     [(_ (name A ...) expr ...) 
      (define (name A ...)
        (flat-named-contract 
-        (cons 'name (map object-name (list A ...)))
+        (cons 'name (map (λ (x) (or (object-name x) x)) (list A ...)))
         (λ (x) (or ((flat-contract expr) x) ...))))]
     ; primitive type or type product
     [(_ name expr) 
@@ -193,11 +193,9 @@
 
 (define (show-blame-error blame value message)
   (string-append
-   (format "\n  Signature violation:  ~a \n" 
-           message)
-   (format "  guilty party:  ~a\n  innocent party:  ~a\n  signature:  ~a : ~a" 
-           (translate-party (blame-positive blame))
-           (translate-party (blame-negative blame))
+   "Signature violation!\n "
+   message
+   (format "\n signature:  ~a :: ~a" 
            (blame-value blame) 
            (translate-contract (blame-contract blame)))))
 
@@ -231,6 +229,7 @@
 (define-type Str string?)
 (define-type Sym symbol?)
 (define-type Fun procedure?)
+(define-type Type contract?)
 (define-type (Fun/c name)
   (and/c procedure?
          (λ(f)(eq? (object-name f) name))))

@@ -19,31 +19,31 @@ A role of a contract could play
          @item{an unary predicate, describing the type;}
          @item{a compound contract, constructed by @tech{contract combinators}.}}
 
-@defproc[(contract? [v Any]) Bool]
+@defproc[(Type [v Any]) Bool]
 Returns @racket[#t] if @racket[_v] could be used as a contract and @racket[#f] otherwise.
 
 Any constant which belongs to a @tech{primitive type} could be used as a contract, representing a @emph{unit type}:
 @interaction[#:eval formica-eval
- (contract? 5)
- (contract? 'abc)]
+ (is 5 Type)
+ (is 'abc Type)]
 
 Any predicate could be used as a contract:
 @interaction[#:eval formica-eval
- (contract? Num)
- (contract? procedure-arity?)
- (contract? cons)]
+ (is Num Type)
+ (is procedure-arity? Type)
+ (is cons Type)]
 
 Contracts could be constructed using @tech{contract combinators}:
 @interaction[#:eval formica-eval 
- (contract? (and/c integer? positive?))
- (contract? (or/c Num (cons: Num Num)))]
+ (Type (and/c integer? positive?))
+ (Type (or/c Num (cons: Num Num)))]
 
-@defform[(is v type-pred) #:contracts ([v Any] [type-pred contract?])]
-Provides safe type check. Returns @racket[#t] if @racket[_v] belongs to a type, defined by the contract @racket[_type-pred], and @racket[#f] otherwise.
+@defform[(is v type-pred) #:contracts ([v Any] [t Type])]
+Provides safe type check. Returns @racket[#t] if @racket[_v] belongs to a type, defined by the contract @racket[_t], and @racket[#f] otherwise.
 
 This form differs from direct contract application in following:
 @itemize{@item{it allows to consider @tech{primitive types};} 
-         @item{if application of @racket[_type-pred] leads to exception, the @racket[is] form does not stop running the program and returns @racket[#f].}}
+         @item{if application of @racket[_t] leads to exception, the @racket[is] form does not stop running the program and returns @racket[#f].}}
 
 @interaction[#:eval formica-eval
  (is 'abc Sym)

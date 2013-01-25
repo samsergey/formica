@@ -23,7 +23,7 @@ Monads are first-class objects in Formica. Following function returns anonymous 
                 [#:bind bind (Any unary? → Any)]
                 [#:mzero mzero Any 'undefined]
                 [#:mplus mplus (Any Any → Any) 'undefined]
-                [#:type type contract? #f]
+                [#:type type Type #f]
                 [#:failure failure (Any → any) raise-match-error]) monad?]
 Returns a monad or an additive monad with given @racket[_return] and @racket[_bind] functions, complemented by @racket[_mplus] operation and zero element @racket[_mzero] in case of additive monads.
 
@@ -47,7 +47,7 @@ If the @racket[_failure] function is given, it will be called in case of failure
                       [bind (Any unary? → Any)]
                       [mzero Any]
                       [mplus (Any Any → Any)]
-                      [type contract?]
+                      [type Type]
                       [failure (Any → Any)])]
 First form defines named monad as a result of @racket[m-expr].
 The second form defines named monad in the same way as @racket[monad] constructor.

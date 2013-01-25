@@ -1,3 +1,4 @@
+%!TEX root = main.tex
 \ProvidesPackage{OFP}
 
 \RequirePackage[bbgreekl]{mathbbol}
@@ -449,18 +450,14 @@ literate={expr}{{$expr$}}1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % предметный указатель
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-\newcommand{\bsfindex}[1] {\index{Racket!базовые формы!#1@\s{#1}}}
-\newcommand{\bfnindex}[1] {\index{Racket!базовые функции!#1@\s{#1}}}
-\newcommand{\sfindex}[1] {\index{Racket!прочие формы и функции!#1@\s{#1}}}
-\newcommand{\fnindex}[1]  {\index{Racket!прочие формы и функции!#1@\s{#1}}}
-\newcommand{\flpindex}[1] {\index{Racket!диалект FLP!#1@\s{#1}}}
+\newcommand{\bsfindex}[1] {\index{Formica!базовые формы!#1@\s{#1}}}
+\newcommand{\bfnindex}[1] {\index{Formica!базовые функции!#1@\s{#1}}}
+\newcommand{\sfindex}[1] {\index{Formica!прочие формы и функции!#1@\s{#1}}}
+\newcommand{\fnindex}[1]  {\index{Formica!прочие формы и функции!#1@\s{#1}}}
 
 \newcommand\si[1]{\s{#1}\fnindex{#1}}
 \newcommand\sbi[1]{\s{#1}\bfnindex{#1}}
 \newcommand\sfi[1]{\s{#1}\bsfindex{#1}}
-\newcommand\sflpi[1]{\s{#1}\flpindex{#1}}
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % гиперссылки

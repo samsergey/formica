@@ -36,10 +36,10 @@
    [(-> dom ... range)
     (-> dom ... rest .. range)
     (-> dom ... (? opt ...) range)
-    (-> dom ... (? opt ...) rest .. range)] #:contracts [(dom contract?)
-                                                         (range contract?)
-                                                         (opt contract?)
-                                                         (rest contract?)]]
+    (-> dom ... (? opt ...) rest .. range)] #:contracts [(dom Type)
+                                                         (range Type)
+                                                         (opt Type)
+                                                         (rest Type)]]
 Определяет сигнатуру для функции, имеющую область определения @racket[_dom ...], 
 область значений @racket[_range], и, возможно, необязательные аргументы
 @racket[_opt ...]. Для вариадических функций тип для

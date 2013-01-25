@@ -23,7 +23,7 @@
                 [#:bind bind (Any unary? → Any)]
                 [#:mzero mzero Any 'undefined]
                 [#:mplus mplus (Any Any → Any) 'undefined]
-                [#:type type contract? #f]
+                [#:type type Type #f]
                 [#:failure failure (Any → any) raise-match-error]) monad?]
 Возвращает монаду (простую или аддитивную) с указанными функциями @racket[_return] и @racket[_bind], дополненными операцией @racket[_mplus] и нейтральным элементом @racket[_mzero] в случае аддитивной монады.
 
@@ -47,7 +47,7 @@
                       [bind (Any unary? → Any)]
                       [mzero Any]
                       [mplus (Any Any → Any)]
-                      [type contract?]
+                      [type Type]
                       [failure (Any → Any)])]
 В первом варианте форма связывает именованную монаду с результатом, возвращаемым @racket[m-expr]. В втором варианте -- определяет именованную монаду с указанными свойствами так же, как функция @racket[monad].
 

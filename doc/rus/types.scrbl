@@ -42,25 +42,25 @@ Formica --- язык со @emph{строгой динамической типи
 
 Контракты можно определять, как обыкновенные функции --- с помощью формы @racket[define].
 
-@defproc[(contract? [v Any]) Bool]
+@defproc[(Type [v Any]) Bool]
 Возвращает @racket[#t] только если @racket[_v] может быть
 использовано, как контракт, и @racket[#f] --- во всех других случаях.
 
 @interaction[#:eval formica-eval
- (contract? Num)
- (contract? Num)
- (contract? (andf integer? positive?))
- (contract? cons)]
+ (is Num Type)
+ (is (andf integer? positive?) Type)
+ (is cons Type)]
 
 Любая константа, принадлежащая @elemref["t:prim"]{простому типу}, представляет собой @emph{единичный тип}
 и может рассматриваться, как контракт для этого типа.
 
 @interaction[#:eval formica-eval
- (contract? 5)
- (contract? 'abc)]
+ (is 5 Type)
+ (is 'abc Type)
+ (is '(a b c) Type)]
 
 
-@defform[(is v type-pred) #:contracts ([v Any] [type-pred contract?])]
+@defform[(is v type-pred) #:contracts ([v Any] [type-pred Type])]
 Возвращает @racket[#t], если @racket[_v] принадлежит типу,
 определяемому контрактом @racket[_type-pred], и @racket[#f] --- во всех других случаях.
 
@@ -108,7 +108,7 @@ Formica --- язык со @emph{строгой динамической типи
 @itemize{@item{@elemref["t:memo"]{мемоизированные} функции, определяемые предикатом @racket[memoized?],}
          @item{@elemref["t:curry"]{каррированные} и @elemref["t:partial"]{частично применённые} функции, определяемые предикатом @racket[curried?],} 
          @item{@elemref["t:formal"]{формальные} функции, определяемые предикатом @racket[formal?],}
-         @item{@elemref["t:predicate"]{контракты}, определяемые предикатом @racket[contract?].}}
+         @item{@elemref["t:predicate"]{контракты}, определяемые предикатом @racket[Type].}}
 
 Функциональные типы, описывающие типы для аргументов и возвращаемого значения, можно
 определять с помощью @elemref["t:signature"]{сигнатур}.
@@ -116,15 +116,15 @@ Formica --- язык со @emph{строгой динамической типи
 Некоторые часто используемые простые типы имеют краткие обозначения. Они могут рассматриваться, как имена множеств, отражающие эти типы.
 
 
-@defthing[Bool contract?] определяет множество величин логического типа. Эквивалентен предикату @racket[boolean?].
-@defthing[Num contract?] определяет множество чиел. Эквивалентен предикату @racket[Num].
-@defthing[Real contract?]  определяет множество действительных чисел. Эквивалентен предикату @racket[real?].
-@defthing[Int contract?]  определяет множество целых чисел. Эквивалентен предикату @racket[integer?].
-@defthing[Nat contract?]  определяет множество натуральных чисел.
-@defthing[Index contract?]  определяет множество натуральных чисел больших нуля.
-@defthing[Str contract?]  определяет множество строк. Эквивалентен предикату @racket[string?].
-@defthing[Sym contract?] определяет множество символов. Эквивалентен предикату @racket[symbol?].
-@defthing[Fun contract?]  определяет множество функций. Эквивалентен предикату @racket[function?].
+@defthing[Bool Type] определяет множество величин логического типа. Эквивалентен предикату @racket[boolean?].
+@defthing[Num Type] определяет множество чиел. Эквивалентен предикату @racket[Num].
+@defthing[Real Type]  определяет множество действительных чисел. Эквивалентен предикату @racket[real?].
+@defthing[Int Type]  определяет множество целых чисел. Эквивалентен предикату @racket[integer?].
+@defthing[Nat Type]  определяет множество натуральных чисел.
+@defthing[Index Type]  определяет множество натуральных чисел больших нуля.
+@defthing[Str Type]  определяет множество строк. Эквивалентен предикату @racket[string?].
+@defthing[Sym Type] определяет множество символов. Эквивалентен предикату @racket[symbol?].
+@defthing[Fun Type]  определяет множество функций. Эквивалентен предикату @racket[function?].
 
 
 @section[#:tag "type:definition"]{Определение типов}
@@ -135,7 +135,7 @@ Formica --- язык со @emph{строгой динамической типи
 
 @defform*[#:literals(? and or not)
  [(define-type name c ...)
-  (define-type (name x ...) c ...)] #:contracts ([c contract?] [x contract?])]
+  (define-type (name x ...) c ...)] #:contracts ([c Type] [x Type])]
 Конструирует именованный тип, возвращающий @racket[#t], если его аргумент удовлетворяет хотя бы одному из контрактов @racket[_c ...]. Если указаны типы-параметры @racket[_x ...], определяется параметризуемый тип.
 
 Типы, определяемые формой @racket[define-type] соответствуют понятию @emph{алгебраического типа}, где простые типы соответствуют @emph{единичным типам}, составные и абстрактные типы ---  @emph{произведению типов}, а последовательность @nonbreaking{@racket[_c ...]} --- @emph{сумме типов}.
@@ -144,13 +144,13 @@ Formica --- язык со @emph{строгой динамической типи
 
 Тип величины в Formica описывает множество, к которому величина принадлежит. Кроме непосредственного определения перечислением, с помощью предиката или индуктивного, множества можно определять алгебраически: путём их объединения, пересечения или отрицания.  @elemtag["t:type:comb"]{@emph{Комбинаторы контрактов}} позволяют комбинировать контракты друг с другом алгебраически.
 
-@defproc[(Any [v Any]) contract?]
+@defproc[(Any [v Any]) Type]
 контракт для произвольного выражения.
 
 @deftogether[
-[@defproc[(∪ [c contract?] ...) contract?]
- @defproc[(∩ [c contract?] ...) contract?]
- @defproc[(\\ [c contract?]) contract?]]]
+[@defproc[(∪ [c Type] ...) Type]
+ @defproc[(∩ [c Type] ...) Type]
+ @defproc[(\\ [c Type]) Type]]]
 Объединение, пересечение и дополнение контрактов.
 
 @subsection[#:tag "types:container"]{Контейнерные типы}
@@ -158,7 +158,7 @@ Formica --- язык со @emph{строгой динамической типи
 Алгебраические типы данных создаются с помощью контейнерных типов: пар или формальных функций.
 
 
-@defproc[(cons: [c1 contract?] [c2 contract?]) contract?]
+@defproc[(cons: [c1 Type] [c2 Type]) Type]
 контракт для @elemref["t:pair"]{пары}, элементы которой имеют типы @racket[_c1] и @racket[_c2].
 
 @interaction[#:eval formica-eval
@@ -169,7 +169,7 @@ Formica --- язык со @emph{строгой динамической типи
 
 @defform*[
 [(list: c ...) 
- (list: c ..)] #:contracts [(c contract?)]]
+ (list: c ..)] #:contracts [(c Type)]]
 контракт для @elemref["t:list"]{списка}.
 
 @itemize{ @item{@racket[(list: c ...)] контракт для списка фиксированным числом элементов.
@@ -187,7 +187,7 @@ Formica --- язык со @emph{строгой динамической типи
                    (is '(1 2 x 4 5) (list: Num ..))
                    (is '(1 2 30 1) (list: positive? ..))]}}
 
-@defform/none[(f: c ...) #:contracts [(c contract?)]]
+@defform/none[(f: c ...) #:contracts [(c Type)]]
 контракт для аппликации 
 @elemref["t:formal"]{формальной функции} @racket[_f]. Подобен контракту @racket[list:].
 

@@ -14,7 +14,7 @@
 (provide 
  ordered?
  (contract-out
-  (type-ordering (parameter/c (list: (cons: contract? Fun) ..)))
-  (add-to-type-ordering (-> contract? (? contract? Fun) void?))
+  (type-ordering (parameter/c (list: (cons: Type Fun) ..)))
+  (add-to-type-ordering (-> Type (? Type Fun) void?))
   (symbol<? (-> Sym Sym Sym .. Bool))
   (pair<? (-> pair? pair? pair? .. Bool))))

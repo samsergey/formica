@@ -100,7 +100,7 @@ Examples:
  (ordered? 1 "a" 'x #f)
  (sort '(#f 'y (3 2) 2.0 "ab" 'x 'b 3 "abc" 'a "bca" (1 (2 3)) (1 2) 1 (1) #t) ordered?)]
 
-@defparam[type-ordering p (list: (cons: contract? (Any Any → Bool)))]
+@defparam[type-ordering p (list: (cons: Type (Any Any → Bool)))]
 A parameter which defines the ordering of different types and ordering functions within types.
 
 In following example even numbers follow odd numbers, moreover, within odd numbers reverse ordering is set up. Symbols are not ordered, hence they are left unsorted, but shifted to the right.
@@ -109,7 +109,7 @@ In following example even numbers follow odd numbers, moreover, within odd numbe
                                      (cons even? <))])
    (sort '(0 1 2 3 'x 4 5 6 'a 7 8 9) ordered?))]
 
-@defproc[(add-to-type-ordering (type contract?) (prec-type (or/c contract? 'last 'first) 'last) (ord-fun (Any Any → Bool) (cons #f))) void?]
+@defproc[(add-to-type-ordering (type Type) (prec-type (or/c Type 'last 'first) 'last) (ord-fun (Any Any → Bool) (cons #f))) void?]
 Adds @racket[_type] to the current @racket[(type-ordering)] table. If the @racket[_prec-type] is given, the new type will have the order next to it. If the comparing function @racket[_ord-fun] is given, it will be used to compare values within the type. If @racket[_prec-type] is equal to @racket['last] or @racket['first] the new type will be appended or, correspondingly prepended to the current @racket[(type-ordering)] table.
 
 If @racket[_type] already exists in the current @racket[(type-ordering)] table, it's ordering will be changed according to new @racket[_prec-type] and @racket[_ord-fun].
