@@ -306,13 +306,13 @@ $$
 \fnindex{bisection}
 \begin{Definition}[emph={f,a,b}]
 (:: bisection ((Real -> Real) Real Real -> ($\cup$ Real #f))
-(define (bisection f a b)
-  (and %\cmt функция f меняет знак на~(a b)%
-       (let ([c %\cmt среднее между a и~b%])
-         (if %\cmt отрезок (a b) достаточно мал%
-             c
-             (or %\cmt корень на~отрезке (a с)%
-                 %\cmt корень на~отрезке (с b)%)))))
+  (define (bisection f a b)
+    (and %\cmt функция f меняет знак на~(a b)%
+         (let ([c %\cmt среднее между a и~b%])
+           (if %\cmt отрезок (a b) достаточно мал%
+               c
+               (or %\cmt корень на~отрезке (a с)%
+                   %\cmt корень на~отрезке (с b)%)))))
 \end{Definition}\vspace{-\medskipamount}
 
 \newpage
