@@ -1,6 +1,4 @@
 #lang formica
-
-
 (define-type ω positive?)
 (define-type Imp complex?)
 
@@ -16,7 +14,6 @@
                c
                (or (bisection f a c)
                    (bisection f c b)))))))
-
 
 (module symbolic formica
   (require "common")
@@ -64,7 +61,6 @@
         (|| (L 0.5e-6)
             (-- (R 3)
                 (C c)))))
-
 
 (:: resonance (Circuit positive? positive? -> positive?)
   (define/memo (resonance c w1 w2)
