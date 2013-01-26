@@ -276,7 +276,7 @@ $$Z_\text{посл} = \sum\limits_i Z_i,\qquad  Z_\text{парал}= \left(\sum\
  (define-type Imp complex?)
 \end{Definition}
 Теперь мы можем записать сигнатуру и <<скелет>> функции\=/интерпретатора \s{impedance} следующим образом:
-
+\label{example:impedance}%
 \begin{SchemeCode}[emph={cir,w}]
 (:: impedance (Circuit -> ($\omega$ -> Imp))
  (define (impedance cir)
