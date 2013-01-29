@@ -1,4 +1,4 @@
-#lang formica/regular-app
+#lang formica
 (define-formal (delayed 1))
 (define-syntax-rule (~ expr)
   (delayed (λ () expr)))
@@ -21,13 +21,13 @@
 
 (define/c (any p) (foldr (∘ or p) #f))
 
-(define/c (map~ f) (foldr~ (∘ cons f) '()))
+#;(define/c (map~ f) (foldr~ (∘ cons f) '()))
 
-(define (compose~ f  . s)
+(define (map~ f  . s)
   (if (any empty? s) 
       '()
       (cons~ (apply f (map car s))
-             (apply compose~ f (map cdr~ s)))))
+             (apply map~ f (map cdr~ s)))))
 
 (define-type (Stream A)
   '()
@@ -59,7 +59,35 @@
 (define nats (aryth 0 1))
 
 
-(define (euler h f x y)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(define (euler h f x y) 
   (+ y (* h (f x y))))
 
 (define (rk2 h f x y)
@@ -67,12 +95,17 @@
                (+ y (* h 1/2 (f x y)))))))
 
 (define x (aryth 0 0.1))
-(define y (cons~ 1 (compose~ (curry euler 0.1 F) x y)))
+(define (F x y) (- (* x y)))
+(define y (cons~ 1 (map~ (curry rk2 0.1 F) x y)))
+
+
+
+
 
 (define (solution method h f x0)
   (define x (aryth (first x0) h))
-  (define y (cons~ (second x0) (compose~ (curry method h f) x y)))
-  (compose~ list x y))
+  (define y (cons~ (second x0) (map~ (method h f) x y)))
+  (map~ list x y))
 
 
 (define (dsolve f x0 a b (method euler) (h 0.1))
@@ -84,13 +117,14 @@
 
 
 (require plot)
-(define (F x y) (- (* x y)))
-(plot 
+
+(time 
+ (plot 
  (list
   (function (λ (x) (exp (- (* x x 1/2)))) 0 2)
   (points
-   (dsolve F '(0 1) 0 2 euler)  #:sym #\*)
+   (dsolve F '(0 1) 0 2 euler 0.1)  #:sym #\*)
   (points
-   (dsolve F '(0 1) 0 2 rk2))))
+   (dsolve F '(0 1) 0 2 rk2 0.2)))))
 
   
