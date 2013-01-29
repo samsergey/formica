@@ -1,88 +1,82 @@
 #lang formica/regular-app
-
-(define-formal (delayed 1) f)
-
-(define-syntax-rule (delay expr)
-  (delayed (memoized (lambda () expr))))
-
-(define force
-  (/. (delayed expr) --> (force (expr))))
-
-
-(define-type (Stream A)
-  '()
-  (cons: A delayed?))
+(define-formal (delayed 1))
+(define-syntax-rule (~ expr)
+  (delayed (λ () expr)))
+(define//. !
+  (delayed expr) --> (expr))
 
 (define-syntax-rule (cons~ h t)
-  (cons h (delay t)))
+  (cons h (~ t)))
 
 (:: car~ (pair? -> Any)
   (define (car~ s) (car s)))
 
 (:: cdr~ (pair? -> Any)
- (define (cdr~ s) (force (cdr s))))
+  (define (cdr~ s) (! (cdr s))))
 
+(:: foldr~ ((Any Any -> Any) Any list? -> Any)
+  (define/c (foldr~ f x0 )
+    (/. '() --> x0
+        (cons h t) --> (! (f h (~ (foldr~ f x0 (! t))))))))
 
-(define show
-  (/. str    --> (show str 6)
-      str  0 --> '()
-      '() n --> '()
-      (cons h t) n --> (cons h (show (force t) (- n 1)))))
+(define/c (map~ f) (foldr~ (∘ cons f) '()))
 
-(define/c (fold~ f x0)
-  (/. '() --> x0
-      (cons h t) --> (force (f h (delay (fold~ f x0 (force t)))))))
+(define-type (Stream A)
+  '()
+  (cons: A delayed?))
 
-(define/c (any~ test?) (fold~ (∘ or test?) #f))
+(:: show ((Stream Any) (? Nat) -> list?)
+  (define show
+    (/. str   --> (show str 6)
+        str 0 --> '()
+        '() n --> '()
+        (cons h t) n --> (cons h (show (! t) (- n 1))))))
 
-(define (stream  . x) (fold~ cons '() x))
+(define (show-all s) (show s +inf.0))
 
-(define/c (until p)
-  (fold~ (λ (h t) (if (p h) '() (cons h t))) '()))
+(define (stream . x) (foldr~ cons '() x))
 
-(define/c (skip-while p)
-  (fold~ (λ (h t) (if (p h) t (cons h t))) '()))
+(define (cycle . x) (foldr~ cons (~ (apply cycle x)) x))
 
-(define/c (map~ f)
-  (/. '() --> '()
-      (cons h t) --> (cons~ (f h) (map~ f (force t)))
-      s ... --> (cons~ (apply f (map car s))
-                       (apply map~ f (map cdr~ s)))))
+(define (aryth a s) (cons~ a (aryth (+ a s) s)))
 
-(define/c (filter~ p)
-  (fold~ (λ (h t) (if (p h) (cons~ h t) t)) '()))
+(define (iterations f x) (cons~ x (iterations f (f x))))
 
+(define (powers x) (iterations (* x) 1))
 
-(define (in-producer g)
-  (define (s . x) 
-    (until eof-object? (cons~ (apply g x) (apply s x))))
-  s)
+(define/c (until p) (foldr~ (λ (h t) (if (p h) '() (cons h t))) '()))
+(define/c (skip-while p) (foldr~ (λ (h t) (if (p h) t (cons h t))) '()))
 
-(:: chars (port? -> (Stream char?))
-  (define chars (in-producer read-char)))
+(define nats (aryth 0 1))
 
-(:: read-word (port? -> (∪ Str eof-object?))
-  (define (read-word p)
-    (let ([ch (chars p)])
-      (if (empty? ch)
-          eof
-          (chars->string (until (curry equal? #\space) ch))))))
+(define (euler h)
+  (λ (f)
+    (/. (list x y) --> (list (+ x h) 
+                             (+ y (* h (f x y)))))))
 
-(:: chars->string ((Stream char?) -> Str)
-  (define (chars->string s)
-    (apply string (show s +inf.0))))
+(define (runge-kutta h)
+  (λ (f)
+    (/. (list x y) --> (list (+ x h) 
+                             (+ y (* h (f (+ x (* h 1/2)) 
+                                          (+ y (* h 1/2 (f x y))))))))))
 
-(:: words (port? -> (Stream Str))
-  (define words (in-producer read-word)))
+(define (select-by p s)
+  (until (negated p)
+         (skip-while (negated p) s)))
 
-(:: enum (Num -> (Stream Num))
- (define (enum n)
-   (cons~ n (enum (+ n 1)))))
-      
+(define (solve-by method f x0 a b)
+  (show-all
+   (map~ list->vector
+         (select-by (λ (x) (< a (car x) b))
+                    (iterations (method f) x0)))))
 
-(define p (open-input-string "one two three four eight nine ten"))
-(define c (chars (open-input-string "one two three four")))
-(define w (words (open-input-string "one two three four  eight nine ten")))
-
-(define randoms (in-producer random))
-(define ss (in-producer current-milliseconds))
+(require plot)
+#;(time
+ (plot 
+ (list
+  (function (λ (x) (exp (- (* x x 1/2)))) 0 2)
+  (points
+   (solve-by (euler 0.2) (λ (x y) (- (* x y))) '(0 1) 0 2)  #:sym #\*)
+  (points
+   (solve-by (runge-kutta 0.2) (λ (x y) (- (* x y))) '(0 1) 0 2)))))
+  
