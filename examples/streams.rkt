@@ -19,7 +19,15 @@
     (/. '() --> x0
         (cons h t) --> (! (f h (~ (foldr~ f x0 (! t))))))))
 
+(define/c (any p) (foldr (∘ or p) #f))
+
 (define/c (map~ f) (foldr~ (∘ cons f) '()))
+
+(define (compose~ f  . s)
+  (if (any empty? s) 
+      '()
+      (cons~ (apply f (map car s))
+             (apply compose~ f (map cdr~ s)))))
 
 (define-type (Stream A)
   '()
@@ -44,39 +52,45 @@
 
 (define (powers x) (iterations (* x) 1))
 
-(define/c (until p) (foldr~ (λ (h t) (if (p h) '() (cons h t))) '()))
-(define/c (skip-while p) (foldr~ (λ (h t) (if (p h) t (cons h t))) '()))
+(define/c (take-while p) (foldr~ (λ (h t) (if (p h) (cons h t) '())) '()))
+(define/c (skip-until p) (foldr~ (λ (h t) (if (not (p h)) t (cons h t))) '()))
+(define (select-by p s) (skip-until p (take-while p s)))
 
 (define nats (aryth 0 1))
 
-(define (euler h)
-  (λ (f)
-    (/. (list x y) --> (list (+ x h) 
-                             (+ y (* h (f x y)))))))
 
-(define (runge-kutta h)
-  (λ (f)
-    (/. (list x y) --> (list (+ x h) 
-                             (+ y (* h (f (+ x (* h 1/2)) 
-                                          (+ y (* h 1/2 (f x y))))))))))
+(define (euler h f x y)
+  (+ y (* h (f x y))))
 
-(define (select-by p s)
-  (until (negated p)
-         (skip-while (negated p) s)))
+(define (rk2 h f x y)
+  (+ y (* h (f (+ x (* h 1/2)) 
+               (+ y (* h 1/2 (f x y)))))))
 
-(define (solve-by method f x0 a b)
+(define x (aryth 0 0.1))
+(define y (cons~ 1 (compose~ (curry euler 0.1 F) x y)))
+
+(define (solution method h f x0)
+  (define x (aryth (first x0) h))
+  (define y (cons~ (second x0) (compose~ (curry method h f) x y)))
+  (compose~ list x y))
+
+
+(define (dsolve f x0 a b (method euler) (h 0.1))
   (show-all
-   (map~ list->vector
-         (select-by (λ (x) (< a (car x) b))
-                    (iterations (method f) x0)))))
+     (map~ list->vector
+           (select-by (λ (x) (<= a (car x) b))
+                      (solution method h f x0)))))
+
+
 
 (require plot)
-#;(time
- (plot 
+(define (F x y) (- (* x y)))
+(plot 
  (list
   (function (λ (x) (exp (- (* x x 1/2)))) 0 2)
   (points
-   (solve-by (euler 0.2) (λ (x y) (- (* x y))) '(0 1) 0 2)  #:sym #\*)
+   (dsolve F '(0 1) 0 2 euler)  #:sym #\*)
   (points
-   (solve-by (runge-kutta 0.2) (λ (x y) (- (* x y))) '(0 1) 0 2)))))
+   (dsolve F '(0 1) 0 2 rk2))))
+
   
