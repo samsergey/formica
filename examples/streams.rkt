@@ -1,7 +1,7 @@
-#lang formica
+#lang formica/regular-app
 (define-formal (delayed 1))
 (define-syntax-rule (~ expr)
-  (delayed (λ () expr)))
+  (delayed (memoized (λ () expr))))
 (define//. !
   (delayed expr) --> (expr))
 
@@ -59,52 +59,27 @@
 (define nats (aryth 0 1))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 (define (euler h f x y) 
   (+ y (* h (f x y))))
+
+(define (F x y) (- (* x y)))
+(define x (aryth 0 0.1))
+(define y (cons~ 1 (map~ (curry euler 0.1 (verbose F)) x y)))
+
+
+
+
+
+
 
 (define (rk2 h f x y)
   (+ y (* h (f (+ x (* h 1/2)) 
                (+ y (* h 1/2 (f x y)))))))
 
-(define x (aryth 0 0.1))
-(define (F x y) (- (* x y)))
-(define y (cons~ 1 (map~ (curry rk2 0.1 F) x y)))
-
-
-
-
 
 (define (solution method h f x0)
   (define x (aryth (first x0) h))
-  (define y (cons~ (second x0) (map~ (method h f) x y)))
+  (define y (cons~ (second x0) (map~ (curry method h f) x y)))
   (map~ list x y))
 
 
@@ -115,10 +90,16 @@
                       (solution method h f x0)))))
 
 
+(define (verbose f)
+  (λ x (displayln (apply (hold f) x))
+    (apply f x)))
+  
 
-(require plot)
 
-(time 
+
+#;(require plot)
+
+#;(time 
  (plot 
  (list
   (function (λ (x) (exp (- (* x x 1/2)))) 0 2)
@@ -127,4 +108,12 @@
   (points
    (dsolve F '(0 1) 0 2 rk2 0.2)))))
 
-  
+
+(define (secant x-1 x-2 y-1 y-2)
+  (/ (- (* y-1 x-2) (* y-2 x-1))
+     (- y-1 y-2)))
+
+(define (f x) (- (* x x) 2))
+
+(define xx (cons~ 1. (cons~ 2. (map~ secant xx (cdr~ xx) fx (cdr~ fx)))))
+(define fx (map~ (verbose f) xx))
