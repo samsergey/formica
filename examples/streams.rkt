@@ -52,9 +52,12 @@
 
 (define (powers x) (iterations (* x) 1))
 
-(define/c (take-while p) (foldr~ (λ (h t) (if (p h) (cons h t) '())) '()))
-(define/c (skip-until p) (foldr~ (λ (h t) (if (not (p h)) t (cons h t))) '()))
-(define (select-by p s) (skip-until p (take-while p s)))
+(define/c (until p) (foldr~ (λ (h t) (if (p h) '() (cons h t))) '()))
+(define/c (skip-until p)
+  (/. '() --> '()
+      (cons h t) --> (if (p h) (cons h t) (skip-until p (! t)))))
+
+(define (select-by p s) (until (negated p) (skip-until p s)))
 
 (define nats (aryth 0 1))
 
@@ -115,5 +118,27 @@
 
 (define (f x) (- (* x x) 2))
 
-(define xx (cons~ 1. (cons~ 2. (map~ secant xx (cdr~ xx) fx (cdr~ fx)))))
-(define fx (map~ (verbose f) xx))
+;(define xx (cons~ 1. (cons~ 2. (map~ secant xx (cdr~ xx) fx (cdr~ fx)))))
+;(define fx (map~ (verbose f) xx))
+
+(:: chars (port? -> (Stream char?))
+  (define (chars p) 
+    (until eof-object?
+           (cons~ (read-char p) (chars p)))))
+
+(:: words (port? -> (Stream Str))
+  (define (words p) 
+    (until eof-object? 
+           (cons~ (read-word p) (words p)))))
+
+(:: read-word (port? -> (∪ eof-object? Str))
+  (define (read-word p)
+    (let ([ch (chars p)])
+      (if (empty? ch)
+          eof
+          (chars->string (select-by not-space? ch))))))
+
+(define not-space? (negated (curry equal? #\space)))
+
+(define (chars->string s) 
+  (apply string (show s +inf.0)))
