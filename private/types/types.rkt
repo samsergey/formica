@@ -76,23 +76,26 @@
                lst)
         stx)))
 
-(define-syntax (:: stx)
-  (syntax-case stx ()
-    [(:: name contract body) 
-     (let ([f (free-symbols #'contract)])
-       (if (null? f)
-           ; no free symbols
-           #`(with-contract name 
-                            ((name #,(parse-infix-contract #'contract)))
-                            body)
-           ; polymorphic types
-           (with-syntax ([(free ...) f])
-             #`(with-contract name 
-                              ((name (parametric->/c 
-                                      (free ...)
-                                      #,(parse-infix-contract #'contract)))) 
-                              body))))]))
+(define-syntax-rule (:: name c body)
+  (begin
+    body
+    (set! name (::* c name))))
 
+
+(define-syntax (::* stx)
+  (syntax-case stx ()
+    [(::* c body) 
+     (let ([f (free-symbols #'c)])
+         (if (null? f)
+             ; no free symbols
+             #`(contract #,(parse-infix-contract #'c)
+                         body
+                         5 6)
+             ; polymorphic types
+             (with-syntax ([(free ...) f])
+               #`(contract (parametric->/c (free ...) #,(parse-infix-contract #'c))
+                           body
+                           5 6))))]))
 
 ;;;=================================================================
 ;;; type definitions
