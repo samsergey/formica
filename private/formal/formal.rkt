@@ -18,9 +18,10 @@
                      racket/syntax
                      "../tools/tags.rkt"
                      "hold.rkt")
-         (prefix-in part: "../../partial-app.rkt")
+         (prefix-in part: "../syntax/partial-app.rkt")
          "../tools/tags.rkt"
-         "hold.rkt")
+         "hold.rkt"
+         "../types/infix-arrow.rkt")
 
 (provide 
  (contract-out
@@ -83,7 +84,7 @@
 ;; The definition of formal functions
 ;;--------------------------------------------------------------------------------
 (define-syntax (define-formal stx)
-  (syntax-case stx ()
+  (syntax-case stx (.. ?)
     [(_ (id n)) 
      ; compile-time syntax check
      (unless (symbol? (syntax-e #'id)) 
@@ -126,6 +127,108 @@
               (match-lambda predicate-rules ... (_ #f)))
             ; new predicate in the list of functions declared to be formal
             (add-to-formals id?))))]
+    
+    [(_ (id n #:contract (cntr ...))) 
+     ; compile-time syntax check
+     (unless (symbol? (syntax-e #'id)) 
+       (raise-syntax-error 'define-formal 
+                           "expected a symbol as a formal function name" 
+                           #'(id n)))
+     (let* ([str (symbol->string (syntax-e #'id))]
+            [str? (string->symbol (string-append str "?"))]
+            [str: (string->symbol (string-append str ":"))]
+            [dn (syntax->datum #'n)])
+       (with-syntax* 
+        ([id? (datum->syntax #'id str? #'id)]
+         [id: (datum->syntax #'id str: #'id)] 
+         [(match-rules ...) (make-match-rules #'id #'id dn)]
+         [(predicate-rules ...) (make-predicate-rules #'id dn)]
+         [f #'(contract (.->. cntr ... id?) (hold 'id n) 'id 'id 'id #f)])
+        #'(begin
+            ; declaration-time syntax check
+            (unless (procedure-arity? n) 
+              (raise-syntax-error 'define-formal 
+                                  "invalid arity specification" 
+                                  #'(id n)))
+            
+            (define-syntax id:
+              ; the contracts for formal applications
+              (syntax-rules (..)
+                [(id: c (... ...) (? x)) (procedure-reduce-arity
+                                          (or/c (id: c (... ...))
+                                                (id: c (... ...) x))
+                                          n)]
+                [(id: c ..) (procedure-reduce-arity
+                             (cons/c 'id (listof c)) n)]
+                [(id: c (... ...) x ..) (flat-contract
+                                         (procedure-reduce-arity
+                                          (foldr cons/c (listof x) (list 'id c (... ...)))
+                                          n))]
+                [(id: c (... ...)) (procedure-reduce-arity
+                                    (list/c 'id c (... ...))
+                                    n)]))
+            
+            (define id? 
+               ; the predicate for formal applications
+               (match-lambda
+                 [(? (id: cntr ...)) #t]
+                 [_ #f]))
+            
+            (define-match-expander id 
+              ; the match expander (f: ...)
+              (syntax-rules () 
+                match-rules ... 
+                [(id x (... ...)) (list (quote id) x (... ...))])
+              ; formal function outside the match form
+              (syntax-id-rules ()
+                [(id x (... ...)) (part:#%app f x (... ...))]
+                [id f]))
+            
+            ; new predicate in the list of functions declared to be formal
+            (add-to-formals id?))))]
+    
+    
+    [(_ (id #:contract (cntr ...))) 
+     ; compile-time syntax check
+     (unless (symbol? (syntax-e #'id)) 
+       (raise-syntax-error 'define-formal 
+                           "expected a symbol as a formal function name" 
+                           (syntax-e #'id)))
+     (let* ([str (symbol->string (syntax-e #'id))]
+            [str? (string->symbol (string-append str "?"))]
+            [str: (string->symbol (string-append str ":"))])
+       (with-syntax* ([id? (datum->syntax #'id str? #'id)]
+                     [id: (datum->syntax #'id str: #'id)]
+                     [f #'(contract (.->. cntr ... id?) (hold 'id) 'id 'id 'id #f)])
+         #'(begin             
+             (define-syntax id:
+             ; the contracts for formal applications
+               (syntax-rules (.. ?)
+                 [(id: c (... ...) (? x)) (or/c (id: c (... ...))
+                                                (id: c (... ...) x))]
+                 [(id: c ..) (cons/c 'id (listof c))]
+                 [(id: c (... ...) x ..) (flat-contract
+                                          (foldr cons/c (listof x) (list 'id c (... ...))))]
+                 [(id: c (... ...)) (list/c 'id c (... ...))]))
+
+             (define id? 
+               ; the predicate for formal applications
+               (match-lambda
+                 [(? (id: cntr ...)) #t]
+                 [_ #f]))
+             
+             (define-match-expander id
+               ; the match expander (f: ...)
+               (syntax-rules () 
+                 [(id x (... ...)) (list (quote id) x (... ...))])
+               ; formal function outside the match form
+              (syntax-id-rules ()
+                [(id x (... ...)) (part:#%app f x (... ...))]
+                [id f]))
+             
+             ; new predicate in the list of functions declared to be formal
+             (add-to-formals id?))))]
+    
     [(_ id) 
      ; compile-time syntax check
      (unless (symbol? (syntax-e #'id)) 

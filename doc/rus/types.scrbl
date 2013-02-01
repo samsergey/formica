@@ -129,16 +129,15 @@ Formica --- язык со @emph{строгой динамической типи
 
 @section[#:tag "type:definition"]{Определение типов}
 
-Форма @racket[define-type] позволяет давать определения типам, используя синтаксис, подобный тому, что принято использовать для определения
-алгебраических типов данных.
-
-
-@defform*[#:literals(? and or not)
- [(define-type name c ...)
-  (define-type (name x ...) c ...)] #:contracts ([c Type] [x Type])]
-Конструирует именованный тип, возвращающий @racket[#t], если его аргумент удовлетворяет хотя бы одному из контрактов @racket[_c ...]. Если указаны типы-параметры @racket[_x ...], определяется параметризуемый тип.
-
-Типы, определяемые формой @racket[define-type] соответствуют понятию @emph{алгебраического типа}, где простые типы соответствуют @emph{единичным типам}, составные и абстрактные типы ---  @emph{произведению типов}, а последовательность @nonbreaking{@racket[_c ...]} --- @emph{сумме типов}.
+@defform*[[(define-type name)
+           (define-type (name c ...))
+           (define-type name c ...)
+           (define-type (name x ...) c ...)] #:contracts ([c Type] [x Type])]
+Определяет именованные абстрактные, алгебраические или параметризованные типы.
+@itemize{@item{@racket[(define-type name)] --- определяет абстрактный тип-контейнер, в виде формальной функции.}
+         @item{@racket[(define-type (name c ...))] --- определяет алгебраический тип, являющийся произведением типов @racket[_c ...].}
+         @item{@racket[(define-type name c ...)] --- определяет алгебраический тип, являющийся суммой типов @racket[_c ...].}
+         @item{@racket[(define-type (name x ...) c ...)] --- определяет параметризованный тип.}}
 
 @subsection[#:tag "ss:type:comb"]{Комбинаторы контрактов}
 
@@ -257,7 +256,7 @@ Formica --- язык со @emph{строгой динамической типи
 точечной паре:
 
 @def+int[#:eval formica-eval
-  (define-formal kons)
+  (define-type (kons Any Any))
   (kons 1 2)
   (kons (kons 1 2) (kons 3 4))]
 
@@ -317,19 +316,14 @@ Formica --- язык со @emph{строгой динамической типи
 Определим параметризованный алгебраический тип для представления двоичного дерева 
 с элементами заданного типа @racket[A].
 @racketgrammar[#:literals (Empty) (Tree A) Empty (Leaf A) (Node (Tree A) (Tree A))]
-В качестве конструкторов для типов @racket[Leaf] и  @racket[Node] используем формальные
-функции, а единичный тип @racket[Empty] будет представлен символом @racket['Empty].
 
-@def+int[#:eval formica-eval
-  (define-formal Leaf Node)]
-
-Контракт для типа:
-
-@def+int[#:eval formica-eval
+@defs+int[#:eval formica-eval
+  ((define-type (Leaf Any))
+  (define-type (Node Any Any))
   (define-type (Tree A) 
     'Empty
     (Leaf: A)
-    (Node: (Tree A) (Tree A)))]
+    (Node: (Tree A) (Tree A))))]
 
 Теперь мы можем создавать двоичные деревья
 

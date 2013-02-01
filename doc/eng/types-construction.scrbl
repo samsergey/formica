@@ -13,11 +13,16 @@
 
 @title[#:tag "type:definition"]{Defining new types}
 
-@defform*[[(define-type name c ...)
-  (define-type (name x ...) c ...)] #:contracts ([c Type] [x Type])]
-Defines named contract which returns @racket[#t], if the argument satisfies any contract within @racket[_c ...]. If parameters @racket[_x ...] are given, defines the contract for parametrized type.
+@defform*[[(define-type name)
+           (define-type (name c ...))
+           (define-type name c ...)
+           (define-type (name x ...) c ...)] #:contracts ([c Type] [x Type])]
+Defines named abstract, algebraic and parameterized types.
+@itemize{@item{@racket[(define-type name)] --- defines an abstract container type as a @tech{formal function}.}
+         @item{@racket[(define-type (name c ...))] --- defines an algebraic type, being a type product of @racket[_c ...].}
+         @item{@racket[(define-type name c ...)] --- defines an algebraic type, being a type sum of @racket[_c ...].}
+         @item{@racket[(define-type (name x ...) c ...)] --- defines a parameterized type.}}
 
-Types defined by @racket[define-type] represent @deftech{algebraic types}, where the sequence @nonbreaking{@racket[_c ...]} represents the @emph{type sum}, @tech{container types}  correspond to @emph{type products} and @tech{primitive types} correspond to @emph{unit types}.
 
 @section[#:tag "types:type combinators"]{Contract combinators}
 @deftech{Contract combinators} allow to construct new types out of existing @tech{primitive types} or @tech{container types}.
@@ -82,7 +87,7 @@ Special types could be defined as usual predicate functions:
 To deal with unit types use contract combinators:
  @def+int[#:eval formica-eval
   (define-type Nat*
-    (and/c (not/c 4) integer? positive?))
+    (\\ Nat 4))
   (is 3 Nat*)
   (is 4 Nat*)
   (is 5 Nat*)]
@@ -100,6 +105,22 @@ Enumerable type "friend":
   (is 845 Friend)]
 
 @bold{Example 3.}
+
+A simple container type:
+@def+int[#:eval formica-eval
+ (define-type A)
+ (A 6)
+ (is (A 'x 'y) A?)
+ (is (A 'x 'y) (A: Sym Sym))
+ ((/. (A x y) --> (+ x y)) (A 2 4))]
+
+A simple container type with specified type of argumets:
+@def+int[#:eval formica-eval
+ (define-type (A Int))
+ (A 6)
+ (A 'x)
+ (is (A 6) A?)
+ (is '(A x) A?)]
 
 Inductive type "List":
 
@@ -128,7 +149,7 @@ Inductive parametrized type: "List of A":
 This defines an abstract data type equivalent to a @racket[cons]-pair:
 
 @def+int[#:eval formica-eval
-  (define-formal kons)
+  (define-type (kons Any Any))
   (kons 1 2)
   (kons (kons 1 2) (kons 3 4))]
 
@@ -172,16 +193,14 @@ Finally let's define folding of @racket[klist]s and it's ancestors:
 
 Let's define a parametrized abstract algebraic type to represent a binary tree having leaves of given type:
 @racketgrammar[#:literals (Empty) (Tree A) Empty (Leaf A) (Node (Tree A) (Tree A))]
-As a type constructors @racket[Leaf] and @racket[Node] we will use formal functions, the unit type @racket[Empty] will be represented by a symbol @racket['Empty].
 
-@def+int[#:eval formica-eval
-  (define-formal Leaf Node)]
-
-@def+int[#:eval formica-eval
+@defs+int[#:eval formica-eval
+  ((define-type (Leaf Any))
+  (define-type (Node Any Any))
   (define-type (Tree A) 
     'Empty
     (Leaf: A)
-    (Node: (Tree A) (Tree A)))]
+    (Node: (Tree A) (Tree A))))]
 
 Now we are able to create binary trees:
 @defs+int[#:eval formica-eval

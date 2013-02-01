@@ -12,12 +12,14 @@
          racket/path
          racket/match
          (for-syntax racket/base)
-         "../tools/tags.rkt")
+         "infix-arrow.rkt"
+         "../tools/tags.rkt"
+         "../formal/formal.rkt")
 
 (provide 
  ::
- define-type
  (rename-out (.->. ->))
+ define-type
  Any Bool Num Real Int Nat Index Str Sym Fun Fun/c Type
  ∩ ∪ \\ complement/c
  is check-result check-argument check-type
@@ -26,25 +28,6 @@
              ->
              list/c
              cons/c))
-
-;;;=================================================================
-;;; helper functions and forms
-;;;=================================================================
-(define-for-syntax (parse-infix-contract stx) 
-  (syntax-case stx (.->.)
-    [(x ... .->. y) #`(.->. #,@(parse-infix-contract #'(x ...)) #,(parse-infix-contract #'y))]
-    [(x y ...) #`(#,(parse-infix-contract #'x) #,@(parse-infix-contract #'(y ...)))]
-    [x #'x]))
-
-;; infix arrow which will replace the usual arrow in contracts
-(define-syntax .->.
-  (syntax-id-rules (.. ?)
-    [(.->. v ... (? x ...) y .. res) (->* (v ...) (x ...) #:rest (listof y) res)]
-    [(.->. v ... (? x ...) res) (->* (v ...) (x ...) res)]
-    [(.->. v ... x .. res) (->* (v ...) #:rest (listof x) res)]
-    [(.->. v ... res) (-> v ... res)]
-    [.->. (raise-syntax-error '-> "could be used only in contract!")]))
-
 
 ;;;=================================================================
 ;;; interpretation of free symbols in contracts
@@ -76,52 +59,49 @@
                lst)
         stx)))
 
-(define-syntax-rule (:: name c body ...)
-  (begin
-    body ...
-    (set! name (::* c name))))
-
-
-(define-syntax (::* stx)
+(define-syntax (:: stx)
   (syntax-case stx ()
-    [(::* c body) 
+    [(:: name c body) 
      (let ([f (free-symbols #'c)])
-         (if (null? f)
-             ; no free symbols
-             #`(contract #,(parse-infix-contract #'c)
-                         body
-                         5 6)
-             ; polymorphic types
-             (with-syntax ([(free ...) f])
-               #`(contract (parametric->/c (free ...) #,(parse-infix-contract #'c))
-                           body
-                           5 6))))]))
+       (if (null? f)
+           ; no free symbols
+           #`(with-contract name ((name #,(parse-infix-contract #'c))) body)
+           ; polymorphic types
+           (with-syntax ([(free ...) f])
+             #`(with-contract name
+                              ((name (parametric->/c (free ...) #,(parse-infix-contract #'c))))
+                              body))))]))
 
 ;;;=================================================================
 ;;; type definitions
 ;;;=================================================================
-(define-syntax define-type
-  (syntax-rules (_)
+(define-syntax (define-type stx)
+  (syntax-case stx ()    
+    ; abstract type with contract
+    [(_ (id c ...)) 
+     #'(define-formal (id #:contract (c ...)))]
+    ; abstract type
+    [(_ name) #'(define-formal name)]
     ; parameterized type
     [(_ (name A ...) expr ...) 
-     (define (name A ...)
-       (flat-named-contract 
-        (cons 'name (map (λ (x) (or (object-name x) x)) (list A ...)))
-        (λ (x) (or ((flat-contract expr) x) ...))))]
+     #'(define (name A ...)
+         (flat-named-contract 
+          (cons 'name (map (λ (x) (or (object-name x) x)) (list A ...)))
+          (λ (x) (or ((flat-contract expr) x) ...))))]
     ; primitive type or type product
     [(_ name expr) 
-     (define name 
-       (procedure-rename 
-        (flat-named-contract 'name expr) 
-        'name))]
+     #'(define name 
+         (procedure-rename 
+          (flat-named-contract 'name expr) 
+          'name))]
     ; type sum
     [(_ name expr ...) 
-     (define name 
-       (procedure-rename
-        (flat-named-contract 
-         'name
-         (flat-rec-contract name (or/c expr ...))) 
-        'name))]))
+     #'(define name 
+         (procedure-rename
+          (flat-named-contract 
+           'name
+           (flat-rec-contract name (or/c expr ...))) 
+          'name))]))
 
 
 ;;;=================================================================
