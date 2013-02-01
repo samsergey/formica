@@ -14,34 +14,33 @@
 \hrule
 \bigskip
            \HUGE\titlefont
-            Основы\\
-            функционального\\
-            программирования\\
+            Функциональное\\
+            программирование\\
             \huge\normalcolor\normalfont
             в примерах и задачах
 \bigskip
 \hrule
 \vspace{2cm}
-\begin{SchemeCode}[emph={n,b,f,x},
-basicstyle={\schemestyle\color{gray!80!blue}},
-classoffset=0,
-keywordstyle={\schemestyle\color{gray!80!purple}},
-classoffset=1,
-keywordstyle={\bfseries\color{gray!70!blue}},
-classoffset=0,
-emphstyle={\itshape\color{gray!80!blue}}]
-    (define fact (Y Ф))
+% \begin{SchemeCode}[emph={n,b,f,x},
+% basicstyle={\schemestyle\color{gray!80!blue}},
+% classoffset=0,
+% keywordstyle={\schemestyle\color{gray!80!purple}},
+% classoffset=1,
+% keywordstyle={\bfseries\color{gray!70!blue}},
+% classoffset=0,
+% emphstyle={\itshape\color{gray!80!blue}}]
+%     (define fact (Y Ф))
     
-    (define Y (lambda(b) ((lambda(f) (b (lambda(x) ((f f) x))))
-                     (lambda(f) (b (lambda(x) ((f f) x)))))))
-    (define Ф
-      (lambda(f)
-        (lambda(n)
-          (if (zero? n) 
-              1 
-              (* n (f (- n 1)))))))
+%     (define Y (lambda(b) ((lambda(f) (b (lambda(x) ((f f) x))))
+%                      (lambda(f) (b (lambda(x) ((f f) x)))))))
+%     (define Ф
+%       (lambda(f)
+%         (lambda(n)
+%           (if (zero? n) 
+%               1 
+%               (* n (f (- n 1)))))))
 
-\end{SchemeCode}
+% \end{SchemeCode}
 \vfill
 \normalsize
 Петропавловск-Камчатский\\

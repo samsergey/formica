@@ -76,9 +76,9 @@
                lst)
         stx)))
 
-(define-syntax-rule (:: name c body)
+(define-syntax-rule (:: name c body ...)
   (begin
-    body
+    body ...
     (set! name (::* c name))))
 
 
