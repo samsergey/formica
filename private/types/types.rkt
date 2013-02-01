@@ -13,6 +13,7 @@
          racket/match
          (for-syntax racket/base)
          "infix-arrow.rkt"
+         "type-checking.rkt"
          "../tools/tags.rkt"
          "../formal/formal.rkt")
 
@@ -76,7 +77,7 @@
 ;;; type definitions
 ;;;=================================================================
 (define-syntax (define-type stx)
-  (syntax-case stx ()    
+  (syntax-case stx (? ..)    
     ; abstract type with contract
     [(_ (id c ...)) 
      #'(define-formal (id #:contract (c ...)))]
@@ -87,7 +88,7 @@
      #'(define (name A ...)
          (flat-named-contract 
           (cons 'name (map (λ (x) (or (object-name x) x)) (list A ...)))
-          (λ (x) (or ((flat-contract expr) x) ...))))]
+          (λ (x) (or (is x (flat-contract expr)) ...))))]
     ; primitive type or type product
     [(_ name expr) 
      #'(define name 
@@ -103,44 +104,6 @@
            (flat-rec-contract name (or/c expr ...))) 
           'name))]))
 
-
-;;;=================================================================
-;;; Safe type checking
-;;;=================================================================
-(define-syntax is
-  (make-set!-transformer
-   (lambda (stx)
-     (syntax-case stx ()
-       [(is x type) 
-        (with-syntax ([c (parse-infix-contract #'type)])
-          (syntax-protect
-           #'(cond
-               [(contract? c) 
-                (with-handlers ([exn:fail? (lambda (exn) #f)])
-                  (contract-first-order-passes? c x))]
-               [else (raise-type-error 'is "predicate" 1 x type)])))]
-       [is (syntax-protect
-            #'(λ (x t) (is x t)))]))))
-
-(define check-type (make-parameter #t))
-
-(define-syntax-rule (check-result id type expr text ...)
-  (let ([res expr])
-    (if (or (not (check-type)) (is res type))
-        res
-        (raise-arguments-error 
-         id 
-         (format "the result should have type ~a"  (build-compound-type-name type))
-         "received" res
-         text ...))))
-
-(define-syntax-rule (check-argument id type x text ...)
-  (unless (or (not (check-type)) (is x type)) 
-    (raise-arguments-error 
-     id 
-     (format "the argument should have type ~a" (build-compound-type-name type))
-     "given" x
-     text ...)))
 
 ;;;=================================================================
 ;;; Blaming text
@@ -208,7 +171,7 @@
 (define-type Real real?)
 (define-type Int integer?)
 (define-type Nat natural-number/c +inf.0)
-(define-type Index (and/c integer? (>/c 0) +inf.0))
+(define-type Index (and/c integer? (>/c 0)) +inf.0)
 (define-type Str string?)
 (define-type Sym symbol?)
 (define-type Fun procedure?)
