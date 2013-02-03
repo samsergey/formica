@@ -85,8 +85,8 @@
   \thispagestyle{chapter}%
   \addcontentsline{toc}{chapter}{#1}%
   \phantomsection%
-  \rule{0pt}{0.29\textwidth}%
-  \hfill\parbox[b]{0.7\textwidth}
+  \rule{0pt}{0.38\textwidth}%
+  \hfill\parbox[b]{0.62\textwidth}
      {\flushright\par%
       \Huge\textha{#1}}%
   \bigskip}
@@ -114,10 +114,11 @@
   \addcontentsline{toc}{section}{#2}%
   \phantomsection%
   \settodepth{\@section@heigth}
-    {\parbox[t]{0.35\textwidth}{\large\raggedleft\textha{\bfseries#2}}}%
-  \Needspace{1.2\@section@heigth + 2em}%
+    {\parbox[t]{0.39\textwidth}{\large\raggedleft\textha{\bfseries#2}}}%
+  \Needspace{1.2\@section@heigth + 1.5em}%
   \noindent%
-  \parbox[t]{0.35\textwidth}{\large\raggedleft\color{darkred}{\textha{\bfseries#2}}}\par%
+  \hspace{-0.8em}%
+  \parbox[t]{0.39\textwidth}{\large\raggedleft\color{darkred}{\textha{\bfseries#2}}}\par%
   \nopagebreak[4]%
   \vspace{-1\@section@heigth}{\large\vspace{-0.7em}}\hangpara{0.4\textwidth}{-#1}%
 }
@@ -175,7 +176,7 @@ classoffset=1,
 morekeywords={test,define,lambda,if,cond,else,begin,quote,unquote, quote-spliced,define-syntax-rule,define-formal,define/c,define/.,define//.,syntax-rules,match-lambda,match-case,let,define/memo,quasiquote,delay,lazy,cons~,amb-do,collect,replace,replace-all,replace-repeated,replace-all-repeated,then,define-type,~},
 keywordstyle=\syntaxform,
 classoffset=2,
-keywords={1,2,3,4,5,6,7,8,9,-1,-2,-3,-4,-5,-6,-7,-8,-9,0,42,200,23,3+1/2i,1+i,2-i,3/2,1-i,\#t,\#f,65536,16,25,14,30,12,75,1000,2000,3000,10,1e-5,001,100,36,-inf,+inf,123,144,2/3,20,100/4,100/12,1/2 1e-9, 1e6,+i,-i,0.5e-6,10e-9},
+keywords={1,2,3,4,5,6,7,8,9,-1,-2,-3,-4,-5,-6,-7,-8,-9,0,42,200,23,3+1/2i,1+i,2-i,3/2,1-i,\#t,\#f,65536,16,25,14,30,12,75,1000,2000,3000,10,1e-5,001,100,36,-inf,+inf,123,144,2/3,20,100/4,100/12,1/2 1e-9, 1e6,+i,-i,0.5e-6,10e-9,0.1},
 keywordstyle=\constantstyle,
 classoffset=0,
 commentstyle=\schemecomment,

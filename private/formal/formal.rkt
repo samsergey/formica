@@ -82,12 +82,13 @@
       [(cons n m) (append (make-predicate-rules id n) (make-predicate-rules id m))]
       [else '()])))
 
+
 ;;--------------------------------------------------------------------------------
 ;; The definition of formal functions
 ;;--------------------------------------------------------------------------------
 (define-syntax (define-formal stx)
   
- (syntax-case stx (.. ?)
+  (syntax-case stx (.. ?)
     [(_ (id n)) 
      ; compile-time syntax check
      (unless (symbol? (syntax-e #'id)) 
@@ -118,13 +119,25 @@
               (syntax-id-rules ()
                 [(id x (... ...)) (part:#%app (hold 'id n) x (... ...))]
                 [id (hold 'id n)]))
-            (define-syntax id:
+            (define-syntax (id: stx)
               ; the contracts for formal applications
-              (syntax-rules (..)
-                [(id: c ..) (cons/c 'id (listof c))]
-                [(id: c (... ...)) (procedure-reduce-arity
-                                    (list/c 'id c (... ...))
-                                    n)]))
+              (syntax-case stx (.. ?)
+                [(id: c (... ...) (? x (... ...))) 
+                 (with-syntax ([((oc (... ...)) (... ...)) 
+                                (add-optional (syntax->list #'(c (... ...)))
+                                              (syntax->list #'(x (... ...))))])
+                   #'(procedure-rename 
+                      (or/c (id: oc (... ...)) (... ...))
+                      (string->symbol (format "~a" '(id: c (... ...) (? x (... ...)))))))]
+                [(id: c ..) #'(procedure-rename                               
+                               (cons/c 'id (listof c))
+                               (string->symbol (format "~a" '(id: c ..) )))]
+                [(id: c (... ...) x ..) #'(procedure-rename                                           
+                                           (foldr cons/c (listof x) (list 'id c (... ...)))
+                                           (string->symbol (format "~a" '(id: c (... ...) x ..))))]
+                [(id: c (... ...)) #'(procedure-rename 
+                                      (list/c 'id c (... ...))
+                                      (string->symbol (format "~a" '(id: c (... ...)))))]))
             ; the predicate for formal applications
             (define id?
               (match-lambda predicate-rules ... (_ #f)))
@@ -146,15 +159,25 @@
          [id: (datum->syntax #'id str: #'id)]
          [f #'(contract (.->. cntr ... id?) (hold 'id) 'id 'id 'id #f)])
         #'(begin             
-            (define-syntax id:
+            (define-syntax (id: stx)
               ; the contracts for formal applications
-              (syntax-rules (.. ?)
-                [(id: c (... ...) (? x)) (or/c (id: c (... ...))
-                                               (id: c (... ...) x))]
-                [(id: c ..) (cons/c 'id (listof c))]
-                [(id: c (... ...) x ..) (flat-contract
-                                         (foldr cons/c (listof x) (list 'id c (... ...))))]
-                [(id: c (... ...)) (list/c 'id c (... ...))]))
+              (syntax-case stx (.. ?)
+                [(id: c (... ...) (? x (... ...))) 
+                 (with-syntax ([((oc (... ...)) (... ...)) 
+                                (add-optional (syntax->list #'(c (... ...)))
+                                              (syntax->list #'(x (... ...))))])
+                   #'(procedure-rename 
+                      (or/c (id: oc (... ...)) (... ...))
+                      (string->symbol (format "~a" '(id: c (... ...) (? x (... ...)))))))]
+                [(id: c ..) #'(procedure-rename                               
+                               (cons/c 'id (listof c))
+                               (string->symbol (format "~a" '(id: c ..) )))]
+                [(id: c (... ...) x ..) #'(procedure-rename                                           
+                                           (foldr cons/c (listof x) (list 'id c (... ...)))
+                                           (string->symbol (format "~a" '(id: c (... ...) x ..))))]
+                [(id: c (... ...)) #'(procedure-rename 
+                                      (list/c 'id c (... ...))
+                                      (string->symbol (format "~a" '(id: c (... ...)))))]))
             
             (define (id? x)
               ; the predicate for formal applications
@@ -192,11 +215,25 @@
                (syntax-id-rules ()
                  [(id x (... ...)) (part:#%app (hold 'id) x (... ...))]
                  [id (hold 'id)]))
-             (define-syntax id:
+             (define-syntax (id: stx)
                ; the contracts for formal applications
-               (syntax-rules (..)
-                 [(id: c ..) (cons/c 'id (listof c))]
-                 [(id: c (... ...)) (list/c 'id c (... ...))]))
+               (syntax-case stx (.. ?)
+                 [(id: c (... ...) (? x (... ...))) 
+                  (with-syntax ([((oc (... ...)) (... ...)) 
+                                 (add-optional (syntax->list #'(c (... ...)))
+                                               (syntax->list #'(x (... ...))))])
+                    #'(procedure-rename 
+                       (or/c (id: oc (... ...)) (... ...))
+                       (string->symbol (format "~a" '(id: c (... ...) (? x (... ...)))))))]
+                 [(id: c ..) #'(procedure-rename                               
+                                (cons/c 'id (listof c))
+                                (string->symbol (format "~a" '(id: c ..) )))]
+                 [(id: c (... ...) x ..) #'(procedure-rename                                           
+                                            (foldr cons/c (listof x) (list 'id c (... ...)))
+                                            (string->symbol (format "~a" '(id: c (... ...) x ..))))]
+                 [(id: c (... ...)) #'(procedure-rename 
+                                       (list/c 'id c (... ...))
+                                       (string->symbol (format "~a" '(id: c (... ...)))))]))
              ; the predicate for formal applications
              (define id? 
                (match-lambda
@@ -205,6 +242,11 @@
              ; new predicate in the list of functions declared to be formal
              (add-to-formals id?))))]
     [(_ ids ...) #'(begin (define-formal ids) ...)]))
+
+(define-for-syntax (add-optional s xlist)
+  (reverse 
+   (for/fold ([res (list s)]) ([x (in-list xlist)])
+     (cons (append (car res) (list x)) res))))
 
 ;;--------------------------------------------------------------------------------
 ;; The predicate that returns #t for the formal applications

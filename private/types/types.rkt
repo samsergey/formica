@@ -86,20 +86,20 @@
     ; parameterized type
     [(_ (name A ...) expr ...) 
      #'(define (name A ...)
-         (flat-named-contract 
+         (coerce-flat-contract 
           (cons 'name (map (λ (x) (or (object-name x) x)) (list A ...)))
           (λ (x) (or (is x (flat-contract expr)) ...))))]
     ; primitive type or type product
     [(_ name expr) 
      #'(define name 
          (procedure-rename 
-          (flat-named-contract 'name expr) 
+          (coerce-flat-contract 'name expr) 
           'name))]
     ; type sum
     [(_ name expr ...) 
      #'(define name 
          (procedure-rename
-          (flat-named-contract 
+          (coerce-flat-contract 
            'name
            (flat-rec-contract name (or/c expr ...))) 
           'name))]))
