@@ -37,7 +37,7 @@
  or and
  ; functions
  xor
- different? eq? equal? almost-equal? ≈
+ different? eq? equal? almost-equal? ≈ ≥ ≤
  (contract-out
   (any-args (-> unary? Fun))
   (all-args (-> unary? Fun))

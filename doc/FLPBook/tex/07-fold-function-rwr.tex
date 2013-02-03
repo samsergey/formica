@@ -32,7 +32,7 @@
       (cons h t) --> ($f$ h ($F$ t))))
 \end{SchemeCode}
 \noindent%
-Отличаются У этих трёх функций только $f$ и~$x_0$:
+Отличаются у этих трёх функций только $f$ и~$x_0$:
 
 \begin{center}
 \begin{threeparttable}
@@ -205,12 +205,13 @@ arrow (c . (b . (a . '())))
 \fun{from-digits}{digit-list base}~--- возвращает целое число в десятичной системе исчисления, состоящее из~цифр, перечисленных в~списке \lex{digit-list}, используя основание \lex{base}. Если основание не задано, функция должна использовать десятичную систему.
 \begin{Specification}
 (test 
-  (from-digits '(1 2 3))     123  ;основание 10
-  (from-digits '(1 0 0) 2)   4)   ;основание 2
+  (from-digits '(1 2 3))   ==> 123  ;основание 10
+  (from-digits '(1 0 0) 2) ==> 4)   ;основание 2
 \end{Specification}
 \end{Assignment}
 
 \section{Абстракция структурной~рекурсии}%
+\index{абстракция!структурной рекурсии}%
 Мы увидели, что через свёртку можно выразить множество разнообразных функций, обрабатывающих списки. Такая универсальность не случайна. Вспомним, как определяется абстрактный тип для списков:
 \begin{SchemeCode}
 (define-type List 
@@ -236,18 +237,15 @@ arrow (c . (b . (a . '())))
 Нам необходимо описать обработку базового случая \s{0} и произведения \s{(+ 1 Nat)}:
 \begin{Definition}
 (:: nat-fold ((Nat A -> A) A Nat -> A)
-  (define/c (fold-nat f x0)
+  (define/c (nat-fold f x0)
     (/. 0 --> x0
-        (+ 1 x) --> (f (+ 1 x) (nat-fold f x0 x)))))
+        (+ 1 x) --> (f x (nat-fold f x0 x)))))
 \end{Definition}
-
-\begin{example}{%
-Посмотрим, как работает эта функция:}
+Посмотрим, как работает эта функция:
 \REPLin{(define-formal f g)}
 \REPL
   {(fold-nat f 'x0 3))}
   {'(f 3 (f 2 (f 1 x0)))}
-\end{example}
 
 Использование свёртки увеличивает модульность программы, гарантирует завершаемость и корректность обработки данных принадлежащих к алгебраическим типам.
 
@@ -255,9 +253,9 @@ arrow (c . (b . (a . '())))
 \index{свёртка!дерева}
 В~самом общем случае, любые заквотированные выражения представляют собой списки списков, то есть, древообразные структуры, или просто \emph{деревья}. Структуру такого дерева можно показать следующим образом: в~узлах находится конструктор \s{cons}, а~листьями являются атомы. На левом рисунке показано дерево, соответствующее выражению \s{'((a (b)) (c d e))}.
 \begin{center}\label{fig:tree}
-  \includegraphics[width=0.43\textwidth]{../figures/tree1.jpg}
+  \includegraphics[width=0.41\textwidth]{../figures/tree1.jpg}
   \qquad
-  \includegraphics[width=0.43\textwidth]{../figures/tree4.jpg}
+  \includegraphics[width=0.41\textwidth]{../figures/tree4.jpg}
 \end{center}
 
 Так как \s{cons}~--- бинарная функция, из каждого узла может выходить только две ветви. Такие деревья называются \emph{бинарными}. 
@@ -271,14 +269,14 @@ arrow (c . (b . (a . '())))
 \end{Definition}
 
 Имея выражение для типа, можно сразу дать определение свёртки для него, описав, что делать с каждым слагаемым, и организуя рекурсивные вызовы для рекурсивных множителей в произведении типов:
-\fnindex{foldt}
+\fnindex{tree-fold}
 \begin{Definition}[emph={f,g,a,l,r}]
-(:: foldt ((A A -> A) (Any -> A) A (BTree Any) -> A)
- (define/c (foldt f g $x_0$)
+(:: tree-fold ((A A -> A) (Any -> A) A (BTree Any) -> A)
+ (define/c (tree-fold f g $x_0$)
    (/. '() --> $x_0$
-       (cons l r) --> (f (foldt f g $x_0$ l) 
-                        (foldt f g $x_0$ r))
-       a --> (g a)))
+       (cons l r) --> (f (tree-fold f g $x_0$ l) 
+                        (tree-fold f g $x_0$ r))
+       a --> (g a))))
 \end{Definition}
 Результат свёртки выражения \s{'((a (b)) (c d e))} показан на правом рисунке на стр.~\pageref{fig:tree}.
 
@@ -287,54 +285,51 @@ arrow (c . (b . (a . '())))
 \begin{SchemeCode}
 (:: leaf-count ((BTree Any) -> Nat)
  (define leaf-count 
-   (foldt + (const 1) 0)))
+   (tree-fold + (const 1) 0)))
 
 (:: leaf-total ((BTree Num) -> Num)
  (define leaf-total 
-   (foldt + id 0)))
+   (tree-fold + id 0)))
 \end{SchemeCode}
 
 Вот --- определение функции \si{flatten}, возвращающей список листьев дерева:
 \begin{SchemeCode}
 (:: flatten ((BTree Any) -> list?)
  (define flatten 
-   (foldt append list '())))
+   (tree-fold append list '())))
 \end{SchemeCode}
 
 \newpage
 \begin{Assignment}
-а) Выразите через свёртку натуральных чисел \s{fold-nat} функцию \s{accumulate} (Задание \ref{accumulate}, стр.~\pageref{accumulate}).
+а) Выразите через свёртку натуральных чисел \s{nat-fold} функцию \s{accumulate} (Задание \ref{accumulate}, стр.~\pageref{accumulate}) и наоборот.
 
 б) Напишите определения следующих универсальных функций для деревьев:
 
  \fun{leaf-map}{f tree}~--- возвращает дерево \lex{tree}, ко~всем листьям которого применяется функция \lex{f}.
 \begin{Specification}
-; leaf-map :: (A \arrow B) Tree(A) \arrow Tree(B)
 (test 
-  (leaf-map sqr '((1 2) (3 (4))))  '((1 4) (9 (16)))
-  (leaf-map odd? '(1 (2 (3) 2) 1)) '(#t (#f (#t) #f) #t)
-  (leaf-map list '(1 2 3))         '((1) (2) (3))
-  (leaf-map list 3)                '(3)
-  (leaf-map sqr '(1. 12))          '(1. 144))
+  (leaf-map sqr '((1 2) (3 (4))))  ==> '((1 4) (9 (16)))
+  (leaf-map odd? '(1 (2 (3) 2) 1)) ==> '(#t (#f (#t) #f) #t)
+  (leaf-map list '(1 2 3))         ==> '((1) (2) (3))
+  (leaf-map list 3)                ==> '(3)
+  (leaf-map sqr '(1. 12))          ==> '(1. 144))
 \end{Specification}
 
  \fun{find}{test? tree}~--- возвращает список листьев дерева \lex{tree}, которые удовлетворяют условию \lex{test?}.
 \begin{Specification}
-; find :: (A \arrow Bool) Tree(A) \arrow [A]
 (test 
-  (find odd? '(1 (2 (3) 2) 1))   '(1 3 1)
-  (find odd? '(1 2 3 4))         '(1 3)
-  (find zero? '(1 (2 (3) 2) 1))  '())
+  (find odd? '(1 (2 (3) 2) 1))   ==> '(1 3 1)
+  (find odd? '(1 2 3 4))         ==> '(1 3)
+  (find zero? '(1 (2 (3) 2) 1))  ==> '())
 \end{Specification}
 
 \fun{filter}{test? tree}~--- возвращает дерево с~той же структурой, что и~\lex{tree}, но в~котором присутствуют только листья, удовлетворяющие условию \lex{test?}.
 \begin{Specification}
-; filter :: (A \arrow Bool) Tree(A) \arrow Tree(A)
 (test 
-  (filter odd? '(1 2 3 4))              '(1 3)
-  (filter odd? '((1 2) (3 4)))          '((1) (3))
-  (filter odd? '(0 (1 (2 (3 4)))))      '((1 ((3))))
-  (filter negative? '(0 (1 (2 (3 4))))) '(((())))
+  (filter odd? '(1 2 3 4))              ==> '(1 3)
+  (filter odd? '((1 2) (3 4)))          ==> '((1) (3))
+  (filter odd? '(0 (1 (2 (3 4)))))      ==> '((1 ((3))))
+  (filter negative? '(0 (1 (2 (3 4))))) ==> '(((())))
   (filter odd? 6)  #f)
 \end{Specification}
 
@@ -350,7 +345,7 @@ arrow (c . (b . (a . '())))
 \begin{Assignment}
 \label{as:set}Дайте определения следующим операциям теории множеств:
 
-\fun{element?}{x s}~--- определяет является ли \lex{x} элементом множества \lex{s};
+\fun{element?}{x s}~--- определяет, является ли \lex{x} элементом множества \lex{s};
 
 \fun{set}{lst}~--- возвращает множество элементов списка \lex{lst};
 

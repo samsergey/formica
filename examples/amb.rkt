@@ -1,42 +1,40 @@
-#lang formica
-(define-type amb)
+#lang formica/regular-app
+(define-type Amb)
 
-#;(:: real-sqrt (Real -> amb?)
-    (define (real-sqrt x)
-      (if (< x 0)
-          (amb)
-          (let ([y (sqrt x)]) 
-            (amb y (- y))))))
-
-#;(:: amb-plus (amb? amb? -> amb?)
+(:: amb-plus (Amb? Amb? -> Amb?)
   (define/. amb-plus
-    (amb x ...) (amb y ...) --> (apply amb (append x y))))
+    (Amb x ...) (Amb y ...) --> (apply return (append x y))))
 
-(:: amb-plus (amb? amb? -> amb?)
-    (define/. amb-plus
-      (amb) x --> x
-      (amb x _ ...) _ --> (amb x)))
-
-(:: amb-bind (amb? (Any -> amb?) -> amb?)
+(:: amb-bind (Amb? (Any -> Amb?) -> Amb?)
   (define/. amb-bind
-    (amb x ...) f --> (foldr (∘ amb-plus f) (amb) x)))
+    (Amb x ...) f --> (foldr (∘ amb-plus f) (Amb) x)))
 
-(define-syntax amb-do
-  (syntax-rules (<-)
-    [(amb-do (x <- A) res) (amb-bind A (λ (x) res))]
-    [(amb-do A res) (amb-bind A (λ (_) res))]
-    [(amb-do A B ... res) (amb-do A (amb-do B ... res))]))
+(define-monad Amb-monad
+  #:type Amb
+  #:return (λ x (apply Amb (remove-duplicates x)))
+  #:bind amb-bind
+  #:mplus amb-plus
+  #:mzero (Amb))
 
+(define-type (Just Any))
+(define-type Maybe?
+  Just?
+  'Nothing)
 
-(:: guard (Any -> amb?)
-  (define (guard p)
-    (if p (amb null) (amb))))
+(define-monad Maybe
+  #:type Maybe?
+  #:return (λ (x . y) (Just x))
+  #:bind (/. (Just x) f --> (f x)
+             'Nothing f --> 'Nothing)
+  #:mplus (/. 'Nothing x --> x
+              x 'Nothing --> x
+              x y --> x)
+  #:mzero 'Nothing)
 
-(:: real-sqrt (Real -> amb?)
-  (define (real-sqrt x)
-    (amb-do (guard (>= x 0))
-            (y <- (amb (sqrt x)))
-            (amb y (- y)))))
+(define (real-sqrt x)
+  (do (guard (>= x 0))
+      (y <- (return (sqrt x)))
+      (return y (- y))))
 
-
+(using Maybe (real-sqrt 4))
 

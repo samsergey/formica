@@ -23,7 +23,7 @@
              [almost-equal?* almost-equal?])
  ; functions
  different?
- xor ≈
+ xor ≈ ≥ ≤
  (contract-out
   (any-args (-> procedure? procedure?))
   (all-args (-> procedure? procedure?))
@@ -138,3 +138,7 @@
     [(x y . z) (and (not (equal? x y)) 
                     (andmap (λ (t) (different? x t)) z)
                     (apply different? y z))]))
+
+(define ≥ >=)
+(define ≤ <=)
+
