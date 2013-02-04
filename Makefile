@@ -4,9 +4,9 @@ all: eng
 
 clean:
 	rm -f plt/*.plt
-	rm -f doc/*/*.html
-	rm -f doc/*/*.js
-	rm -f doc/*/*.css
+	# rm -f doc/*/*.html
+	# rm -f doc/*/*.js
+	# rm -f doc/*/*.css
 	rm -f *.*~ */*.*~ */*/*.*~
 	rm -f *.bak */*.bak */*/*.bak
 	find -name compiled | xargs rm -fr
