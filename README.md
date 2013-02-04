@@ -38,17 +38,16 @@ Formica provides
 4. easy to use contract-based type system,
 5. a lot of functional programming tools: memoization, generalized composition, combinators and functionals. 
 
-For a brief tour and complete documentation see the `formica.pdf` file in the 'doc' directory.
-
 Here are the main features of the Formica dialect.
 
 Formal functions
 ----------------
 
 This declares f to be a formal function: a function which doesn’t perform any calculations, but just shows it’s application.
-(define-formal f)
 
 ```Scheme
+(define-formal f)
+
 (f 'x)     ==>  '(f x)
 (f 1 2 3)  ==>  '(f 1 2 3)
 ```
@@ -106,7 +105,7 @@ Following rewrites 1 to 2, 3 to 4, and 4 to 1 repeatedly, until result stops cha
 (r '(1 2 (3 4)))  ==>  '(2 2 (2 2))
 ```
 
-A rewriting-based definition of the map function:
+A rewriting-based definition of the `map` function:
 
 ```Scheme
 (define/. map
@@ -134,14 +133,14 @@ Here is a simple implementation of symbolic η- and β-reduction rules for λ-ca
 Simplified syntax for partial application and point-free definitions
 --------------------------------------------------------------------
 
-Once you have written in Haskell or on the blackboard:
+Once you have written in *Haskell* or on the blackboard:
 
-```Haskel
+```Haskell
 map f = fold (cons . f) []
-map (* 2) [1 2 3]
+map (* 2) [1, 2, 3]
 ```
 
-it is difficult not to try it in Formica:
+it is difficult not to try it in *Formica*:
 
 ```Scheme
 (define/c (map f) (foldr (∘ cons f) '()))
@@ -153,7 +152,7 @@ it is difficult not to try it in Formica:
 Contract-based dynamical typing system
 --------------------------------------
 
-Being not so strict as in Typed Racket or Haskell, the contract typing system gives a flavor of rich type systems used in functional programming, including abstract, algebraic and polymorphic types.
+Being not so strict as in *Typed Racket* or *Haskell*, the contract typing system gives a flavor of rich type systems used in functional programming, including abstract, algebraic and polymorphic types.
 
 ```Scheme
 (define-type Int-or-X
@@ -170,12 +169,6 @@ Being not so strict as in Typed Racket or Haskell, the contract typing system gi
     (/. (cons h t) --> (cons (f h) (map f t)))))
  
 (map (* 2) '(1 21 4 3))  ==>  '(2 42 8 6)
-(map cons '(1 21 4 3))   
-==>  
-Signature violation!
- expected a procedure that accepts 1 mandatory argument without any keywords
- given: #<procedure:cons>
- signature:  map :: (parametric->/c (a b) ...)
 ```
 
 Building abstract algebraic types with formal functions:
@@ -187,7 +180,7 @@ A formal constructor of a pair:
  
 (kons 1 (kons 2 3))  ==>  '(kons 1 (kons 2 3))
 ```
-A constructor of the klist:
+A constructor of the `klist`:
 
 ```Scheme
 (define (klist . x)
@@ -208,7 +201,7 @@ A recursive type declaration:
 (is (kons 1 (kons 2 3)) klist?)  ==>  #f
 ```
 
-Some functions to operate with klists:
+Some functions to operate with `klist`s:
 
 ```Scheme
 (define/c (kfold f x0)
@@ -227,9 +220,9 @@ Some functions to operate with klists:
 Monads
 ------
 
-Monads give a very useful and elegant abstraction for sequential computations, allowing one to go deep into semantics, keeping syntax simple. Even though Racket doesn’t need monads to perform sequential computations, side effects or set comprehension, it is useful to have monads as a powerful tool for designing new semantic constructions.
+Monads give a very useful and elegant abstraction for sequential computations, allowing one to go deep into semantics, keeping syntax simple. Even though *Racket* doesn’t need monads to perform sequential computations, side effects or set comprehension, it is useful to have monads as a powerful tool for designing new semantic constructions.
 
-An example of sequential computations in the List monad:
+An example of sequential computations in the `List` monad:
 
 ```Scheme
 (do [x <- '(1 2 3)]
@@ -253,9 +246,9 @@ Monads allow to define generic functions and then to use them with different sem
     [c <-: (sqrt (- (sqr a) (sqr b)))]
     (integer? c)
     (> b c)))
- ```
+```
 
-One may use find-triples in eager List monad, or in lazy Stream monad, without changing a single line in the function definition.
+One may use find-triples in eager `List` monad, or in lazy `Stream` monad, without changing a single line in the function definition.
 
 ```Scheme
 (using List (find-triples (in-range 20)))   
@@ -274,7 +267,7 @@ One may use find-triples in eager List monad, or in lazy Stream monad, without c
 (stream-ref t 50)  ==>  '(100 80 60)
 ```
 
-As in Haskell, it is possible to use pattern-matching in list-comprehensions
+As in *Haskell*, it is possible to use pattern-matching in list-comprehensions
 
 ```Scheme
 (define primitive-triples
@@ -288,7 +281,7 @@ As in Haskell, it is possible to use pattern-matching in list-comprehensions
 '((5 4 3) (13 12 5) (17 15 8) (25 24 7) (29 21 20))
 ```
 
-Consider a classical problem: A farmer buys 100 animals for $100.00. The animals include at least one cow, one pig, and one chicken, but no other kind. If a cow costs $10.00, a pig costs $3.00, and a chicken costs $0.50, how many of each did he buy?
+Consider a classical problem: *A farmer buys 100 animals for $100.00. The animals include at least one cow, one pig, and one chicken, but no other kind. If a cow costs $10.00, a pig costs $3.00, and a chicken costs $0.50, how many of each did he buy?*
 
 Here is a declarative program solving this problem:
 
@@ -317,7 +310,7 @@ If cow costs $8 there would be 6 possible solutions:
   ((6 cows) (2 pigs) (92 chickens)))
 ```
 
-It is easy to create new monads. Here is an example of defining the parameterized monad (Maybe a).
+It is easy to create new monads. Here is an example of defining the parameterized monad `(Maybe a)`.
 
 ```Scheme
 (define-formal Just)
@@ -338,9 +331,14 @@ It is easy to create new monads. Here is an example of defining the parameterize
                 x       _ --> x)))
  
 (using (Maybe Int)
-  (bind (Just 2) >>= (lift sqr) >>= (lift (* 2))))  ==>  '(Just 8)
+  (bind (Just 2) >>= (lift sqr) >>= (lift (* 2))))  
+==>  
+'(Just 8)
+  
 (using (Maybe Int)
-  (bind 'Nothing >>= (lift sqr) >>= (lift (* 2))))  ==> 'Nothing
+  (bind 'Nothing >>= (lift sqr) >>= (lift (* 2))))  
+==> 
+'Nothing
 ```
 
 This monad could be used to perform guarded computations:
@@ -357,10 +355,11 @@ This monad could be used to perform guarded computations:
 '(Nothing (Just 2) (Just 1.7320508075688772) (Just 3) Nothing Nothing)
 ```
 
-Formica provides monadic functions and operators, such as lift/m, compose/m, fold/m, map/m, etc.
-(using-monad List)
- 
+Formica provides monadic functions and operators, such as `lift/m`, `compose/m`, `fold/m`, `map/m`, etc.
+
 ```Scheme
+(using-monad List)
+
 (lift/m or '(#t #f) '(#t #f))  ==>  '(#t #t #t #f)
 
 (fold/m (λ (x y) `((+ ,x ,y) (- ,x ,y))) 0 '(1 2 3))
@@ -430,11 +429,13 @@ The generalized composition is associative and has identity function as a neutra
 ```Scheme
 (equal? ((∘ (∘ b u) b) 'a 'b 'c)
         ((∘ b (∘ u b)) 'a 'b 'c)
-        (b (u (b 'a 'b)) 'c))      ==>  #t
+        (b (u (b 'a 'b)) 'c))      
+==>  #t
 
 (equal? ((∘ id b) 1 2)
         ((∘ b id) 1 2)
-        (b 1 2))         ==>  #t
+        (b 1 2))         
+==>  #t
 ```
 Some purely functional definitions
 
