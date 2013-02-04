@@ -49,28 +49,37 @@ The contract for a pair of values, which belong to types @racket[_c1] and @racke
   (is (cons 1 'x) (cons: Num Num))
   (is (cons 1 (cons 2 'x)) (cons: Num (cons: Num Sym)))]
 
-@defform*[
-[(list: c ...) 
- (list: c ..)] #:contracts [(c Type)]]
-The contract for lists.
+@defform[(list: c ...)]
+The contract for lists of elements having types specified by contracts @(racket _c ...). The contract specification could be given as a domain of a funtion.
 
-@itemize{ @item{@racket[(list: c ...)] contract for a list with fixed number of elements.
-                 The number of elements must be equal to a number of contracts @racket[_c ...] and all elements
-                 must satisfy corresponding contracts.
-                 @interaction[#:eval formica-eval
-                   (is '(1 2) (list: 1 2))
-                   (is '(1 2) (list: Num Num))
-                   (is '(1 2) (list: Num Sym))
-                   (is '(1 2 -3) (list: positive? positive? negative?))]}
-          @item{@racket[(list: c ..)] contract for list of elements, satisfying contract @racket[c].
-                 @interaction[#:eval formica-eval
-                   (is '(1 2) (list: Num ..))
-                   (is '(1 1 1 1) (list: 1 ..))
-                   (is '(1 2 x 4 5) (list: Num ..))
-                   (is '(1 2 30 1) (list: positive? ..))]}}
+Examples:
 
-@defform/none[(f: c ...) #:contracts [(c Type)]]
-contract for the @tech{formal application} of function @racket[_f]. Similar to @racket[list:] combinator.
+@interaction[#:eval formica-eval
+ (is '(1 2) (list: 1 2))
+ (is '(1 2) (list: Num Num))
+ (is '(1 2) (list: Num Sym))
+ (is '(1 2 -3) (list: positive? positive? negative?))]
+
+@interaction[#:eval formica-eval
+ (is '(1 2) (list: Num ..))
+ (is '(1 1 1 1) (list: 1 ..))
+ (is '(1 2 x 4 5) (list: Num ..))
+ (is '(1 2 30 1) (list: positive? ..))]
+                                       
+@interaction[#:eval formica-eval
+ (is '(1 2 3) (list: 1 Num ..))
+ (is '(1 2 2 2) (list: 1 2 ..))
+ (is '(1 2 x 4 5) (list: 1 2 Num ..))]
+
+@interaction[#:eval formica-eval
+ (is '(1) (list: 1 (? 2 3)))
+ (is '(1 2) (list: 1 (? 2 3)))
+ (is '(1 2 3) (list: 1 (? 2 3)))
+ (is '(1 2 3 4) (list: 1 (? 2 3)))]
+
+
+@defform/none[(f: dom ...)]
+contract for the @tech{formal application} of function @racket[_f] having domain specified by @(racket _dom). Similar to @racket[list:] combinator.
 
 All contracts defined in the @racket[racket/contract] module also could be used. 
 

@@ -37,7 +37,7 @@
     (compose f f)))
 
 (test-case 
- "polymorphic-types"
+ "polymorphic-types 1"
  (check-equal? ((dup (+ 2)) 4) 8)
  (check-equal? (((dup dup) (+ 2)) 4) 12))
 
@@ -46,7 +46,7 @@
     (λ x (f (apply g x)))))
 
 (test-case 
- "polymorphic-types"
+ "polymorphic-types 2"
  (check-equal? ((comp length append) '(1 2 3) '(x y z))  6)
  (check-equal? ((comp sqr -) 1 2 3)  16))
 
@@ -59,7 +59,7 @@
   (define/c (map f) (fold (∘ cons f) '())))
 
 (test-case 
- "polymorphic-types"
+ "polymorphic-types 3"
  (check-equal? (fold ($ 'f 2) 'x0 '(1 2 3))  '(f 1 (f 2 (f 3 x0))))
  (check-equal? (fold + 0 '(1 2 3))  6)
  (check-equal? (map ($ f 1) '(a b c))  '((f a) (f b) (f c)))
@@ -188,6 +188,21 @@
  (check-true (is 'x (\\ 0)))
  (check-true (is 'x (\\ Sym 'y 'z 't)))
  (check-false (is 'x (\\ Sym 'y 'z 'x))))
+
+
+(test-case
+ "Declaration of lists"
+ (check-true (is '(1 2 3) (list: 1 2 3)))
+ (check-true (is '(1 2 3) (list: 1 2 3 ..)))
+ (check-true (is '(1 2 3) (list: Int ..)))
+ (check-true (is '(1) (list: 1 (? 2 3))))
+ (check-true (is '(1 2) (list: 1 (? 2 3))))
+ (check-true (is '(1 2 3) (list: 1 (? 2 3))))
+ (check-false (is '(1 2 3 x) (list: 1 2 3)))
+ (check-false (is '(1 2 3 x) (list: 1 2 3 ..)))
+ (check-false (is '(1 2 3 x) (list: Int ..)))
+ (check-false (is '(1 2 3) (list: 1 (? 2 4))))
+ (check-false (is '(1 2 3 4) (list: 1 (? 2 3)))))
 
 (test-case
  "Declaration of abstract types"

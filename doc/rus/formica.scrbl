@@ -11,10 +11,17 @@
      (sandbox '(require formica))
      sandbox))
 
+@(define book-path (collection-file-path "FLPBook.pdf" "formica/doc/FLPBook"))
+@(define imag-path (collection-file-path "FLPBook.png" "formica/doc/FLPBook"))
 
 @title[#:style '(toc) #:date "2013" #:version "1.0"]{Formica: Функционально-ориентированный язык программирования}
 
 @author{С.Б. Самойленко, П.В. Хан}
+
+@margin-note{Книга @nonbreaking{С.Б. Самойленко,} @nonbreaking{П.В. Хан} 
+                   @(linebreak)
+                   @hyperlink[book-path]{@(image imag-path #:scale 0.5)}
+                   @hyperlink[book-path]{Функциональное программирование в примерах и задачах.}}
 
 @smaller{Справочное руководство по функциям и формам диалекта Formica.}
 

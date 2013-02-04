@@ -148,6 +148,33 @@
 
 (current-blame-format show-blame-error)
 
+;;;=================================================================
+;;; list:
+;;;=================================================================
+(define-syntax list:
+  (syntax-id-rules (.. ?)
+    [(_ c ... (? x ...)) (opt-list: c ... (? x ...))]
+    [(_ c ..) ((procedure-rename listof 'list:) c)]
+    [(_ c ... x ..) (rename (foldr cons/c ((procedure-rename listof 'list:) x) (list c ...)) '(list: c ... x ..))]
+    [(_ c ...) ((procedure-rename list/c 'list:) c ...)]
+    [list: (procedure-rename list/c 'list:)]))
+
+
+(define-for-syntax (add-optional s xlist)
+  (reverse 
+   (for/fold ([res (list s)]) ([x (in-list xlist)])
+     (cons (append (car res) (list x)) res))))
+
+(define-syntax-rule (rename expr name)
+  (procedure-rename expr (string->symbol (format "~a" name))))
+
+(define-syntax (opt-list: stx)
+  (syntax-case stx (?)
+    [(_ c ... (? x ...)) 
+     (with-syntax ([((oc ...) ...) 
+                    (add-optional (syntax->list #'(c ...))
+                                  (syntax->list #'(x ...)))])
+       #'(rename (or/c ((procedure-rename list/c 'list:) oc ...) ...) '(list: c ... (? x ...))))]))
 
 ;;;=================================================================
 ;;; aliaces
@@ -179,11 +206,5 @@
 (define-type (Fun/c name)
   (and/c procedure?
          (λ(f)(eq? (object-name f) name))))
-
-(define-syntax list:
-  (syntax-id-rules (..)
-    [(_ c ..) ((procedure-rename listof 'list:) c)]
-    [(_ c ...) ((procedure-rename list/c 'list:) c ...)]
-    [list: (procedure-rename list/c 'list:)]))
 
 (define cons: (procedure-rename cons/c 'cons:))

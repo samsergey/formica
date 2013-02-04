@@ -54,99 +54,111 @@
      [(symbol? f) f]
      [else (object-name g)])))
 
+(define-for-syntax (bad-rhs stx)
+  (raise-syntax-error 'define/c 
+                      "the right-hand side of point-free definition is not a function constructor, nor the function call"
+                      stx))
+
 ;;;=============================================================
 ;;; point-free definitions
 ;;;=============================================================
-(define-syntax define/c
-  (syntax-rules (match-lambda match-lambda* case-lambda lambda λ 
-                              /. //. replace replace-all
-                              replace-repeated replace-all-repeated 
-                              quote quasiquote)
+(define-syntax (define/c stx)
+  (syntax-case stx (match-lambda match-lambda* case-lambda lambda λ 
+                                 /. //. replace replace-all
+                                 replace-repeated replace-all-repeated 
+                                 quote quasiquote begin)
     [(_ (f x ... (a ...)) body) 
      (raise-syntax-error #f
                          "default or key values in point-free definition"
                          #'(define/c (f x ... (a ...)) body))]
     
     [(_ (f x ...) (/. y ...)) 
-     (define/c/. (f x ...) (/. y ...))]
+     #'(define/c/. (f x ...) (/. y ...))]
     
     [(_ (f x ...) (//. y ...)) 
-     (define/c//. (f x ...) (//. y ...))]
+     #'(define/c//. (f x ...) (//. y ...))]
     
     [(_ (f x ...) (replace y ...)) 
-     (define/c/. (f x ...) (replace y ...))]
+     #'(define/c/. (f x ...) (replace y ...))]
     
     [(_ (f x ...) (replace-all y ...)) 
-     (define/c/. (f x ...) (replace-all y ...))]
+     #'(define/c/. (f x ...) (replace-all y ...))]
     
     [(_ (f x ...) (replace-repeated y ...)) 
-     (define/c//. (f x ...) (replace-repeated y ...))]
+     #'(define/c//. (f x ...) (replace-repeated y ...))]
     
     [(_ (f x ...) (replace-all-repeated y ...)) 
-     (define/c//. (f x ...) (replace-all-repeated y ...))]
+     #'(define/c//. (f x ...) (replace-all-repeated y ...))]
     
     [(_ (f x ...) (lambda () body ...)) 
-     (define (f x ...) body ...)]
+     #'(define (f x ...) body ...)]
     
     [(_ (f x ...) (lambda (y ...) body ...)) 
-     (define (f x ... y ...) body ...)]
+     #'(define (f x ... y ...) body ...)]
     
     [(_ (f x ...) (lambda y body ...)) 
-     (define (f x ... . y) body ...)]
+     #'(define (f x ... . y) body ...)]
     
     [(_ (f x ...) (λ var body ...)) 
-     (define/c (f x ...) (lambda var body ...))]
+     #'(define/c (f x ...) (lambda var body ...))]
     
     [(_ (f x ...) (match-lambda
                     [y body] ...)) 
-     (define f 
-       ((inherit-name 'f)
-        (match-lambda* 
-          [(list x ... y) body] ...)))]
+     #'(define f 
+         ((inherit-name 'f)
+          (match-lambda* 
+            [(list x ... y) body] ...)))]
     
     [(_ (f x ...) (match-lambda* 
                     [(list y ...) body] ...)) 
-     (define f 
-       ((inherit-name 'f)
-        (match-lambda* 
-          [(list x ... y ...) body] ...)))]
+     #'(define f 
+         ((inherit-name 'f)
+          (match-lambda* 
+            [(list x ... y ...) body] ...)))]
     
     [(_ (f x ...) (case-lambda
                     [(y ...) body ...] ...)) 
-     (define f 
-       ((inherit-name 'f)
-        (case-lambda 
-          [(x ... y ...) body ...] ...)))]
+     #'(define f 
+         ((inherit-name 'f)
+          (case-lambda 
+            [(x ... y ...) body ...] ...)))]
     
     [(_ (f x ...) (case-lambda
                     [(y ...) body ...] ... [z rest-body ...])) 
-     (define f 
-       ((inherit-name 'f)
-        (case-lambda 
-          [(x ... y ...) body ...] ...
-          [(x ... . z) rest-body ...])))]
+     #'(define f 
+         ((inherit-name 'f)
+          (case-lambda 
+            [(x ... y ...) body ...] ...
+            [(x ... . z) rest-body ...])))]
     
-    [(_ (f x ...) (quote y ...)) (error 'define/c (format "the right-hand side of point-free definition is not a function constructor, nor the function call\n given ~a" (quote y ...)))]
-    [(_ (f x ...) (quasiquote y ...)) (error 'define/c (format "the right-hand side of point-free definition is not a function constructor, nor the function call\n given ~a" (quasiquote y ...)))]
+    ;[(_ f (quote b ...)) (bad-rhs stx)]
     
-    [(_ (f x ...) (g y ...)) (begin
-                               (unless (procedure? g) (raise-syntax-error 
-                                                       'define/c 
-                                                       "the right-hand side of definiton is not a function application"
-                                                       #'(g y ...)))
-                               (define f 
-                                 ((inherit-name 'f)
-                                  (procedure-reduce-arity
-                                   (λ (x ... . r)
-                                     (apply g (append (list y ...) r)))
-                                   (arity-add (reduce-arity (procedure-arity g) (length '(y ...)))
-                                              (length '(x ...)))))))]
+    ;[(_ f (quasiquote b ...)) (bad-rhs stx)]
     
-    [(_ f b) (begin 
-               (unless (procedure? b)
-                 (error 'define/c (format "the right-hand side of point-free definition is not a function constructor, nor the function call\n given ~a" b)))
-               (define/c f (b)))]
+    ;[(_ f (begin b ...)) (bad-rhs stx)]
     
-    [(_ f a b ...) (raise-syntax-error #f 
-                                       "multiple expressions in point-free definition"
-                                       #'(define/c f a b ...))]))
+    [(_ (f x ...) (g y ...)) #'(begin
+                                 (unless (procedure? g) 
+                                   (raise-syntax-error 
+                                    'define/c 
+                                    "the right-hand side of definiton is not a function application"
+                                    #'(g y ...)))
+                                 (define f 
+                                   ((inherit-name 'f)
+                                    (procedure-reduce-arity
+                                     (λ (x ... . r)
+                                       (apply g (append (list y ...) r)))
+                                     (arity-add (reduce-arity (procedure-arity g) (length '(y ...)))
+                                                (length '(x ...)))))))]
+    
+    [(_ f b) (if (not (symbol? (syntax-e #'b)))
+                 (bad-rhs stx)
+                 #'(begin 
+                     (unless (procedure? b) 
+                       (raise-syntax-error 
+                                    'define/c 
+                                    "the right-hand side of definiton is not a function nor a function application"
+                                    #'b))
+                     (define/c f (b))))]
+    
+    [(_ f a b ...) (bad-rhs stx)]))

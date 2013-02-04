@@ -31,27 +31,19 @@
 
 @section[#:tag "contracts:functions"]{Определение сигнатур}
 
-
-@defform*[#:literals (? ..)
-   [(-> dom ... range)
-    (-> dom ... rest .. range)
-    (-> dom ... (? opt ...) range)
-    (-> dom ... (? opt ...) rest .. range)] #:contracts [(dom Type)
-                                                         (range Type)
-                                                         (opt Type)
-                                                         (rest Type)]]
-Определяет сигнатуру для функции, имеющую область определения @racket[_dom ...], 
-область значений @racket[_range], и, возможно, необязательные аргументы
-@racket[_opt ...]. Для вариадических функций тип для
-списка аргументов определяется контрактом @racket[_rest] и следующим за ним ключевым
-символом @litchar{..} .
+@defform/subs[#:literals (? ..)
+   (-> dom range)
+   ([dom (type ...)
+         (type ... rest ..)
+         (type ... (? opt ...))
+         (type ... (? opt ...) rest ..)])]
+         
+Определяет сигнатуру для функции, имеющую область определения @racket[_dom], 
+область значений @racket[_range]. Типы необязательных аргументв перечисляются в форме @racket[(? _opt ...)]. Для вариадических функций тип списка аргументов определяется контрактом @racket[_rest] и следующим за ним ключевым символом @litchar{..} .
 
 Может быть введён в инфиксной форме:
 
-@racketblock[(dom ... -> range)
-             (dom ... rest .. -> range)
-             (dom ... (? opt ...) -> range)
-             (dom ... (? opt ...) rest .. -> range)]
+@racketblock[(_dom -> _range)]
 
 @section[#:tag "contracts:declaration"]{Объявление сигнатуры функции}
 

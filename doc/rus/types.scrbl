@@ -130,12 +130,12 @@ Formica --- язык со @emph{строгой динамической типи
 @section[#:tag "type:definition"]{Определение типов}
 
 @defform*[[(define-type name)
-           (define-type (name c ...))
+           (define-type (name dom ...))
            (define-type name c ...)
            (define-type (name x ...) c ...)] #:contracts ([c Type] [x Type])]
 Определяет именованные абстрактные, алгебраические или параметризованные типы.
 @itemize{@item{@racket[(define-type name)] --- определяет абстрактный тип-контейнер, в виде формальной функции.}
-         @item{@racket[(define-type (name c ...))] --- определяет алгебраический тип, являющийся произведением типов @racket[_c ...].}
+         @item{@racket[(define-type (name dom ...))] --- определяет алгебраический тип, являющийся произведением типов, в виде формальной функции с областью определеня @racket[_dom]. Область определения указывается так же, как и в @seclink["contracts:functions"]{сигнатурах}.}
          @item{@racket[(define-type name c ...)] --- определяет алгебраический тип, являющийся суммой типов @racket[_c ...].}
          @item{@racket[(define-type (name x ...) c ...)] --- определяет параметризованный тип.}}
 
@@ -166,29 +166,36 @@ Formica --- язык со @emph{строгой динамической типи
   (is (cons 1 'x) (cons: Num Num))
   (is (cons 1 (cons 2 'x)) (cons: Num (cons: Num Sym)))]
 
-@defform*[
-[(list: c ...) 
- (list: c ..)] #:contracts [(c Type)]]
-контракт для @elemref["t:list"]{списка}.
+@defform[(list: dom)]
+контракт для @elemref["t:list"]{списка}, имеющего элементы, принадлежащие области @racket[_dom], которая указывается так же, как область определения в @seclink["contracts:functions"]{сигнатурах}.
 
-@itemize{ @item{@racket[(list: c ...)] контракт для списка фиксированным числом элементов.
-                 Число элементов списка должно совпадать с числом контрактов @racket[_c ...] и все эти 
-                 элементы должны соответствовать своим контрактам.
-                 @interaction[#:eval formica-eval
-                   (is '(1 2) (list: 1 2))
-                   (is '(1 2) (list: Num Num))
-                   (is '(1 2) (list: Num Sym))
-                   (is '(1 2 -3) (list: positive? positive? negative?))]}
-          @item{@racket[(list: c ..)] контракт для списка, все элементы которого удовлетворяют контракту @racket[c].
-                 @interaction[#:eval formica-eval
-                   (is '(1 2) (list: Num ..))
-                   (is '(1 1 1 1) (list: 1 ..))
-                   (is '(1 2 x 4 5) (list: Num ..))
-                   (is '(1 2 30 1) (list: positive? ..))]}}
+Примеры:
 
-@defform/none[(f: c ...) #:contracts [(c Type)]]
-контракт для аппликации 
-@elemref["t:formal"]{формальной функции} @racket[_f]. Подобен контракту @racket[list:].
+@interaction[#:eval formica-eval
+ (is '(1 2) (list: 1 2))
+ (is '(1 2) (list: Num Num))
+ (is '(1 2) (list: Num Sym))
+ (is '(1 2 -3) (list: positive? positive? negative?))]
+
+@interaction[#:eval formica-eval
+ (is '(1 2) (list: Num ..))
+ (is '(1 1 1 1) (list: 1 ..))
+ (is '(1 2 x 4 5) (list: Num ..))
+ (is '(1 2 30 1) (list: positive? ..))]
+                                       
+@interaction[#:eval formica-eval
+ (is '(1 2 3) (list: 1 Num ..))
+ (is '(1 2 2 2) (list: 1 2 ..))
+ (is '(1 2 x 4 5) (list: 1 2 Num ..))]
+
+@interaction[#:eval formica-eval
+ (is '(1) (list: 1 (? 2 3)))
+ (is '(1 2) (list: 1 (? 2 3)))
+ (is '(1 2 3) (list: 1 (? 2 3)))
+ (is '(1 2 3 4) (list: 1 (? 2 3)))]
+
+@defform/none[(f: dom) #:contracts [(c Type)]]
+контракт для аппликации @elemref["t:formal"]{формальной функции} @racket[_f], имеющей область определения @racket[_dom]. Область определения указывается так же как и для контракта @racket[list:].
 
 Полный список определённых в языке контрактов
 можно найти в  документации к модулю @racket[racket/contract]. 
@@ -379,7 +386,7 @@ Formica --- язык со @emph{строгой динамической типи
 
 Для проверки типов можно определить @elemref["t:signature"]{сигнатуру} функции:
 @def+int[#:eval formica-eval
-   (:: total ((Tree Num) → Num)
+   (:: total ((Tree Num) -> Num)
      (define total (tfold + 0 id)))
    (total A)
    (total B)]

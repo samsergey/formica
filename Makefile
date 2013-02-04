@@ -27,7 +27,7 @@ pack-rus: clean
 	cat plt/info-rus.rkt > info.rkt
 	rm -f plt/*.plt
 	cd ..; \
-raco pack --plt-name "Formica 1.0" --replace --at-plt ++setup formica formica-rus.plt formica formica/doc/rus; \
+raco pack --plt-name "Formica 1.0" --replace --at-plt ++setup formica formica-rus.plt formica formica/doc/rus formica/doc/FLPBook/FLPBook.pdf formica/doc/FLPBook/FLPBook.png; \
 mv -f formica-rus.plt formica/plt/; \
 cd formica
 

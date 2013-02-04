@@ -15,21 +15,16 @@
 
 The @deftech{function signature} defines the domain and range of a function. On the other hand the signature plays role of the contract: it defines preconditions and postconditions for a function in terms of predicates which should be satisfied by arguments and a result. In case of pure functions this two interpretations of signature coincide. 
 
-@defform*[#:literals (? ..)
-   [(-> dom ... range)
-    (-> dom ... rest .. range)
-    (-> dom ... (? opt ...) range)
-    (-> dom ... (? opt ...) rest .. range)] #:contracts [(dom Type)
-                                                         (range Type)
-                                                         (opt Type)
-                                                         (rest Type)]]
-Defines a function signature, having domain @racket[_dom ...] and range  @racket[_range]. Function may have optional arguments @racket[_opt ...]. For @tech{variadic} functions the type of arguments is given by the contract @racket[_rest] followed by symbol @litchar{..} .
+@defform/subs[#:literals (? ..)
+   (-> dom range)
+   ([dom (type ...)
+         (type ... rest ..)
+         (type ... (? opt ...))
+         (type ... (? opt ...) rest ..)])]
+Defines a function signature, having domain @racket[_dom] and range  @racket[_range]. Function may have optional arguments @racket[_opt]. For @tech{variadic} functions the type of arguments is given by the contract @racket[_rest] followed by symbol @litchar{..} .
 
 Could be used in the infix notation:
-@racketblock[(dom ... -> range)
-             (dom ... rest .. -> range)
-             (dom ... (? opt ...) -> range)
-             (dom ... (? opt ...) rest .. -> range)]
+@racketblock[(dom -> range)]
 
 
 @defform[(:: f sig fun-def)]
