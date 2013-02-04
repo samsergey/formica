@@ -14,15 +14,11 @@ Formica is based on the [Racket programming language](http://planet.racket-lang.
 Why Racket?
 -----------
 
-  a) Racket is elegant, transparent and flexible: it is possible to build from scratch and show any of programming concepts and paradigms, such as abstract data types and type systems, objects, continuations, monads, concurrency; logic, concatenative, reactive, combinatorial programming and so on.
-  
-  b) The symbols are first-class objects, so one may see how the program works.
-
-  c) It is very easy to create a domain specific dialect or a language.
-  
-  d) Racket has brilliant IDE DrRacket which is very friendly for newcommers.
-
-  e) Racket has active community, reach libraries and provides a lot of real-life instruments for GUI development, web tools etc. It is possible to give short and *really* interesting examples during the course: parsers, translators, web-servers, symbolic computations, elements of AI etc.
+1. Racket is elegant, transparent and flexible: it is possible to build from scratch and show any of programming concepts and paradigms, such as abstract data types and type systems, objects, continuations, monads, concurrency; logic, concatenative, reactive, combinatorial programming and so on.
+2. The symbols are first-class objects, so one may see how the program works.
+3. It is very easy to create a domain specific dialect or a language.
+4. Racket has brilliant IDE DrRacket which is very friendly for newcommers.
+5. Racket has active community, rich libraries and provides a lot of real-life instruments for GUI development, web tools etc. It is possible to give short and *really* interesting examples during the course: parsers, translators, web-servers, symbolic computations, elements of AI etc.
 
 Why Formica?
 ------------
@@ -36,15 +32,11 @@ What is inside?
 
 Formica provides
  
- 1) a concept of **formal functions** and **abstract rewriting systems**,
- 
- 3) simplified syntax for **partial applications** and **tacit notation**,
-  
- 4) handy tools to operate with **monads**,
- 
- 5) easy to use contract-based type system,
- 
- 6) a lot of functional programming tools: memoization, generalized composition, combinators and functionals. 
+1. a concept of **formal functions** and **abstract rewriting systems**,
+2. simplified syntax for **partial applications** and **tacit notation**,
+3. handy tools to operate with **monads**,
+4. easy to use contract-based type system,
+5. a lot of functional programming tools: memoization, generalized composition, combinators and functionals. 
 
 For a brief tour and complete documentation see the `formica.pdf` file in the 'doc' directory.
 
@@ -55,27 +47,33 @@ The Formica can be interpreted by the `racket` program or in the DrRacket IDE. I
 
 To build and install Formica in the DrRacket environment follow one of possible ways:
  
- 1) For users
+1. For users
 
- Download the `formica.plt` package from this repository and install it using File|Install .plt-file in the DrRacket menu, or using 'raco setup'.
+   Download the `formica.plt` package from this repository and install it using File|Install .plt-file in the DrRacket menu, or using 'raco setup'.
 
- 2) For possible contributors
+2. For possible contributors
 
- Clone this repository to any working directory using 
- ```
- git clone https://github.com/samsergey/formica.git
- ``` 
- and then install package using
- ```
- make install
- ``` 
- or manually by running 
- ```
- raco link formica
- raco setup formica
- [sudo] raco setup -U
- ```
- from the parent folder of the working one.
+   Clone this repository to any working directory using
+
+   ```
+   git clone https://github.com/samsergey/formica.git
+   ``` 
+
+   and then install package using
+
+   ```
+   make install
+   ``` 
+
+   or manually by running 
+
+   ```
+   raco link formica
+   raco setup formica
+   [sudo] raco setup -U
+   ```
+
+   from the parent folder of the working one.
 
 ---------------------------------------------------------------
 
