@@ -1,0 +1,49 @@
+#lang formica
+(define-type Amb)
+
+
+(:: amb-apply ((Any -> Amb?) Amb? -> Amb?)
+  (define/. amb-apply
+    f (Amb x ...) --> (foldr (composition amb-plus f) (Amb) x)))
+
+(:: amb-plus (Amb? Amb? -> Amb?)
+  (define/. amb-plus
+    (Amb x ...) (Amb y ...) --> (apply Amb (append x y))))
+
+(:: amb-bind (Amb? (Any -> Amb?) -> Amb?)
+  (define amb-bind (flipped amb-apply)))
+
+(define-monad Amb-monad
+#:type Amb?
+#:return Amb
+#:bind amb-bind
+#:mplus amb-plus
+#:mzero (Amb))
+
+(define-type (Just Any))
+(define-type Maybe? Just? 'Nothing)
+(define-monad Maybe
+  #:type Maybe?
+  #:return (λ (x . y) (Just x))
+  #:bind (/. (Just x) f --> (f x)
+             'Nothing f --> 'Nothing)
+  #:mplus (/. 'Nothing x --> x
+              x 'Nothing --> x
+              x _ --> x)
+  #:mzero 'Nothing)
+
+(using Amb-monad
+  (do (x <- (Amb 1 2 3))
+      (guard (odd? x))
+      (z <- (Amb  10 20 30))
+      (Amb (+ x z))))
+
+(define (real-sqrt x)
+  (do (guard (> x 0))
+      [y <- (return (sqrt x))]
+      (return y (- y))))
+
+(using Amb-monad (real-sqrt 4))
+(using Amb-monad (real-sqrt -4))
+(using Maybe (real-sqrt 4))
+(using Maybe (real-sqrt -4))
