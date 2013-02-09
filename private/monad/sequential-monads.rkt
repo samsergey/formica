@@ -22,6 +22,7 @@
 
 (provide 
  amb
+ !
  (contract-out 
   ; Monoid
   (Monoid (->* (#:return (->* () #:rest list? listable?)
@@ -106,7 +107,7 @@
                ; the for-cycle is over
                (yield 'end-of-stream)))
   ; return a stream, produced by the generator
- (in-producer g 'end-of-stream))
+ (sequence->stream (in-producer g 'end-of-stream)))
 
 (define (stream-concatenate s1 s2) 
   (define g 
@@ -122,11 +123,7 @@
 
 (define-monad Stream 
   (Monoid
-   #:type (flat-named-contract 
-           'listable?
-           (and/c sequence? 
-                  (not/c integer?)
-                  (not/c list?)))
+   #:type listable?
    #:return make-stream
    #:map stream-concat-map
    #:mplus stream-concatenate))
@@ -134,6 +131,8 @@
 (define (stream-take s n)
   (for/list ([i (in-range n)]
              [x (in-stream s)]) x))
+
+(define ! stream->list)
 
                      
 

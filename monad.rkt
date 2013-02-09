@@ -48,7 +48,8 @@
 
 (require "private/monad/sequential-monads.rkt"
          racket/set
-         racket/stream)
+         racket/stream
+         racket/list)
 (provide 
  amb
 
@@ -75,5 +76,6 @@
   (amb-union (-> listable? listable? stream?)))
 
  (all-from-out racket/set
-               racket/stream))
+               racket/stream
+               racket/list))
 (using-monad List)
