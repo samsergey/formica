@@ -99,7 +99,7 @@
  (define (c-root n x)
    (collect (make-polar ρ φ)
      [ρ <-: (expt (magnitude x) (/ 1 n))]
-     [k <- (in-range 0 n)]
+     [k <- (range 0 n)]
      [φ <-: (+ (angle x) (* 2 pi k (/ 1 n)))]))
  
  ;; set the tolerance for tests

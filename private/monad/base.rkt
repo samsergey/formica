@@ -12,10 +12,12 @@
          (only-in "../../types.rkt" 
                   check-result 
                   check-argument
-                  check-type)
+                  check-type
+                  Any)
          racket/match
          racket/stream
          racket/contract
+         racket/promise
          (only-in "../../formal.rkt" formal?)
          (for-syntax racket/base racket/syntax ))
 
@@ -28,6 +30,7 @@
          using
          check-result
          ; functional forms
+         type
          return
          bind
          mzero
@@ -62,7 +65,7 @@
   (error "do: no matching clause for" x))
 
 (define (monad-zero? v)
-  (and (monad? v) (not (eq? 'undefined (monad-mzero v)))))
+  (and (monad? v) (not (eq? 'undefined (force (monad-mzero v))))))
 
 (define (monad-plus? v)
   (and (monad-zero? v) (not (eq? 'undefined (monad-mplus v)))))
@@ -82,10 +85,10 @@
      (case-lambda
        [() (return)]
        [(x) (cond
-             [(undefined? x) x]
-             [type (check-result 'return type (return x) 
-                                 "using" (using-monad))]
-             [else (return x)])]
+              [(undefined? x) x]
+              [type (check-result 'return type (return x) 
+                                  "using" (using-monad))]
+              [else (return x)])]
        [(x y . z) (if type 
                       (check-result 'return type (apply return x y z) 
                                     "using" (using-monad))
@@ -177,11 +180,17 @@
   (if (monad-plus? (using-monad))
       expr
       (error id (format "~a is not of a type <monad-plus?>" (using-monad)))))
+
 ;;;==============================================================
 ;;; Syntax sugar for monadic functions
 ;;; functions return, bind, mzero and mplus
 ;;; are syntax forms in order to track the current monad
 ;;;==============================================================
+;; type of values in the current monad
+(define-syntax type
+  (syntax-id-rules () 
+    [type (or (monad-type (using-monad)) Any)]))
+
 ;; return in the current monad
 (define-syntax return
   (syntax-id-rules ()
@@ -212,7 +221,7 @@
 ;; mzero of the current monad
 (define-syntax mzero
   (syntax-id-rules ()
-    [mzero (when-monad-zero (monad-mzero (using-monad)) 'mzero)]))
+    [mzero (when-monad-zero (force (monad-mzero (using-monad))) 'mzero)]))
 
 ;; mplus of the current monad
 (define-syntax mplus
@@ -297,16 +306,16 @@
               'composed/m)]
     [(_ f g) #'(procedure-rename
                 (procedure-reduce-arity
-                (λ x (bind (apply return x) >>= g >>= f))
-                (procedure-arity g))
+                 (λ x (bind (apply return x) >>= g >>= f))
+                 (procedure-arity g))
                 'composed/m)]
     [(_ f ... g) (with-syntax ([(s ...) (local-expand 
-                                       #'(seq f ... g) 'expression #f)])
-                 #'(procedure-rename
-                    (procedure-reduce-arity
-                     (λ x (bind (apply return x) >>= s ...))
-                     (procedure-arity g))
-                    'composed/m))]))
+                                         #'(seq f ... g) 'expression #f)])
+                   #'(procedure-rename
+                      (procedure-reduce-arity
+                       (λ x (bind (apply return x) >>= s ...))
+                       (procedure-arity g))
+                      'composed/m))]))
 
 (define-syntax (seq stx)
   (syntax-case stx (>>=)
@@ -370,7 +379,9 @@
 (define listable?
   (flat-named-contract 
    'listable?
-   (and/c sequence? (not/c formal?))))
+   (and/c sequence? 
+          (not/c integer?) 
+          (not/c formal?))))
 
 ;; monadic sequencing
 (define sequence/m
@@ -387,3 +398,7 @@
 ;; monadic sum
 (define (sum/m lst) 
   (when-monad-plus (foldr mplus mzero lst) 'sum/m))
+
+
+
+
