@@ -18,6 +18,9 @@
          racket/math
          racket/list)
 
+(provide Inferred
+         using-monad*)
+
 (define monad-types (make-parameter (list (cons Any Id))))
 
 (using-monad List)
@@ -40,39 +43,12 @@
   #:mzero (delay/name (inferred-mzero))
   #:failure (λ (x) ((inferred-failure) x)))
 
-(define (using-monad* M . Ms)
-  (monad-types
-   (foldr (λ (m res) (cons (cons (using m type) m) res))
-          (list (cons Any Id))
-          (cons M Ms)))
-  (using-monad Inferred))
-
-(require formica/examples/Maybe)
-(define-type m)
- (define-monad M
-   #:type m?
-   #:return m
-   #:bind (/. (m x) f --> (f x)))
-
-(using-monad* List Stream (Maybe Int) M)
- 
-(module+ test
-  
-  (bind 7 >>= (lift (curry * 2)) >>= (lift sqr))
-  (bind (Just 7) >>= (lift (curry * 2)) >>= (lift sqr))
-  (bind (list 7) >>= (lift (curry * 2)) >>= (lift sqr))
-  (bind (m 7) >>= (lift (curry * 2)) >>= (lift sqr))
-  (sequence->list (bind (in-value 7) >>= (lift (curry * 2)) >>= (lift sqr)))
-  
-  (define (isqrt x)
-    (let next ([s 0] [r 0])
-      (cond
-        [(> s x) mzero]
-        [(= s x) (mplus (return r) (return (- r)))]
-        [else (next (+ s (* 2 r) 1) (+ 1 r))])))
-  
-  (bind (Just 16) >>= isqrt >>= isqrt)
-  (bind (list 16) >>= isqrt)
-  (bind (range 100) >>= isqrt)
-  (stream->list (bind (in-range 10) >>= isqrt))
-  )
+(define using-monad*
+  (case-lambda
+    [() (using-monad)]
+    [(M) (using-monad M)]
+    [(M . Ms)  (monad-types
+                (foldr (λ (m res) (cons (cons (using m type) m) res))
+                       (list (cons Any Id))
+                       (cons M Ms)))
+               (using-monad Inferred)]))

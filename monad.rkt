@@ -33,7 +33,7 @@
   (monad? predicate/c)
   (monad-zero? predicate/c)
   (monad-plus? predicate/c)
-  (using-monad (parameter/c monad?))
+  #;(using-monad (parameter/c monad?))
   (lift (-> Fun Fun))
   (fold/m (-> binary? Any list? Any))
   (filter/m (-> unary? list? Any))
@@ -78,4 +78,11 @@
  (all-from-out racket/set
                racket/stream
                racket/list))
-(using-monad List)
+
+(require "private/monad/inferrence.rkt")
+(provide 
+ (contract-out 
+  (Inferred monad-plus?))
+  (rename-out (using-monad* using-monad)))
+
+(using-monad* List Stream)

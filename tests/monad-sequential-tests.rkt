@@ -6,7 +6,7 @@
          "../types.rkt"
          rackunit)
 
-#;(test-case
+(test-case
  "listable? tests"
  (check-false (listable? 3))
  (check-false (listable? 0)) 
