@@ -49,7 +49,7 @@ In the @racket[Id] monad @racket[do] form works like @racket[match-let*] form wi
 @defproc[(Monoid [#:return ret (Any ... → listable?)]
                    [#:mplus seq-append (listable? listable? → listable?)]
                    [#:map seq-append-map ((Any → listable?) listable? → listable?) mplus-map]) monad-plus?]
-Returns a monad which performs computations which may return zero or more then one possible results as a sequence (list, stream, set etc.). This is an abstraction of, monads operating with monoids. Monads @racket[List], @racket[Stream] and @racket[Amb] are defined through the @racket[Monoid] function.
+Returns a monad which performs computations which may return zero or more then one possible result as a sequence (list, stream, set etc.). This is an abstraction of monads operating with monoids. Monads @racket[List], @racket[Stream] and @racket[Amb] are defined through the @racket[Monoid] function.
 
 Definition:
 @codeblock{return = _ret
@@ -86,7 +86,7 @@ Using @racket[Monoid] it is easy to define monads working with different types o
     [x <- (format "~a(~a)" x (char->integer x))]))]
 
 @defproc[(listable? (v Any)) Bool]
-Returns @racket[#t] if @racket[v] is a sequence but not the @tech{formal application}.
+Returns @racket[#t] if @racket[v] is a sequence, except for @tech{formal applications} or integers.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -123,26 +123,8 @@ The @racket[List] monad is used for list comprehension and in order to perform c
 
 Definition:
 @codeblock{List = (Monoid #:return list
-                          #:mplus concatenate
-                          #:map concat-map)}
-
-@defproc[(concatenate (s listable?) ...) list?]
-Returns a result of @racket[_s ...] concatenation in a form of a list.
-
-Examples:
-@interaction[#:eval formica-eval
-  (concatenate '(1 2 3) '(a b c))
-  (concatenate 4 (stream 'a 'b 'c))
-  (concatenate (in-set (set 'x 'y 'z)) (in-value 8))
-  (concatenate 1 2 3)]
-
-@defproc[(concat-map (f (Any → n/f-list?)) (s listable?)) list?]
-Applies @racket[_f] to elements of @racket[_s] and returns the concatenation of results.
-
-Examples:
-@interaction[#:eval formica-eval
-  (concat-map (λ (x) (list x (- x))) '(1 2 3))
-  (concat-map (λ (x) (list x (- x))) 4)]
+                          #:mplus append
+                          #:map append-map)}
 
 @bold{Examples}
 
@@ -166,39 +148,24 @@ Examples of list comprehension
    (odd? x)
    (< x y))]
 
-In place of a list any sequence could be used, but only a list is produced.
-@interaction[#:eval formica-eval
- (collect (cons x y) [(x y) <<- 10] (< 4 (+ (sqr x) (sqr y)) 9))]
-
-@interaction[#:eval formica-eval
- (lift/m cons 2 "abc")]
-
 Forms @racket[do] and @racket[collect] in the @racket[List] monad work like @racket[for*/list] form:
 @interaction[#:eval formica-eval
- (do [x <- 2] 
-     [y <- "abc"] 
+ (do [x <- '(1 2)] 
+     [y <- '(a b c)] 
      (return (cons x y)))
- (for*/list ([x 2] 
-             [y "abc"]) 
+ (for*/list ([x '(1 2)] 
+             [y '(a b c)]) 
    (cons x y))]
 
 @interaction[#:eval formica-eval
  (collect (cons x y) 
-   [x <- 3] 
+   [x <- '(1 2 3)] 
    (odd? x) 
-   [y <- "abc"])
- (for*/list ([x 3] 
+   [y <- '(a b c)])
+ (for*/list ([x '(1 2 3)] 
              #:when (odd? x)
-             [y "abc"]) 
+             [y '(a b c)]) 
    (cons x y))]
-
-It is easy to combine parallel and usual monadic processing:
-@interaction[#:eval formica-eval
-  (using List
-    (do [a <- '(x y z)]
-        [(list x y) <- (zip "AB" 
-                            (in-naturals))]
-      (return (f a x y))))]
 
 The use of monad @racket[List] goes beyond the simple list generation. The main purpose of monadic computations is to provide computation with functions which may return more then one value (or fail to produce any). The examples of various applications of this monad could be found in the @filepath{nondeterministic.rkt} file in the @filepath{examples/} folder.
 
@@ -220,7 +187,7 @@ Examples:
   (stream->list 
    (stream-concatenate '(1 2 3) '(a b c)))
   (stream->list 
-   (stream-concatenate 4 (stream 'a 'b 'c)))
+   (stream-concatenate (in-range 4) (stream 'a 'b 'c)))
   (stream-ref 
    (stream-concatenate (stream 1 (/ 0)) (in-naturals)) 
    0)
@@ -236,7 +203,7 @@ Examples:
   (stream->list 
    (stream-concat-map (λ (x) (stream x (- x))) '(1 2 3)))
   (stream->list 
-   (stream-concat-map (λ (x) (stream x (- x))) 4))
+   (stream-concat-map (λ (x) (stream x (- x))) (in-range 4)))
   (stream-ref 
    (stream-concat-map (λ (x) (stream x (/ x))) '(1 0 3)) 
    0)
@@ -333,7 +300,7 @@ Examples:
   (stream->list 
    (amb-union '(1 2 3) '(2 3 4)))
   (stream->list 
-   (amb-union 4 (amb 'a 'b 'c)))
+   (amb-union (in-range 4) (amb 'a 'b 'c)))
   (stream-ref 
    (amb-union (amb 1 (/ 0)) (in-naturals)) 
    0)
@@ -349,7 +316,7 @@ Examples:
   (stream->list 
    (amb-union-map (lift sqr) '(-3 -2 -1 0 -1 2 3)))
   (stream->list 
-   (amb-union-map (λ (x) (amb x (- x))) 4))
+   (amb-union-map (λ (x) (amb x (- x))) (in-range 4)))
   (stream-ref 
    (amb-union-map (λ (x) (amb x (/ x))) '(1 0 3)) 
    0)

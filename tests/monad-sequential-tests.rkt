@@ -4,7 +4,15 @@
          "../rewrite.rkt"
          "../tools.rkt"
          "../types.rkt"
-         rackunit)
+         rackunit
+         racket/sequence)
+
+(test-case
+ "zip tests"
+ (check-equal? (zip '(a b c) '(1 2 3)) '((a 1) (b 2) (c 3)))
+ (check-equal? (zip '(a b c) '(1 2)) '((a 1) (b 2)))
+ (check-equal? (zip '(a b) '(1 2 3)) '((a 1) (b 2)))
+ (check-equal? (sequence->list (zip '(a b) 3)) '((a 0) (b 1))))
 
 (test-case
  "listable? tests"

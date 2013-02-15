@@ -181,10 +181,10 @@ Examples:
 
 @section{Switching between monads}
 
-All monads share the same syntax for binding and monadic functions. At a given time only one monad, called @deftech{currently used monad} could be used.
+All monads share the same syntax for binding and monadic functions. In any computation sequence only one monad, called @deftech{currently used monad} could be used. The @tech{currently used monad} is defined either by the @(racket using-monad) procedure or if several monads are given by the @(racket using-monad) is determined by the type of the expression invovlved in monadic computations.
 
-@defparam[using-monad m monad?]
-Defines the @tech{currently used monad}.
+@defproc[(using-monad (m monad?) ...) (or/c void? monad?)]
+Defines the set of @tech{currently used monads}.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -193,8 +193,30 @@ Examples:
  (using-monad)]
 
 
+Examples:
+@interaction[#:eval formica-eval
+ (using-monad List M (Maybe Int))
+ (using-monad)]
+
+@interaction[#:eval formica-eval
+ (bind 7 >>= sqrt >>= add1)
+ (bind (m 7) >>= (lift sqrt) >>= (lift add1))
+ (bind (Just 5) >>= (lift sqrt) >>= (lift add1))
+ (bind '(7 5) >>= (lift sqrt) >>= (lift add1))]
+
+Iterative formula for finding integer square roots:
+@def+int[#:eval formica-eval
+ (define (isqrt x)
+   (let next ([s 0] [r 0])
+     (cond
+       [(> s x) mzero]
+       [(= s x) (mplus (return r) (return (- r)))]
+       [else (next (+ s (* 2 r) 1) (+ 1 r))])))
+ (bind '(4) >>= isqrt)
+ (bind (Just 4) >>= isqrt)]
+
 @defform[(using m expr ...) #:contracts ([m monad?])]
-Evaluates @racket[_expr ...] using monad @racket[_m] as @tech{currently used monad}.
+Evaluates @racket[_expr ...] using monad @racket[_m] as the only @tech{currently used monad}.
 
 Examples:
 @interaction[#:eval formica-eval
