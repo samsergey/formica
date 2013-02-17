@@ -13,11 +13,11 @@
   #:return m
   #:bind (/. (m x) f --> (f x)))
 
-(using-monad List Stream (Maybe Int) M)
+(using-monad List M (Maybe Int))
 
 (test-case 
  "binding tests"
-; (check-equal? (bind 7 >>= (lift (curry * 2)) >>= (lift sqr)) 196)
+ (check-equal? (bind 7 >>= (lift (curry * 2)) >>= (lift (+ 1))) 196)
  (check-equal? (bind (Just 7) >>= (lift (curry * 2)) >>= (lift sqr)) (Just 196))
 ; (check-equal? (bind (list 7) >>= (lift (curry * 2)) >>= (lift sqr)) '(196))
  (check-equal? (bind (m 7) >>= (lift (curry * 2)) >>= (lift sqr)) (m 196))

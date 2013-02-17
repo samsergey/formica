@@ -11,7 +11,7 @@
          "base.rkt"
          (only-in "../../tools.rkt" argmap)
          (only-in "../../formal.rkt" formal? n/f-list?)
-         (only-in "../../types.rkt" check-result check-argument)
+         (only-in "../../types.rkt" check-result check-argument \\)
          racket/set
          racket/list
          racket/contract
@@ -23,6 +23,7 @@
 (provide 
  amb
  !
+ zip
  (contract-out 
   ; Monoid
   (Monoid (->* (#:return (->* () #:rest list? listable?)
@@ -30,7 +31,7 @@
                  (#:map (-> (-> any/c listable?) listable? listable?)
                   #:type contract?) monad-plus?))
   (mplus-map (-> (-> any/c listable?) listable? any/c))
-  (zip (->* (listable?) #:rest (listof listable?) (sequence/c list?)))
+  #;(zip (->* ((\\ sequence? formal?)) #:rest (listof (\\ sequence? formal?)) (sequence/c list?)))
   ; List monad
   (List monad-plus?)  
   (concatenate (->* () #:rest (listof listable?) n/f-list?))
@@ -48,8 +49,12 @@
 ;;;===============================================================================
 ;;; general helper functions
 ;;;===============================================================================
-;; the tool for parallel sequencing in the Accumulating monads.
-(define zip (compose in-values-sequence in-parallel))
+;; the tool for parallel sequencing in theaccumulating monads.
+(define (zip . x)
+  (define res (in-values-sequence (apply in-parallel x)))
+  (if (andmap n/f-list? x) 
+     (sequence->list res)
+     res))
 
 ;;;===============================================================================
 ;;; Monoid
@@ -145,8 +150,8 @@
     [(amb x) (stream x)]
     [(amb x y ...) (amb-union (stream x) (amb y ...))]
     ; works once at at input
-    [amb (procedure-rename 
-          (case-lambda 
+    [amb (procedure-rename
+          (case-lambda
             [() empty-stream]
             [(x) (stream x)]
             [(x . y) (amb-union (stream x) y)])
@@ -154,13 +159,13 @@
 
 
 (define (amb-union-map f m) 
-  (define g 
+  (define g
     (generator ()
                ; the set of results
                (define s (set))
                (for* ([x m]
-                      [fx (check-result 
-                           'bind 
+                      [fx (check-result
+                           'bind
                            (flat-named-contract 'stream? (and/c stream? (not/c formal?)))
                            (f x))])
                  (unless (set-member? s fx) 

@@ -181,20 +181,21 @@ Examples:
 
 @section{Switching between monads}
 
-All monads share the same syntax for binding and monadic functions. At a given time only one monad, called @deftech{currently used monad} could be used.
+All monads share the same syntax for binding and monadic functions. In any computation sequence only one monad, called @deftech{currently used monad} could be used. 
 
 @defparam[using-monad m monad?]
 Defines the @tech{currently used monad}.
 
 Examples:
 @interaction[#:eval formica-eval
+ (using-monad List)
  (using-monad)
  (using-monad Id)
  (using-monad)]
 
 
 @defform[(using m expr ...) #:contracts ([m monad?])]
-Evaluates @racket[_expr ...] using monad @racket[_m] as @tech{currently used monad}.
+Evaluates @racket[_expr ...] using monad @racket[_m] as the only @tech{currently used monad}.
 
 Examples:
 @interaction[#:eval formica-eval
@@ -475,12 +476,12 @@ Sequential evaluation of elements of @racket[_s] stream (list).
 Examples:
 @interaction[#:eval formica-eval
  (using List
-   (sequence/m '((a) 3 "bc")))]
+   (sequence/m '((a) (range 3))))]
 
 @interaction[#:eval formica-eval
  (using Stream
    (stream-first 
-    (sequence/m (list '(a) 3 (stream 'x (/ 0))))))]
+    (sequence/m (list '(a) (in-range 3) (stream 'x (/ 0))))))]
 
 @defproc[(map/m [f unary?] [s listable?]) Any]
 Monadic mapping.
